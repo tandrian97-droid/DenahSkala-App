@@ -206,10 +206,29 @@ body.focus #top,body.focus #opts,body.focus #rail,body.focus #status{display:non
 .pc .pt{border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.06),0 8px 20px rgba(16,24,40,.08);transition:transform .15s}
 .pc:active .pt{transform:scale(.97)}
 .pc.newc .pt{color:var(--pri);border-color:#c9d6f5}
-@media (max-width:1150px){#top .ttl{display:none}#top .hl{max-width:none}}
+@media (max-width:1400px){#top .ttl{display:none}#top .hl{max-width:none}}
+@media (max-width:1250px){.tb{min-width:43px}.tb span{font-size:9px}}
 @media (max-width:900px){.tb{min-width:44px}.tb span{display:none}.tb{height:40px}}
 @media (max-width:600px){#rail{top:auto;bottom:70px;transform:none}.rb{width:42px;height:40px}.rb span{display:none}#top .hr .ib[data-a=v3d]{display:none}}
 
+input,textarea,select,[contenteditable]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default}
+input[type=text],input[type=search],textarea{font-size:16px}
+#impbar{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:5;display:none;align-items:center;gap:10px;background:rgba(17,20,24,.88);color:#fff;padding:10px 16px;border-radius:14px;font-size:13px}
+#impbar.show{display:flex}#impbar i{display:block;width:140px;height:4px;border-radius:2px;background:rgba(255,255,255,.2);overflow:hidden}#impbar i b{display:block;height:100%;background:var(--pri);width:0}
+.ncrow{display:none;margin-top:8px;padding:10px;border-radius:12px;background:#f4f6fa}.ncrow.show{display:block}
+.ncrow .cswrow{margin-top:8px}
+.catpick{display:flex;gap:8px;align-items:center}.catpick select{flex:1}
+
+.rb.lk{background:#fff1f2;color:#e11d48}.rb.lk span{color:#e11d48}
+.rngw{display:flex;align-items:center;gap:8px;flex:none}.rng{width:150px;accent-color:var(--pri)}.rngv{font-size:12px;min-width:52px;color:#30343b}
+#backchip{position:absolute;left:12px;top:70px;z-index:3;display:none;height:36px;padding:0 14px;border-radius:12px;background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:var(--sh);font-weight:600;color:var(--pri)}
+#backchip.show{display:block}
+body.focus #backchip{display:none!important}
+.htab{display:flex;flex-direction:column;gap:8px;margin:10px 0}.hrow{display:flex;align-items:center;gap:8px}.hrow b{width:26px}.hrow input{width:84px;height:40px;border:1px solid var(--line);border-radius:10px;padding:0 8px;text-align:right;background:#f8f9fb}.hrow span{color:var(--muted);font-size:13px}
+.atab{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}.atab th,.atab td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right}.atab th:first-child,.atab td:first-child{text-align:left}.atab th{color:var(--muted);font-weight:600;font-size:12px}.atab .tot td{font-weight:700;border-bottom:0}
+.abig{font-size:17px;color:var(--ink)!important}.abig b{color:var(--pri);font-size:22px}
+.tedit{overflow:auto;max-height:55vh}.tedit table{border-collapse:collapse}.tedit td{padding:2px}.tedit input{width:120px;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 8px;background:#f8f9fb;font-size:14px}.tedit input.th{font-weight:700}.tedit input.tw{width:120px;background:#eef2ff;text-align:center}
+.rb span{max-width:56px;text-align:center;line-height:1.05}
 </style>
 </head>
 <body>
@@ -223,6 +242,8 @@ body.focus #top,body.focus #opts,body.focus #rail,body.focus #status{display:non
   <div id="hint"></div>
   <div id="rail"></div>
   <div id="ctx"></div>
+  <button id="backchip"></button>
+  <div id="impbar"><span id="impmsg">Mengimpor…</span><i><b id="impprog"></b></i></div>
   <div id="panel"></div>
   <div id="cebar"></div>
   <div id="drawer">
@@ -234,11 +255,12 @@ body.focus #top,body.focus #opts,body.focus #rail,body.focus #status{display:non
 <div id="status"></div>
 <div id="v3d"><div class="v3bar"><button class="btn" data-v3="close">‹ Kembali</button><b id="v3t">3D</b><span class="v3sp"></span>
 <button class="chip" data-v3="iso">Isometri</button><button class="chip" data-v3="top">Atas</button><span class="lbl">Tinggi dinding</span><input type="text" inputmode="decimal" id="v3h" class="v3in"><span class="lbl">m</span>
-<button class="chip" data-v3="png">⤓ Gambar</button><button class="chip on" data-v3="dxf">⤓ 3D untuk SketchUp/AutoCAD</button></div><div id="v3c"></div><div class="v3hint">1 jari = putar · 2 jari = geser & zoom</div></div>
+<button class="chip" data-v3="ceil" id="v3cb">Plafon</button><button class="chip" data-v3="png">⤓ Gambar</button><button class="chip on" data-v3="dxf">⤓ 3D untuk SketchUp/AutoCAD</button></div><div id="v3c"></div><div class="v3hint">1 jari = putar · 2 jari = geser & zoom</div></div>
 <div id="modal"><div class="dlg" id="dlg"></div></div>
 <div id="toast"></div>
 <input type="file" id="file" accept=".json,application/json" style="display:none">
 <input type="file" id="photo" accept="image/*" style="display:none">
+<input type="file" id="impf" style="display:none">
 
 <script>
 'use strict';
@@ -270,7 +292,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 
 function newPage(name,paper='A3',orient='L',scale=100){return{id:uid(),name,paper,orient,scale,kop:'klasik',objs:[],view:null}}
 function newProject(name){return{id:uid(),name:name||'Proyek Baru',pages:[newPage('Denah Lantai 1')],cur:0,info:{studio:'',client:'',address:'',drawnBy:'',note:'',date:''},u:Date.now()}}
-let S={tool:'line',ortho:'90',snap:true,grid:true,hand:true,shape:'auto',scrib:'on',tapSel:true,dimNew:true,dimBlk:false,wallH:3000,svRot:0,cats:[],
+let S={pgMode:'one',pipeT:'ab',pipeD:'½"',tblH:2.5,meSt:'eks',meLast:{},eraseR:12,rectC:false,lockAll:false,tapGest:true,opLbl:'full',ceilShow:true,ceilZ:2800,opLast:{},v3ceil:false,tool:'line',ortho:'90',snap:true,grid:true,hand:true,shape:'auto',scrib:'on',tapSel:true,dimNew:true,dimBlk:false,wallH:3000,svRot:0,cats:[],
   showLen:true,unit:'m',step:50,lineC:'#16191d',lineW:0.35,penC:'#16191d',penW:0.5,hlC:'#fde047',hlW:5,
   wallT:150,wallFill:'#c5c9cf',wallPat:'none',wallPc:'#16191d',pat:'ker60',patS:1,patC:'#6b7078',area:true,
   txtH:3.5,txtC:'#16191d',txtF:'sans',hw:'off',blk:'pintu1',blkRot:0,offD:150,seenHelp:false,recentC:[],kopTpls:[],lastBackup:0,su:0,
@@ -349,7 +371,7 @@ function wallGeo(ob){const walls=ob.filter(o=>o.t==='wall'),G=new Map(),tol=2;
             const Q={x:P1.x+dw.x*lam,y:P1.y+dw.y*lam};mus.push((Q.x-o.a.x)*go.d.x+(Q.y-o.a.y)*go.d.y)}
           go.cuts[so].push([Math.min(...mus),Math.max(...mus)]);done=true;break}}
       if(done){if(E==='a')g.capA=false;else g.capB=false}}});
-  ob.forEach(o=>{if(o.t==='blk'&&o.host){const g=G.get(o.host);if(g){const at=clamp(o.at,o.w/2,Math.max(o.w/2,g.L-o.w/2));g.open.push([at-o.w/2,at+o.w/2])}}});
+  ob.forEach(o=>{if(o.t==='blk'&&o.host&&!(BLK[o.k]&&BLK[o.k].me)&&!(o.k==='ventilasi'&&opSill(o)>=1200)){const g=G.get(o.host);if(g){const at=clamp(o.at,o.w/2,Math.max(o.w/2,g.L-o.w/2));g.open.push([at-o.w/2,at+o.w/2])}}});
   const cols=ob.filter(o=>o.t==='blk'&&!o.host&&o.k==='kolom').map(o=>boxCorners(o.p,o.w,o.h,o.rot));
   if(cols.length)G.forEach(g=>{g.cols=[];cols.forEach(C=>{let any=false;
     for(const s of[1,-1]){const A=FP(g,s,0),ts=[];for(let i=0;i<C.length;i++){const p=C[i],q=C[(i+1)%C.length],el=D(p,q)||1,u={x:(q.x-p.x)/el,y:(q.y-p.y)/el},t=lineX(A,g.d,p,u);if(t==null)continue;
@@ -392,39 +414,56 @@ function imgEl(o){let e=IMG.get(o.iid);if(e)return e;e={el:new Image(),ok:false}
   (async()=>{const b=await IDB.get(o.iid);if(b){e.el.src=URL.createObjectURL(b)}else if(o.aid){e.el.src='/_blob/'+o.aid}})();return e}
 
 /* ---------- rendering ---------- */
-function draw(){render(ctx,PG(),V(),{d:DPR,cw:CW,ch:CH,exp:false});status()}
+const PGGAP=26;
+function stackLayout(){let y=0,mw=0;const L=P.pages.map(pg=>{const[PW,PH]=pdim(pg);mw=Math.max(mw,PW);const r={pg,y,PW,PH};y+=PH+PGGAP;return r});L.mw=mw;return L}
+function syncViews(){const L=stackLayout(),cur=L[P.cur],v=V();if(!v||!cur)return L;const z=v.z,bx=v.ox-(L.mw-cur.PW)*z/2,by=v.oy-cur.y*z;L.forEach((r,i)=>{if(i!==P.cur)r.pg.view={z,ox:bx+(L.mw-r.PW)*z/2,oy:by+r.y*z}});return L}
+function allMode(){return S.pgMode==='all'&&P.pages.length>1}
+function drawAll(){const L=syncViews();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#e9ebef';ctx.fillRect(0,0,CW,CH);
+  L.forEach((r,i)=>{if(i===P.cur)return;const v=r.pg.view;if(v.oy+r.PH*v.z<-40||v.oy>CH+40)return;render(ctx,r.pg,v,{d:DPR,cw:CW,ch:CH,exp:false,noClear:true,passive:true})});
+  render(ctx,PG(),V(),{d:DPR,cw:CW,ch:CH,exp:false,noClear:true});
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.font='600 12px -apple-system,sans-serif';ctx.textBaseline='bottom';L.forEach((r,i)=>{const v=i===P.cur?V():r.pg.view;if(!v||v.oy<-20||v.oy>CH+20)return;ctx.fillStyle=i===P.cur?'#2f6bff':'#7a808a';ctx.fillText((i+1)+' · '+r.pg.name+' · 1:'+r.pg.scale,v.ox,v.oy-6)})}
+function pageAt(sx,sy){const L=syncViews();for(let i=0;i<L.length;i++){const v=i===P.cur?V():L[i].pg.view;if(!v)continue;if(sx>=v.ox&&sx<=v.ox+L[i].PW*v.z&&sy>=v.oy-24&&sy<=v.oy+L[i].PH*v.z+PGGAP*v.z)return i}return -1}
+function curPageKeep(i){if(i===P.cur||i<0)return;P.cur=i;pend=null;hatchPts=[];hatchCur=null;dimStage=null;SEL.clear();hidePanel();renderTop();renderOpts();if($('#drawer').classList.contains('show'))renderPages()}
+function draw(){if(allMode())drawAll();else render(ctx,PG(),V(),{d:DPR,cw:CW,ch:CH,exp:false});status()}
 function render(c,pg,v,o){
   const sc=pg.scale,k=v.z/sc,d=o.d,[PW,PH]=pdim(pg),W=PW*sc,H=PH*sc,px=1/k;
   c.layer='0';c.setTransform(d,0,0,d,0,0);
-  if(!o.vec){c.fillStyle=o.exp?'#fff':'#e9ebef';c.fillRect(0,0,o.cw,o.ch)}
+  RPG=pg;if(!o.vec&&!o.noClear){c.fillStyle=o.exp?'#fff':'#e9ebef';c.fillRect(0,0,o.cw,o.ch)}
   if(!o.exp){c.save();c.shadowColor='rgba(0,0,0,.18)';c.shadowBlur=18;c.shadowOffsetY=3;c.fillStyle='#fff';c.fillRect(v.ox,v.oy,PW*v.z,PH*v.z);c.restore()}
   c.setTransform(k*d,0,0,k*d,v.ox*d,v.oy*d);
   const R={c,sc,k,px,exp:o.exp,vec:o.vec,lw:mm=>Math.max(mm*sc,o.vec?0.05*sc:px*(o.exp?1:0.75))};
   c.save();c.beginPath();c.rect(0,0,W,H);c.clip();
   if(S.grid&&!o.exp)drawGrid(R,W,H);
-  const ob=pg.objs,G=wallGeo(ob);if(!o.exp)GEO=G;
+  const ob=pg.objs,G=wallGeo(ob);if(!o.exp&&!o.passive)GEO=G;
   drawLayered(R,ob,G,0);
   c.layer='KOP';drawKop(R,pg,PW,PH);
   c.restore();
-  if(!o.exp){drawSel(R);drawPreview(R,G);c.setTransform(d,0,0,d,0,0);drawOverlay()}
+  if(!o.exp&&!o.passive){drawSel(R);drawPreview(R,G);c.setTransform(d,0,0,d,0,0);drawOverlay()}RPG=null;
 }
 function drawLayered(R,ob,G,depth){const c=R.c;
   c.layer='FOTO';ob.forEach(x=>{if(x.t==='img')drawImg(R,x)});
-  c.layer='ARSIR';ob.forEach(x=>{if(x.t==='hatch')drawHatch(R,x);else if(x.t==='rect'&&x.pat&&x.pat!=='none')drawHatch(R,{pts:rectPts(x),pat:x.pat,ps:x.ps,c:x.pc||'#6b7078'})});
+  c.layer='ARSIR';ob.forEach(x=>{if(x.t==='hatch'&&!x.cz)drawHatch(R,x);else if(x.t==='rect'&&x.pat&&x.pat!=='none')drawHatch(R,{pts:rectPts(x),pat:x.pat,ps:x.ps,c:x.pc||'#6b7078'})});
   c.layer='DINDING';drawWalls(R,G);
   c.layer='PINTU-JENDELA';ob.forEach(x=>{if(x.t==='blk'&&x.host)drawBlk(R,x,G)});
   c.layer='GARIS';ob.forEach(x=>{if(x.t==='line')drawLine(R,x);else if(x.t==='rect')drawRect(R,x)});
   c.layer='FURNITUR';ob.forEach(x=>{if(x.t==='blk'&&!x.host)drawBlk(R,x,G);else if(x.t==='comp'&&depth<4)drawComp(R,x,depth)});
   c.layer='LABEL';
   if(S.showLen)ob.forEach(x=>{if(x.t==='line'||x.t==='wall'){if(x.sd!==false)lenLabel(R,x.a,x.b,x.t==='wall'?x.th/2:0)}else if(x.t==='rect'){if(x.sd!==false)rectLabels(R,x)}else if(x.t==='blk'&&x.sd===true)blkLabels(R,x,G)});
-  ob.forEach(x=>{if(x.t==='hatch')hatchLabel(R,x);else if(x.t==='rect'&&(x.area&&x.pat&&x.pat!=='none'||x.lbl))hatchLabel(R,{pts:rectPts(x),area:x.area&&x.pat&&x.pat!=='none',lbl:x.lbl})});
+  if(depth===0)opLabels(R,ob,G);
+  ob.forEach(x=>{if(x.t==='hatch'&&!x.cz)hatchLabel(R,x);else if(x.t==='rect'&&(x.area&&x.pat&&x.pat!=='none'||x.lbl))hatchLabel(R,{pts:rectPts(x),area:x.area&&x.pat&&x.pat!=='none',lbl:x.lbl})});
+  if(S.ceilShow!==false){c.layer='PLAFON';ob.forEach(x=>{if(x.t==='hatch'&&x.cz)drawCeil(R,x)})}
   c.layer='UKURAN';ob.forEach(x=>{if(x.t==='dim')drawDim(R,x)});
   c.layer='CORETAN';ob.forEach(x=>{if(x.t==='ink'&&x.hl)drawInk(R,x)});ob.forEach(x=>{if(x.t==='ink'&&!x.hl)drawInk(R,x)});
+  c.layer='TABEL';ob.forEach(x=>{if(x.t==='tbl')drawTbl(R,x)});
   c.layer='TEKS';ob.forEach(x=>{if(x.t==='text')drawText(R,x);else if(x.t==='pt')drawPt(R,x)})}
 function compXf(o){return q=>{const x=o.fx?-q.x:q.x;return rotPt({x:o.p.x+x,y:o.p.y+q.y},o.p,o.rot||0)}}
 function drawComp(R,o,depth){const d=(P.defs||{})[o.def],c=R.c;if(!d)return;c.save();c.translate(o.p.x,o.p.y);if(o.rot)c.rotate(-o.rot*Math.PI/180);if(o.fx)c.scale(-1,1);
   if(o._ghost)c.globalAlpha=.55;drawLayered(R,d.objs,wallGeo(d.objs),depth+1);c.restore()}
-function drawPt(R,o){const c=R.c,s=1.6*R.sc,col=o.c||'#c2410c';c.strokeStyle=col;c.lineWidth=R.lw(0.3);c.beginPath();c.moveTo(o.p.x-s,o.p.y);c.lineTo(o.p.x+s,o.p.y);c.moveTo(o.p.x,o.p.y-s);c.lineTo(o.p.x,o.p.y+s);c.stroke();
+function drawPt(R,o){if(o.em){const c=R.c,col='#1e40af',r=5*R.sc*(o.back?1.15:1),p=o.p;c.save();c.lineWidth=R.lw(0.3);c.strokeStyle=col;
+    if(!o.back&&o.ang!=null){const ux=Math.cos(o.ang),uy=Math.sin(o.ang),px=-uy,py=ux;c.fillStyle=col;c.beginPath();c.moveTo(p.x+ux*r*1.8,p.y+uy*r*1.8);c.lineTo(p.x+px*r*.97+ux*r*.25,p.y+py*r*.97+uy*r*.25);c.lineTo(p.x-px*r*.97+ux*r*.25,p.y-py*r*.97+uy*r*.25);c.closePath();c.fill()}
+    c.fillStyle='#fff';c.beginPath();c.arc(p.x,p.y,r,0,7);c.fill();c.stroke();c.beginPath();c.moveTo(p.x-r,p.y);c.lineTo(p.x+r,p.y);c.stroke();
+    wtext(R,o.em,p.x,p.y-r*.46,0,3.4*(o.back?1.15:1),col,'center','middle',true,'sans');wtext(R,o.back?'denah':(o.sref||''),p.x,p.y+r*.48,0,o.back?1.6:2.1,col,'center','middle',false,'sans');c.restore();return}
+const c=R.c,s=1.6*R.sc,col=o.c||'#c2410c';c.strokeStyle=col;c.lineWidth=R.lw(0.3);c.beginPath();c.moveTo(o.p.x-s,o.p.y);c.lineTo(o.p.x+s,o.p.y);c.moveTo(o.p.x,o.p.y-s);c.lineTo(o.p.x,o.p.y+s);c.stroke();
   c.beginPath();c.arc(o.p.x,o.p.y,0.6*R.sc,0,Math.PI*2);c.stroke();if(o.lbl)wtext(R,o.lbl,o.p.x+1.2*R.sc,o.p.y-1.2*R.sc,0,2.2,col,'left','bottom',true,S.ds.font)}
 function blkLabels(R,o,G){if(o.host){const f=hostFrame(G,o);if(!f)return;const ux=Math.cos(f.ang),uy=Math.sin(f.ang);lenLabel(R,{x:f.O.x-ux*o.w/2,y:f.O.y-uy*o.w/2},{x:f.O.x+ux*o.w/2,y:f.O.y+uy*o.w/2},f.th/2);return}
   const C=boxCorners(o.p,o.w,o.h,o.rot);lenLabel(R,C[0],C[1],0);lenLabel(R,C[3],C[0],0)}
@@ -434,7 +473,10 @@ function drawGrid(R,W,H){const c=R.c;let st=1000;if(st*R.k<9)st=5000;if(st*R.k<9
 const fontCSS=(fk,px,bold)=>`${bold?'600 ':''}${px}px ${(FONTS[fk]||FONTS.sans)[1]}`;
 function wtext(R,s,x,y,ang,hmm,col,al='center',bl='middle',bold=false,fk='sans'){const c=R.c;c.save();c.translate(x,y);if(ang)c.rotate(ang);c.font=fontCSS(fk,hmm*R.sc,bold);c.fk=fk;c.fillStyle=col;c.textAlign=al;c.textBaseline=bl;c.fillText(s,0,0);c.restore()}
 function seg(c,a,b){c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke()}
-function drawLine(R,o){const c=R.c;c.strokeStyle=o.c;c.lineWidth=R.lw(o.w);c.lineCap='round';seg(c,o.a,o.b)}
+const PIPET={ab:{n:'Air bersih',cd:'AB',c:'#1d4ed8',w:.5,dash:[]},ak:{n:'Air kotor / buangan',cd:'AK',c:'#78350f',w:.6,dash:[3,1.2]},ah:{n:'Air hujan / AC',cd:'AH',c:'#0e7490',w:.45,dash:[2,.8,.4,.8]},vt:{n:'Vent',cd:'V',c:'#475569',w:.3,dash:[.8,.8]},gs:{n:'Gas',cd:'G',c:'#b91c1c',w:.4,dash:[2.5,.8,.4,.8,.4,.8]}};
+function drawLine(R,o){const c=R.c;if(o.pp){const T=PIPET[o.pp]||PIPET.ab,col=T.c,bar=(o.st||'eks')==='baru';c.save();c.strokeStyle=col;c.lineWidth=R.lw(T.w);c.lineCap='butt';c.setLineDash&&c.setLineDash(T.dash.map(v=>v*R.sc));seg(c,o.a,o.b);c.setLineDash&&c.setLineDash([]);
+    if(bar){c.strokeStyle='#ea580c';c.lineWidth=R.lw(.13);c.setLineDash&&c.setLineDash([.6*R.sc,.6*R.sc]);const L=D(o.a,o.b)||1,nx=-(o.b.y-o.a.y)/L*.9*R.sc,ny=(o.b.x-o.a.x)/L*.9*R.sc;seg(c,{x:o.a.x+nx,y:o.a.y+ny},{x:o.b.x+nx,y:o.b.y+ny});c.setLineDash&&c.setLineDash([])}c.restore();
+    const L=D(o.a,o.b);if(R.exp?L/R.sc>16:L*R.k>80){const m={x:(o.a.x+o.b.x)/2,y:(o.a.y+o.b.y)/2},ra=readAng(Math.atan2(o.b.y-o.a.y,o.b.x-o.a.x)),nx=-Math.sin(ra),ny=Math.cos(ra);wtext(R,T.cd+(o.dia?' '+o.dia:'')+(bar?' baru':''),m.x-nx*1.5*R.sc,m.y-ny*1.5*R.sc,ra,1.6,bar?'#ea580c':col,'center','middle',true,'sans')}return}c.strokeStyle=o.c;c.lineWidth=R.lw(o.w);c.lineCap='round';seg(c,o.a,o.b)}
 function drawRect(R,o){const c=R.c;c.strokeStyle=o.c;c.lineWidth=R.lw(o.w);c.lineJoin='miter';c.beginPath();c.rect(o.x,o.y,o.w2,o.h);c.stroke()}
 function lenLabel(R,a,b,off){const L=D(a,b);if(!R.exp&&L*R.k<34)return;const ra=readAng(Math.atan2(b.y-a.y,b.x-a.x)),m={x:(a.x+b.x)/2,y:(a.y+b.y)/2},c=R.c;
   c.save();c.translate(m.x,m.y);c.rotate(ra);wtext(R,fmtDim(L),0,-(off+0.9*R.sc),0,S.ds.lh,S.ds.lc,'center','bottom',false,S.ds.font);c.restore()}
@@ -585,6 +627,17 @@ const BLK={
  jendelaBuka:{n:'Jendela buka (casement)',host:1,w:1200,door:1,d(c,o,w,th,R){const hx=w/2,sw=o.sw||1,y=sw*th/2,r=w/2;L_(c,-hx,-th/2,hx,-th/2);L_(c,-hx,th/2,hx,th/2);L_(c,-hx,0,hx,0);
    c.stroke();c.beginPath();c.setLineDash&&c.setLineDash([R.sc*1,R.sc*0.8]);L_(c,-hx,y,-hx+r*0.7,y+sw*r*0.7);L_(c,hx,y,hx-r*0.7,y+sw*r*0.7);c.stroke();c.setLineDash&&c.setLineDash([]);c.beginPath()}},
  bukaan:{n:'Bukaan / lubang',host:1,w:900,d(c,o,w,th,R){c.stroke();c.beginPath();c.setLineDash&&c.setLineDash([R.sc*1.2,R.sc*0.8]);const hx=w/2;L_(c,-hx,-th/2,hx,th/2);L_(c,-hx,th/2,hx,-th/2);c.stroke();c.setLineDash&&c.setLineDash([]);c.beginPath()}},
+ ventilasi:{n:'Lubang angin / BV (roster)',host:1,w:600,d(c,o,w,th,R){c.stroke();c.beginPath();c.setLineDash&&c.setLineDash([R.sc*1,R.sc*0.7]);const hx=w/2;c.rect(-hx,-th/2,w,th);L_(c,-hx,0,hx,0);c.stroke();c.setLineDash&&c.setLineDash([]);c.beginPath()}},
+ skt:{n:'Stop kontak',cat:'Listrik & Air (ME)',host:1,me:1,w:120,z:300,cd:'SK',d:(...a)=>meSym(...a)},
+ sklr:{n:'Saklar',host:1,me:1,w:100,z:1400,cd:'S',d:(...a)=>meSym(...a)},
+ skac:{n:'Stop kontak AC',host:1,me:1,w:120,z:2300,cd:'AC',d:(...a)=>meSym(...a)},
+ tvd:{n:'Titik TV / data',host:1,me:1,w:120,z:300,cd:'TV',d:(...a)=>meSym(...a)},
+ lmpd:{n:'Lampu dinding',host:1,me:1,w:150,z:2000,cd:'L',d:(...a)=>meSym(...a)},
+ mcb:{n:'Panel listrik / MCB',host:1,me:1,w:300,z:1600,cd:'MCB',d:(...a)=>meSym(...a)},
+ kran:{n:'Kran air',host:1,me:1,w:100,z:600,cd:'K',d:(...a)=>meSym(...a)},
+ abs:{n:'Titik air bersih',host:1,me:1,w:100,z:500,cd:'AB',d:(...a)=>meSym(...a)},
+ akt:{n:'Titik air kotor / buangan',host:1,me:1,w:100,z:200,cd:'AK',d:(...a)=>meSym(...a)},
+ shw:{n:'Titik shower',host:1,me:1,w:100,z:2000,cd:'SH',d:(...a)=>meSym(...a)},
  kasur1:{n:'Kasur single',cat:'Kamar Tidur',w:1000,h:2000,d:(c,o,w,h)=>bed(c,w,h)},
  kasurQ:{n:'Kasur queen',w:1600,h:2000,d:(c,o,w,h)=>bed(c,w,h)},
  kasurK:{n:'Kasur king',w:1800,h:2000,d:(c,o,w,h)=>bed(c,w,h)},
@@ -653,8 +706,8 @@ function blkThumb(k){const B=BLK[k],cv2=document.createElement('canvas');cv2.wid
   const w=B.w,h=B.host?Math.max(B.w*0.9,600):B.h,s=Math.min(170/(B.host?w*1.9:w),130/(B.host?h*1.6:h));c.setTransform(s,0,0,s,100,B.host?50:76);
   const R={c,sc:1/s/1.2,k:s,px:1/s,lw:()=>1.6/s};
   if(B.host){const th=150;c.fillStyle='#c5c9cf';c.strokeStyle='#16191d';c.lineWidth=1.4/s;[[-w*.95,-w/2],[w/2,w*.95]].forEach(([a,b])=>{c.fillRect(a,-th/2,b-a,th);c.beginPath();c.moveTo(a,-th/2);c.lineTo(b,-th/2);c.moveTo(a,th/2);c.lineTo(b,th/2);c.moveTo(b===-w/2?b:a,-th/2);c.lineTo(b===-w/2?b:a,th/2);c.stroke()});
-    c.strokeStyle=c.fillStyle='#16191d';c.lineWidth=1.6/s;c.beginPath();B.d(c,{sw:1,hf:1},w,th,R);c.stroke()}
-  else{c.strokeStyle=c.fillStyle='#16191d';c.lineWidth=1.6/s;c.lineJoin='round';c.beginPath();B.d(c,{},w,h,R);c.stroke()}
+    c.strokeStyle=c.fillStyle='#16191d';c.lineWidth=1.6/s;c.beginPath();B.d(c,{sw:1,hf:1,k},w,th,R);c.stroke()}
+  else{c.strokeStyle=c.fillStyle='#16191d';c.lineWidth=1.6/s;c.lineJoin='round';c.beginPath();B.d(c,{k},w,h,R);c.stroke()}
   return cv2.toDataURL()}
 
 /* ---------- selection / preview drawing ---------- */
@@ -703,7 +756,7 @@ function triDialog(){openDlg(`<h2>Titik dari 2 jarak</h2><p>Ukur jarak dari titi
   <div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Hitung</button></div>`,{x:()=>{closeDlg();SV={mode:'tri',stage:0};req()},ok:()=>{const rA=parseL($('#ta').value),rB=parseL($('#tb').value);if(!rA||!rB)return toast('Isi kedua jarak');
     const A=SV.A,B=SV.B,d=D(A,B);if(d<1||d>rA+rB||d<Math.abs(rA-rB))return toast('Jarak tidak mungkin dengan titik A & B ini — cek ukuran');
     const a=(rA*rA-rB*rB+d*d)/(2*d),h=Math.sqrt(Math.max(0,rA*rA-a*a)),M={x:A.x+(B.x-A.x)*a/d,y:A.y+(B.y-A.y)*a/d},n={x:-(B.y-A.y)/d,y:(B.x-A.x)/d};
-    SV.c=[{x:M.x+n.x*h,y:M.y+n.y*h},{x:M.x-n.x*h,y:M.y-n.y*h}];SV.rA=rA;SV.rB=rB;SV.stage=3;closeDlg();hint('Ketuk salah satu dari 2 kemungkinan titik');req()}});setTimeout(()=>$('#ta')?.focus(),60)}
+    SV.c=[{x:M.x+n.x*h,y:M.y+n.y*h},{x:M.x-n.x*h,y:M.y-n.y*h}];SV.rA=rA;SV.rB=rB;SV.stage=3;closeDlg();hint('Ketuk salah satu dari 2 kemungkinan titik');req()}});focusIn('#ta')}
 function canOff(o){return(['line','wall','rect','hatch'].includes(o.t)||o.t==='blk'&&!o.host)&&!o.lock}
 function offPoly(P,d){const A=polyArea(P),sg=A>0?1:-1,n=P.length,Ls=[];if(n<3)return null;
   for(let i=0;i<n;i++){const a=P[i],b=P[(i+1)%n],L=D(a,b)||1,nx=(b.y-a.y)/L*sg,ny=-(b.x-a.x)/L*sg;Ls.push({p:{x:a.x+nx*d,y:a.y+ny*d},v:{x:(b.x-a.x)/L,y:(b.y-a.y)/L}})}
@@ -722,12 +775,13 @@ function drawPreview(R,G){const c=R.c,px=R.px;
     if(OFS.prev){c.save();c.globalAlpha=.75;OFS.prev.forEach(p=>{if(p.t==='wall'){drawWalls(R,wallGeo([{...p,id:'_o'}]))}else if(p.t==='rect')drawRect(R,{...p,c:'#c2410c'});else if(p.t==='hatch'){drawHatch(R,{...p,oc:'#c2410c'})}else drawLine(R,{...p,c:'#c2410c'})});c.restore()}}
   if(OP&&(OP.t==='pen'||OP.t==='hl')&&OP.pts.length)drawInk(R,{pts:OP.pts,c:OP.t==='hl'?S.hlC:S.penC,w:OP.t==='hl'?S.hlW:S.penW,hl:OP.t==='hl',sh:OP.sh});
   const tmpLine=(a,b)=>{if(S.tool==='wall'){const tw={t:'wall',id:'_',a,b,th:S.wallT,f:S.wallFill,pat:S.wallPat,pc:S.wallPc};drawWalls(R,wallGeo([tw]));lenLabel(R,a,b,S.wallT/2)}else{drawLine(R,{a,b,c:S.lineC,w:S.lineW});lenLabel(R,a,b,0)}};
-  if(OP&&(OP.t==='line'||OP.t==='wall')){if(OP.moved&&D(OP.a,OP.b)>0)tmpLine(OP.a,OP.b);else if(pend&&OP.tb)tmpLine(pend,OP.tb)}
-  if(OP&&OP.t==='rect'&&OP.moved){const o=normRect(OP.a,OP.b);drawRect(R,{...o,c:S.lineC,w:S.lineW});rectLabels(R,o)}
+  if(OP&&(OP.t==='line'||OP.t==='wall'||OP.t==='pipe')){if(OP.moved&&D(OP.a,OP.b)>0)tmpLine(OP.a,OP.b);else if(pend&&OP.tb)tmpLine(pend,OP.tb)}
+  if(OP&&OP.t==='rect'&&OP.moved){const o=rectOP();drawRect(R,{...o,c:S.lineC,w:S.lineW});rectLabels(R,o);if(S.rectC){const q=OP.a,s2=2.2*R.sc;c.strokeStyle='#2f6bff';c.lineWidth=R.lw(.25);c.beginPath();c.moveTo(q.x-s2,q.y);c.lineTo(q.x+s2,q.y);c.moveTo(q.x,q.y-s2);c.lineTo(q.x,q.y+s2);c.stroke()}}
   if(OP&&OP.t==='dim'&&OP.moved&&!dimStage&&D(OP.a,OP.b)>1)drawDim(R,{a:OP.a,b:OP.b,off:8*R.sc});
   if(dimStage)drawDim(R,dimStage);
-  if(OP&&OP.t==='hatch'&&OP.moved&&!hatchPts.length){const o=normRect(OP.a,OP.b);drawHatch(R,{pts:rectPts(o),pat:S.pat,ps:S.patS,c:S.patC})}
-  if(hatchPts.length){const P=hatchCur?[...hatchPts,hatchCur]:hatchPts;if(P.length>=3)drawHatch(R,{pts:P,pat:S.pat,ps:S.patS,c:S.patC});
+  if(HEDIT){const w=byId(HEDIT);if(w)[[w.a,'A'],[w.b,'B']].forEach(([p,t])=>{const r=3.2*R.sc;c.fillStyle='#2f6bff';c.beginPath();c.arc(p.x,p.y,r,0,7);c.fill();wtext(R,t,p.x,p.y,0,3.4,'#fff','center','middle',true,'sans')})}
+  if(OP&&(OP.t==='hatch'||OP.t==='ceil')&&OP.moved&&!hatchPts.length){const o=normRect(OP.a,OP.b);if(OP.t==='ceil')drawCeil(R,{pts:rectPts(o)},1);else drawHatch(R,{pts:rectPts(o),pat:S.pat,ps:S.patS,c:S.patC})}
+  if(hatchPts.length){const P=hatchCur?[...hatchPts,hatchCur]:hatchPts;if(P.length>=3){if(S.tool==='ceil')drawCeil(R,{pts:P},1);else drawHatch(R,{pts:P,pat:S.pat,ps:S.patS,c:S.patC})}
     c.strokeStyle='#c2410c';c.lineWidth=px*1.5;c.beginPath();P.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.stroke();
     c.fillStyle='#c2410c';hatchPts.forEach((p,i)=>{c.beginPath();c.arc(p.x,p.y,(i?3.5:6)*px,0,7);c.fill()});if(hatchCur)lenLabel(R,hatchPts[hatchPts.length-1],hatchCur,0)}
   if(pend){c.strokeStyle='#c2410c';c.lineWidth=px*1.5;const s=10*px;c.beginPath();c.moveTo(pend.x-s,pend.y);c.lineTo(pend.x+s,pend.y);c.moveTo(pend.x,pend.y-s);c.lineTo(pend.x,pend.y+s);c.stroke();c.beginPath();c.arc(pend.x,pend.y,5*px,0,7);c.stroke()}
@@ -740,12 +794,14 @@ function drawPreview(R,G){const c=R.c,px=R.px;
     if(SV.poly&&SV.at){const Q=roomWorld(SV.at);c.globalAlpha=.85;pathPoly(c,Q);c.lineWidth=px*2;c.stroke();c.globalAlpha=1;Q.forEach((p,i)=>lenLabel(R,p,Q[(i+1)%Q.length],0));c.beginPath();c.arc(Q[0].x,Q[0].y,6*px,0,7);c.fill()}c.restore()}
   if(CAL&&CAL.pts.length){c.fillStyle='#c2410c';c.strokeStyle='#c2410c';c.lineWidth=px*2;CAL.pts.forEach(p=>{c.beginPath();c.arc(p.x,p.y,6*px,0,7);c.fill()});if(CAL.pts.length===2)seg(c,CAL.pts[0],CAL.pts[1])}}
 function drawOverlay(){const c=ctx;
-  if(HOVER&&!OP){c.strokeStyle='rgba(194,65,12,.85)';c.lineWidth=1.2;c.beginPath();c.moveTo(HOVER.x-9,HOVER.y);c.lineTo(HOVER.x-3,HOVER.y);c.moveTo(HOVER.x+3,HOVER.y);c.lineTo(HOVER.x+9,HOVER.y);c.moveTo(HOVER.x,HOVER.y-9);c.lineTo(HOVER.x,HOVER.y-3);c.moveTo(HOVER.x,HOVER.y+3);c.lineTo(HOVER.x,HOVER.y+9);c.stroke()}
+  if(S.tool==='erase'){const E0=OP&&OP.t==='erase'&&OP.lx!=null?{x:OP.lx,y:OP.ly}:HOVER;if(E0){c.save();c.strokeStyle='rgba(220,38,38,.8)';c.fillStyle='rgba(220,38,38,.08)';c.lineWidth=1.2;c.beginPath();c.arc(E0.x,E0.y,S.eraseR||10,0,7);c.fill();c.stroke();c.restore()}}
+  if(HOVER&&!OP&&S.tool!=='erase'){c.strokeStyle='rgba(194,65,12,.85)';c.lineWidth=1.2;c.beginPath();c.moveTo(HOVER.x-9,HOVER.y);c.lineTo(HOVER.x-3,HOVER.y);c.moveTo(HOVER.x+3,HOVER.y);c.lineTo(HOVER.x+9,HOVER.y);c.moveTo(HOVER.x,HOVER.y-9);c.lineTo(HOVER.x,HOVER.y-3);c.moveTo(HOVER.x,HOVER.y+3);c.lineTo(HOVER.x,HOVER.y+9);c.stroke()}
   if(snapMark){const p=w2s(snapMark.p);c.strokeStyle='#16a34a';c.lineWidth=2;c.beginPath();
     if(snapMark.kind==='end')c.rect(p.x-7,p.y-7,14,14);else if(snapMark.kind==='mid'){c.moveTo(p.x,p.y-8);c.lineTo(p.x+7,p.y+5);c.lineTo(p.x-7,p.y+5);c.closePath()}else{c.moveTo(p.x-6,p.y-6);c.lineTo(p.x+6,p.y+6);c.moveTo(p.x+6,p.y-6);c.lineTo(p.x-6,p.y+6)}c.stroke()}
   if(readout){c.font='600 14px -apple-system,Arial,sans-serif';const w=c.measureText(readout.s).width+16;let x=readout.x+22,y=readout.y-44;if(x+w>CW-6)x=readout.x-w-22;if(y<6)y=readout.y+24;
     c.fillStyle='rgba(22,25,29,.9)';rr(c,x,y,w,28,8);c.fill();c.fillStyle='#fff';c.textBaseline='middle';c.textAlign='left';c.fillText(readout.s,x+8,y+14)}}
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function rectOP(){return S.rectC?normRect({x:2*OP.a.x-OP.b.x,y:2*OP.a.y-OP.b.y},OP.b):normRect(OP.a,OP.b)}
 function normRect(a,b){return{x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),w2:Math.abs(b.x-a.x),h:Math.abs(b.y-a.y)}}
 function blkPoly(o){if(o.host){const f=hostFrame(GEO,o);if(!f)return null;const sw=BLK[o.k]?.door?(o.sw||1):0,ext=BLK[o.k]?.door?o.w:0,hy=f.th/2;
     const loc=[[-o.w/2,-hy+(sw<0?-ext:0)],[o.w/2,-hy+(sw<0?-ext:0)],[o.w/2,hy+(sw>0?ext:0)],[-o.w/2,hy+(sw>0?ext:0)]];
@@ -754,18 +810,18 @@ function blkPoly(o){if(o.host){const f=hostFrame(GEO,o);if(!f)return null;const 
 function textBox(o){const sc=PG().scale,lines=String(o.s).split('\n'),w=Math.max(...lines.map(l=>l.length))*o.h*0.58*sc,h=lines.length*o.h*1.3*sc;
   return[{x:0,y:0},{x:w,y:0},{x:w,y:h},{x:0,y:h}].map(p=>rotPt({x:o.p.x+p.x,y:o.p.y+p.y},o.p,o.r||0))}
 function objPoly(o){switch(o.t){case'line':case'dim':return[o.a,o.b];case'wall':{const g=GEO.get(o.id);if(g)return wallPieces(g).flatMap(p=>piecePoly(g,p));return[o.a,o.b]}
-  case'rect':return rectPts(o);case'hatch':return o.pts;case'ink':return o.pts.map(p=>({x:p[0],y:p[1]}));case'text':return textBox(o);case'img':return boxCorners(o.p,o.w,o.h,o.rot);case'blk':return blkPoly(o);case'comp':return compPoly(o);case'pt':return[{x:o.p.x-200,y:o.p.y-200},{x:o.p.x+200,y:o.p.y+200}]}return null}
+  case'rect':return rectPts(o);case'hatch':return o.pts;case'ink':return o.pts.map(p=>({x:p[0],y:p[1]}));case'text':return textBox(o);case'tbl':return tblPoly(o);case'img':return boxCorners(o.p,o.w,o.h,o.rot);case'blk':return blkPoly(o);case'comp':return compPoly(o);case'pt':return[{x:o.p.x-200,y:o.p.y-200},{x:o.p.x+200,y:o.p.y+200}]}return null}
 function objBBox(o){const P=objPoly(o);return P&&P.length?bbox(P):null}
 function compPoly(o){const d=(P.defs||{})[o.def];if(!d)return boxCorners(o.p,1000,1000,o.rot);const b=d.bb||(d.bb=defBBox(d.objs)),f=compXf(o);return[{x:b.x0,y:b.y0},{x:b.x1,y:b.y0},{x:b.x1,y:b.y1},{x:b.x0,y:b.y1}].map(f)}
 function defBBox(objs){const Q=[];objs.forEach(o=>{let A=null;switch(o.t){case'line':case'dim':A=[o.a,o.b];break;case'wall':A=wallPoly(o);break;case'rect':A=rectPts(o);break;case'hatch':A=o.pts;break;
-  case'ink':A=o.pts.map(p=>({x:p[0],y:p[1]}));break;case'text':A=textBox(o);break;case'img':case'blk':A=o.host?null:boxCorners(o.p,o.w,o.h,o.rot);break;case'comp':A=compPoly(o);break;case'pt':A=[o.p];break}if(A)Q.push(...A)});
+  case'ink':A=o.pts.map(p=>({x:p[0],y:p[1]}));break;case'text':A=textBox(o);break;case'tbl':A=tblPoly(o);break;case'img':case'blk':A=o.host?null:boxCorners(o.p,o.w,o.h,o.rot);break;case'comp':A=compPoly(o);break;case'pt':A=[o.p];break}if(A)Q.push(...A)});
   return Q.length?bbox(Q):{x0:-500,y0:-500,x1:500,y1:500,w:1000,h:1000}}
 
 /* ---------- snapping ---------- */
 function keyPts(o){switch(o.t){case'line':case'dim':return[o.a,o.b];
   case'wall':{const g=GEO.get(o.id),P=[o.a,o.b];if(g)wallPieces(g).forEach(p=>P.push(...piecePoly(g,p)));return P}
-  case'rect':return rectPts(o);case'hatch':return o.pts;case'blk':return o.host?[]:[...boxCorners(o.p,o.w,o.h,o.rot),o.p];case'img':return boxCorners(o.p,o.w,o.h,o.rot);case'comp':return[...compPoly(o),o.p];case'pt':return[o.p];default:return[]}}
-function segsOf(o){switch(o.t){case'line':return[[o.a,o.b]];
+  case'rect':return rectPts(o);case'hatch':return o.pts;case'blk':return o.host?[]:[...boxCorners(o.p,o.w,o.h,o.rot),o.p];case'img':return boxCorners(o.p,o.w,o.h,o.rot);case'tbl':return tblPoly(o);case'comp':return[...compPoly(o),o.p];case'pt':return[o.p];default:return[]}}
+function segsOf(o){switch(o.t){case'line':return[[o.a,o.b]];case'tbl':{const P2=tblPoly(o);return P2.map((p,i)=>[p,P2[(i+1)%4]])}
   case'wall':{const g=GEO.get(o.id),S2=[[o.a,o.b]];if(g){S2.push([FP(g,1,g.t0[1]),FP(g,1,g.t1[1])],[FP(g,-1,g.t0[-1]),FP(g,-1,g.t1[-1])])}return S2}
   case'rect':{const P=rectPts(o);return P.map((p,i)=>[p,P[(i+1)%4]])}case'hatch':return o.pts.map((p,i)=>[p,o.pts[(i+1)%o.pts.length]]);
   case'blk':if(o.host)return[];{const P=boxCorners(o.p,o.w,o.h,o.rot);return P.map((p,i)=>[p,P[(i+1)%4]])}case'comp':{const P=compPoly(o);return P.map((p,i)=>[p,P[(i+1)%4]])}default:return[]}}
@@ -796,31 +852,34 @@ function settingsChanged(){S.su=Date.now();save();cloudMeta()}
 function removeIds(ids){const set=new Set(ids);PG().objs.forEach(o=>{if(o.t==='blk'&&o.host&&set.has(o.host))set.add(o.id)});PG().objs=PG().objs.filter(o=>!set.has(o.id));ids.forEach(i=>SEL.delete(i))}
 
 /* ---------- pointer handling ---------- */
-const PT=new Map();let penDown=false,G=null;
+const PT=new Map();let penDown=false,G=null,lastPen=0;if(S.fingerDraw===undefined)S.fingerDraw=/Android/i.test(navigator.userAgent)&&!/Mobile.*Pencil/i.test(navigator.userAgent);const TT=()=>[...PT.values()].filter(q=>q.t==='touch'&&!q.palm);
 function lp(e){const r=cv.getBoundingClientRect();if(Math.abs(r.width-CW)>0.5||Math.abs(r.height-CH)>0.5)resize();return{x:e.clientX-r.left,y:e.clientY-r.top}}
 cv.addEventListener('pointerdown',e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}
-  const p=lp(e),t=e.pointerType==='touch'?'touch':'pen';PT.set(e.pointerId,{...p,t,x0:p.x,y0:p.y,t0:performance.now()});
-  if(t==='pen'){penDown=true;G=null;if(PENBACK&&S.tool==='select'){const pb=PENBACK;setTool(pb,false,true);hint('Pencil: '+((TOOLS.find(x=>x[0]===pb)||[0,pb])[1]))}beginOp(p.x,p.y);return}
-  if(penDown)return;
-  const T=[...PT.values()].filter(q=>q.t==='touch');
+  if(allMode()&&!PT.size&&!OP){const q0=lp(e),pi=pageAt(q0.x,q0.y);if(pi>=0&&pi!==P.cur)curPageKeep(pi)}
+  const p=lp(e),fd=S.fingerDraw&&e.pointerType==='touch'&&!penDown&&!TT().length&&!(G&&(G.k==='pinch'||G.k==='done')),t=e.pointerType==='touch'&&!fd?'touch':'pen';PT.set(e.pointerId,{...p,t,fp:fd,x0:p.x,y0:p.y,t0:performance.now()});
+  if(e.pointerType==='touch'&&!fd&&S.fingerDraw){const fq=[...PT.values()].find(q=>q.fp);if(fq){if(OP&&!OP.moved){cancelOp();penDown=false;fq.t='touch';fq.fp=false}else{PT.get(e.pointerId).palm=true;return}}}
+  if(t==='pen'){if(!fd){lastPen=performance.now();PT.forEach(q=>{if(q.t==='touch')q.palm=true})}if(G){if(G.k==='drag')endDrag(true);else if(G.k==='pan'&&G.moved){const v=V();v.ox=G.ox;v.oy=G.oy}if(G.lp)clearTimeout(G.lp)}hideCtx();penDown=true;G=null;if(PENBACK&&S.tool==='select'){const pb=PENBACK;setTool(pb,false,true);hint('Pencil: '+((TOOLS.find(x=>x[0]===pb)||[0,pb])[1]))}beginOp(p.x,p.y);return}
+  const me=PT.get(e.pointerId);if(penDown||(!S.fingerDraw&&performance.now()-lastPen<900)||(e.width||0)>70||(e.height||0)>70){me.palm=true;return}
+  const T=TT();
   if(T.length>=2){if(OP)cancelOp();hideCtx();const pv=G&&G.k==='pinch'?G:null,t0=pv?pv.t0:(G&&G.tp0)||performance.now();if(G&&G.k==='drag')endDrag(true);else if(G&&G.lp)clearTimeout(G.lp);startPinch(T);G.t0=t0;G.nmax=Math.max(pv?pv.nmax:2,T.length);if(pv)G.mv=pv.mv;return}
   fingerDown(p.x,p.y)});
 cv.addEventListener('pointermove',e=>{const q=PT.get(e.pointerId);const p=lp(e);
   if(!q){if(e.pointerType!=='touch'&&S.tool==='block'){updGhost(p.x,p.y);req()}return}e.preventDefault();
   const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];q.x=p.x;q.y=p.y;
-  if(q.t==='pen'){if(OP&&(OP.t==='pen'||OP.t==='hl')&&evs.length>1){evs.forEach(ev=>{const pp=lp(ev);moveOp(pp.x,pp.y)})}else moveOp(p.x,p.y);return}
-  if(penDown)return;
-  if(G&&G.k==='pinch'){const T=[...PT.values()].filter(t=>t.t==='touch');if(T.length>=2)pinch(T);return}
+  if(q.t==='pen'){if(!q.fp)lastPen=performance.now();if(OP&&(OP.t==='pen'||OP.t==='hl')&&evs.length>1){evs.forEach(ev=>{const pp=lp(ev);moveOp(pp.x,pp.y)})}else moveOp(p.x,p.y);return}
+  if(penDown||q.palm)return;
+  if(G&&G.k==='pinch'){const T=TT();if(T.length>=2)pinch(T);return}
   if(G&&G.k==='drag'){dragMove(p.x,p.y);return}
   if(G&&G.k==='pan'){if(!G.moved&&Math.hypot(p.x-G.x0,p.y-G.y0)>8){G.moved=true;if(G.lp)clearTimeout(G.lp)}const v=V();v.ox=G.ox+p.x-G.x0;v.oy=G.oy+p.y-G.y0;req();return}});
 function upH(e){const q=PT.get(e.pointerId);if(!q)return;PT.delete(e.pointerId);const p=lp(e);
-  if(q.t==='pen'){penDown=false;if(e.type==='pointercancel')cancelOp();else endOp(p.x,p.y);return}
-  if(G&&G.k==='pinch'){const T=[...PT.values()].filter(t=>t.t==='touch');if(T.length<2){const tap=performance.now()-G.t0<380&&G.mv<14,nm=G.nmax||2;G=T.length?{k:'done'}:null;
+  if(q.t==='pen'){penDown=false;if(!q.fp)lastPen=performance.now();if(e.type==='pointercancel')cancelOp();else endOp(p.x,p.y);return}
+  if(q.palm)return;
+  if(G&&G.k==='pinch'){const T=TT();if(T.length<2){const tap=S.tapGest!==false&&performance.now()-G.t0<380&&G.mv<14&&performance.now()-lastPen>900&&G.t0-lastPen>900,nm=G.nmax||2;G=T.length?{k:'done'}:null;
       if(tap){if(nm===2){undo();hint('Undo')}else if(nm===3){redo();hint('Redo')}else toggleFocus()}save()}return}
-  if(G&&G.k==='done'){if(![...PT.values()].some(t=>t.t==='touch'))G=null;return}
+  if(G&&G.k==='done'){if(!TT().length)G=null;return}
   if(G&&G.k==='drag'){const tap=!G.moved&&performance.now()-G.tp0<450,x0=G.x0,y0=G.y0;endDrag(tap);if(tap)fingerTap(x0,y0);return}
   if(G&&G.k==='pan'){if(G.lp)clearTimeout(G.lp);const tap=!G.moved&&!G.lpDone&&performance.now()-G.tp0<450;G=null;save();if(tap)fingerTap(p.x,p.y);return}}
-function fingerTap(sx,sy){if(!S.tapSel||S.tool==='calib')return;hideCtx();const f=fingerHit(sx,sy),o=f.obj||f.area;if(S.tool!=='select'){const pv=S.tool;setTool('select');PENBACK=pv}
+function fingerTap(sx,sy){if(!S.tapSel||S.tool==='calib'||performance.now()-lastPen<900)return;hideCtx();const f=fingerHit(sx,sy),o=f.obj||f.area;if(o&&o.t==='pt'&&o.em){gotoElev(o);return}if(o&&o.meRef){meEditDialog(o.meRef);return}if(S.tool!=='select'){const pv=S.tool;setTool('select');PENBACK=pv}
   if(o){const ids=grpExpand(new Set([o.id]));SEL=new Set(ids);showSelPanel()}else{SEL.clear();hidePanel();renderOpts()}req()}
 function toggleFocus(){document.body.classList.toggle('focus');setTimeout(resize,30);hint(document.body.classList.contains('focus')?'Mode fokus — ketuk 4 jari lagi untuk menampilkan menu':'Menu ditampilkan')}
 function showCtx(sx,sy){const m=$('#ctx');m.innerHTML=`<button data-cx="paste" ${CLIP?'':'disabled'}>Tempel</button><button data-cx="selAll">Pilih semua</button><button data-cx="undo">Undo</button><button data-cx="fit">Pas layar</button>`;
@@ -829,10 +888,10 @@ function hideCtx(){const m=$('#ctx');if(m)m.classList.remove('show')}
 cv.addEventListener('pointerup',upH);cv.addEventListener('pointercancel',upH);
 function fingerDown(sx,sy){const v=V();hideCtx();G={k:'pan',x0:sx,y0:sy,ox:v.ox,oy:v.oy,moved:false,tp0:performance.now()};const f=fingerHit(sx,sy);
   if(!f.obj&&!f.area){const g0=G;G.lp=setTimeout(()=>{if(G===g0&&!G.moved){g0.lpDone=true;showCtx(g0.x0,g0.y0)}},550)}
-  if(!S.hand)return;
+  if(!S.hand||S.lockAll)return;
   if(f.obj){startDrag(f.obj,sx,sy);G.tp0=performance.now();return}
-  if(f.area){const g0=G;G.lp=setTimeout(()=>{if(G===g0&&!G.moved){const v2=V();v2.ox=g0.ox;v2.oy=g0.oy;startDrag(f.area,g0.x0,g0.y0);G.tp0=-1e9;hint('Diangkat — geser dengan jari');req()}},420)}}
-function fingerHit(sx,sy){const w=s2w(sx,sy),tol=14/K(),ob=PG().objs,quick=['pt','text','ink','dim','blkh','blk','line','rect','wall','comp'];
+  if(f.area&&!S.lockAll){const g0=G;G.lp=setTimeout(()=>{if(G===g0&&!G.moved){const v2=V();v2.ox=g0.ox;v2.oy=g0.oy;startDrag(f.area,g0.x0,g0.y0);G.tp0=-1e9;hint('Diangkat — geser dengan jari');req()}},420)}}
+function fingerHit(sx,sy){const w=s2w(sx,sy),tol=14/K(),ob=PG().objs,quick=['pt','text','tbl','ink','dim','blkh','blk','line','rect','wall','comp'];
   for(const ty of quick)for(let i=ob.length-1;i>=0;i--){const o=ob[i];if(o.lock)continue;const tt=o.t==='blk'&&o.host?'blkh':o.t;if(tt!==ty)continue;
     if(ty==='comp'){if(!hitObj(o,w,tol))continue;const bb=bbox(compPoly(o));if(Math.max(bb.w,bb.h)*K()>260)return{area:o};return{obj:o}}
     if(ty==='wall'){if(segD(w,o.a,o.b).d<tol+o.th/2)return{obj:o};continue}
@@ -865,10 +924,10 @@ document.addEventListener('touchmove',e=>{if(e.target===cv)e.preventDefault()},{
 
 function setRead(sx,sy,s){readout=s?{x:sx,y:sy,s}:null}
 function lenRead(a,b){return fmtL(D(a,b))+' '+uLbl()+'   ∠ '+String(angDeg(a,b)).replace('.',',')+'°'}
-function updGhost(sx,sy){const w=s2w(sx,sy);if(String(S.blk).startsWith('comp:')){const id=S.blk.slice(5);if(!(P.defs||{})[id]){ghost=null;return}const s=snapPt(w);ghost={t:'comp',def:id,p:s.p,rot:S.blkRot,fx:false,sd:false,_ghost:1};snapMark=s.kind?s:null;return}
+function updGhost(sx,sy){const w=s2w(sx,sy);if(PG().sheet&&BLK[S.blk]&&BLK[S.blk].me){const h=elevAt(w);ghost=null;readout=h?{x:sx,y:sy,s:BLK[S.blk].n+'  +'+cmS(Math.max(0,Math.round(h.z/10)*10))+' cm'}:null;return}if(String(S.blk).startsWith('comp:')){const id=S.blk.slice(5);if(!(P.defs||{})[id]){ghost=null;return}const s=snapPt(w);ghost={t:'comp',def:id,p:s.p,rot:S.blkRot,fx:false,sd:false,_ghost:1};snapMark=s.kind?s:null;return}
   const B=BLK[S.blk];if(!B){ghost=null;return}
-  if(B.host){const h=nearWall(sx,sy,48);if(h){const at=clamp(roundStep(h.t),B.w/2,Math.max(B.w/2,h.g.L-B.w/2));const side=Math.sign((w.x-h.g.w.a.x)*h.g.n.x+(w.y-h.g.w.a.y)*h.g.n.y)||1;
-      ghost={t:'blk',k:S.blk,host:h.g.w.id,at,w:B.w,sw:side,hf:1,sd:S.dimBlk};ghost._f={O:{x:h.g.w.a.x+h.g.d.x*at,y:h.g.w.a.y+h.g.d.y*at},ang:Math.atan2(h.g.d.y,h.g.d.x),th:h.g.w.th};setRead(sx,sy,'Jarak dari ujung: '+fmtL(at-B.w/2)+' '+uLbl())}
+  if(B.host){const h=nearWall(sx,sy,48),BW=((S.opLast||{})[S.blk]||{}).w||B.w;if(h){const at=clamp(roundStep(h.t),BW/2,Math.max(BW/2,h.g.L-BW/2));const side=Math.sign((w.x-h.g.w.a.x)*h.g.n.x+(w.y-h.g.w.a.y)*h.g.n.y)||1;
+      ghost={t:'blk',k:S.blk,host:h.g.w.id,at,w:BW,sw:side,hf:1,sd:S.dimBlk};ghost._f={O:{x:h.g.w.a.x+h.g.d.x*at,y:h.g.w.a.y+h.g.d.y*at},ang:Math.atan2(h.g.d.y,h.g.d.x),th:h.g.w.th};setRead(sx,sy,'Jarak dari ujung: '+fmtL(at-B.w/2)+' '+uLbl())}
     else{ghost={t:'blk',k:S.blk,host:'?',w:B.w,_f:{O:w,ang:0,th:150}};setRead(sx,sy,'Arahkan ke dinding')}}
   else{const s=snapPt(w);ghost={t:'blk',k:S.blk,p:s.p,w:B.w,h:B.h,rot:S.blkRot,sd:S.dimBlk};snapMark=s.kind?s:null}}
 function nearWall(sx,sy,tolPx){const w=s2w(sx,sy),tol=tolPx/K();let best=null,bd=1e18;GEO.forEach(g=>{const r=segD(w,g.w.a,g.w.b),d=r.d-g.h;if(d<tol&&d<bd){bd=d;best={g,t:r.t*g.L}}});return best}
@@ -877,18 +936,19 @@ function beginOp(sx,sy){const w=s2w(sx,sy),t=S.tool;OP={t,sx0:sx,sy0:sy,moved:fa
   if((t==='pen')&&HW.timer){clearTimeout(HW.timer);HW.timer=0}
   switch(t){
     case'pen':case'hl':OP.pts=[[r1(w.x),r1(w.y)]];break;
-    case'line':case'wall':case'rect':case'hatch':{const s=snapPt(w);OP.a=s.p;OP.b=s.p;snapMark=s.kind?s:null;break}
+    case'line':case'wall':case'pipe':case'rect':case'hatch':case'ceil':{const s=snapPt(w);OP.a=s.p;OP.b=s.p;snapMark=s.kind?s:null;break}
     case'dim':if(dimStage){OP.mode='off';dimOff(w)}else{const s=snapPt(w);OP.a=s.p;OP.b=s.p;snapMark=s.kind?s:null}break;
-    case'erase':eraseAt(sx,sy);break;
+    case'erase':OP.lx=sx;OP.ly=sy;eraseAt(sx,sy);break;
     case'block':updGhost(sx,sy);break;
     case'calib':break;
     case'survey':break;
     case'offset':{const o=OFS&&byId(OFS.id);if(o){OP.ofs=true;OFS.prev=offGeom(o,w,S.offD)}else OP.pick=true;break}
     case'select':{const o=sel1();
-      if(o&&!o.lock&&(o.t==='line'||o.t==='wall'||o.t==='dim')){for(const k of['a','b']){const q=w2s(o[k]);if(Math.hypot(q.x-sx,q.y-sy)<24)OP.handle=k}}
-      if(o&&!o.lock&&o.t==='img'){boxCorners(o.p,o.w,o.h,o.rot).forEach(p=>{const q=w2s(p);if(Math.hypot(q.x-sx,q.y-sy)<26){OP.scale=true;OP.orig=clone(o);OP.d0=D(o.p,p)}})}
+      if(o&&!o.lock&&!S.lockAll&&(o.t==='line'||o.t==='wall'||o.t==='dim')){for(const k of['a','b']){const q=w2s(o[k]);if(Math.hypot(q.x-sx,q.y-sy)<24)OP.handle=k}}
+      if(o&&!o.lock&&!S.lockAll&&o.t==='img'){boxCorners(o.p,o.w,o.h,o.rot).forEach(p=>{const q=w2s(p);if(Math.hypot(q.x-sx,q.y-sy)<26){OP.scale=true;OP.orig=clone(o);OP.d0=D(o.p,p)}})}
       if(!OP.handle&&!OP.scale){const h=hit(sx,sy);
-        if(h){if(!SEL.has(h.id)){SEL.clear();SEL.add(h.id);grpExpand(SEL)}OP.move=!h.lock&&selObjs().every(x=>!x.lock);
+        if(h&&h.t==='pt'&&h.em)OP.emTap=h;if(h&&h.meRef)OP.meTap=h;
+        if(h){if(!SEL.has(h.id)){SEL.clear();SEL.add(h.id);grpExpand(SEL)}OP.move=!S.lockAll&&!h.lock&&selObjs().every(x=>!x.lock);
           const ids=expandSel();OP.orig=new Map(PG().objs.filter(x=>ids.has(x.id)).map(x=>[x.id,clone(x)]));OP.grab=h.id}
         else{SEL.clear();OP.box={s:w}}}
       showSelPanel();break}}
@@ -898,15 +958,15 @@ function moveOp(sx,sy){if(!OP)return;const w=s2w(sx,sy);if(!OP.moved&&Math.hypot
     case'pen':case'hl':{if(OP.shp){if(OP.shp.kind==='line'){OP.pts=lineSnap(OP.shp.a,w);req()}break}
       const L=OP.pts[OP.pts.length-1];if(Math.hypot(w.x-L[0],w.y-L[1])*K()>0.8)OP.pts.push([r1(w.x),r1(w.y)]);
       if(S.shape!=='off'&&(!OP.ha||Math.hypot(sx-OP.ha.x,sy-OP.ha.y)>3)){OP.ha={x:sx,y:sy};clearTimeout(OP.ht);OP.ht=setTimeout(holdShape,460)}break}
-    case'line':case'wall':if(OP.moved){const c=constrain(OP.a,w);OP.b=c.p;snapMark=c.kind?c:null;setRead(sx,sy,lenRead(OP.a,OP.b))}
+    case'line':case'wall':case'pipe':if(OP.moved){const c=constrain(OP.a,w);OP.b=c.p;snapMark=c.kind?c:null;setRead(sx,sy,lenRead(OP.a,OP.b))}
       else if(pend){const c=constrain(pend,w);OP.tb=c.p;snapMark=c.kind?c:null;setRead(sx,sy,lenRead(pend,OP.tb))}break;
     case'rect':if(OP.moved){const s=snapPt(w);let p=s.p;if(!s.kind)p={x:OP.a.x+roundStep(w.x-OP.a.x),y:OP.a.y+roundStep(w.y-OP.a.y)};OP.b=p;snapMark=s.kind?s:null;
       setRead(sx,sy,fmtL(Math.abs(p.x-OP.a.x))+' × '+fmtL(Math.abs(p.y-OP.a.y))+' '+uLbl())}break;
     case'dim':if(OP.mode==='off')dimOff(w);else if(OP.moved){const c=constrain(OP.a,w);OP.b=c.p;snapMark=c.kind?c:null;setRead(sx,sy,lenRead(OP.a,OP.b))}break;
-    case'hatch':if(!hatchPts.length&&OP.moved){const s=snapPt(w);OP.b=s.kind?s.p:{x:OP.a.x+roundStep(w.x-OP.a.x),y:OP.a.y+roundStep(w.y-OP.a.y)};snapMark=s.kind?s:null;
-        const r=normRect(OP.a,OP.b);setRead(sx,sy,fmtL(r.w2)+' × '+fmtL(r.h)+'  =  '+fmtA(r.w2*r.h))}
+    case'hatch':case'ceil':if(!hatchPts.length&&OP.moved){const s=snapPt(w);OP.b=s.kind?s.p:{x:OP.a.x+roundStep(w.x-OP.a.x),y:OP.a.y+roundStep(w.y-OP.a.y)};snapMark=s.kind?s:null;
+        const r=rectOP();setRead(sx,sy,fmtL(r.w2)+' × '+fmtL(r.h)+'  =  '+fmtA(r.w2*r.h))}
       else if(hatchPts.length){const c=constrain(hatchPts[hatchPts.length-1],w);hatchCur=c.p;snapMark=c.kind?c:null;setRead(sx,sy,lenRead(hatchPts[hatchPts.length-1],hatchCur))}break;
-    case'erase':eraseAt(sx,sy);break;
+    case'erase':OP.lx=sx;OP.ly=sy;eraseAt(sx,sy);break;
     case'block':updGhost(sx,sy);break;
     case'survey':if(SV&&SV.mode==='room')SV.at=snapPt(w).p;break;
     case'offset':{const o=OFS&&byId(OFS.id);if(OP.ofs&&o){if(OP.moved){const d=roundStep(dynDist(o,w))||roundStep(1)||1;OFS.dd=d;OFS.prev=offGeom(o,w,d);setRead(sx,sy,'Offset '+fmtL(d)+' '+uLbl())}else OFS.prev=offGeom(o,w,S.offD)}break}
@@ -917,33 +977,37 @@ function moveOp(sx,sy){if(!OP)return;const w=s2w(sx,sy);if(!OP.moved&&Math.hypot
       if(OP.scale&&o){const f=Math.max(0.02,D(o.p,w)/OP.d0);o.w=OP.orig.w*f;o.h=OP.orig.h*f;setRead(sx,sy,'Lebar foto '+fmtL(o.w)+' '+uLbl());break}
       if(OP.move&&OP.moved){moveGroup(OP,w,sx,sy)}break}}
   req()}
-function endOp(sx,sy){if(!OP)return;const w=s2w(sx,sy),t=OP.t,sc=PG().scale;snapMark=null;readout=null;
+function endOp(sx,sy){if(!OP)return;if(OP.t==='select'&&OP.emTap&&!OP.moved){const o=OP.emTap;OP=null;gotoElev(o);return}if(OP.t==='select'&&OP.meTap&&!OP.moved){const o=OP.meTap;OP=null;meEditDialog(o.meRef);return}const w=s2w(sx,sy),t=OP.t,sc=PG().scale;snapMark=null;readout=null;
   switch(t){
     case'pen':case'hl':{clearTimeout(OP.ht);let pts=OP.pts,sh=OP.sh,shaped=!!OP.shp;
       if(t==='pen'&&!shaped&&S.scrib!=='off'){const ids=scribbleHits(pts);if(ids.length){pushUndo(OP.pre);removeIds(ids);commit();hint(ids.length+' coretan dihapus (coret-hapus)');break}}
       if(t==='pen'&&!shaped&&S.shape==='auto'){const r=shpRecog(pts,false);if(r){pts=r.pts;sh=r.sharp;shaped=true;hint(r.name+' dirapikan · Undo untuk mengembalikan coretan asli')}}
       pushUndo(OP.pre);const o=add({t:'ink',pts,c:t==='hl'?S.hlC:S.penC,w:t==='hl'?S.hlW:S.penW,hl:t==='hl'});if(sh)o.sh=1;commit();if(t==='pen'&&!shaped&&S.hw!=='off')hwAdd(o);break}
-    case'line':case'wall':
+    case'line':case'wall':case'pipe':
       if(OP.moved){if(D(OP.a,OP.b)>1){pushUndo(OP.pre);const o=add(mkLine(OP.a,OP.b));pend=null;commit();showLinePanel(o)}}
       else if(pend){const c=constrain(pend,w);if(D(pend,c.p)>1){pushUndo(OP.pre);add(mkLine(pend,c.p));pend=c.p;commit()}showChainPanel()}
       else{pend=snapPt(w).p;showChainPanel()}break;
-    case'rect':if(OP.moved){const r=normRect(OP.a,OP.b);if(r.w2>1&&r.h>1){pushUndo(OP.pre);const o=add({t:'rect',...r,c:S.lineC,w:S.lineW,sd:S.dimNew});commit();showRectPanel(o)}}break;
+    case'rect':if(OP.moved){const r=rectOP();if(r.w2>1&&r.h>1){pushUndo(OP.pre);const o=add({t:'rect',...r,c:S.lineC,w:S.lineW,sd:S.dimNew});commit();showRectPanel(o)}}break;
     case'dim':
       if(OP.mode==='off'){pushUndo(OP.pre);add({t:'dim',a:dimStage.a,b:dimStage.b,off:dimStage.off});dimStage=null;commit();hint('Garis ukur dibuat')}
       else if(OP.moved&&D(OP.a,OP.b)>1){dimStage={a:OP.a,b:OP.b,off:8*sc};hint('Sentuh & geser untuk posisi garis ukur, lalu angkat')}
       else if(!OP.moved){const sg=nearSeg(sx,sy);if(sg){pushUndo(OP.pre);const[a,b]=sg.s,L=D(a,b),nx=-(b.y-a.y)/L,ny=(b.x-a.x)/L,m={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
         const side=Math.sign((w.x-m.x)*nx+(w.y-m.y)*ny)||-1;add({t:'dim',a:{...a},b:{...b},off:side*((sg.o.t==='wall'?sg.o.th/2:0)+7*sc)});commit();hint('Ukuran otomatis ditambahkan')}
         else hint('Ketuk garis/dinding, atau tarik dari titik ke titik')}break;
-    case'hatch':
-      if(!hatchPts.length&&OP.moved){const r=normRect(OP.a,OP.b);if(r.w2>1&&r.h>1){pushUndo(OP.pre);const o=add(mkHatch(rectPts(r)));commit();askRoom(o)}}
+    case'hatch':case'ceil':
+      if(!hatchPts.length&&OP.moved){const r=normRect(OP.a,OP.b);if(r.w2>1&&r.h>1){pushUndo(OP.pre);if(t==='ceil'){const o=add(mkCeil(rectPts(r)));commit();showCeilPanel(o)}else{const o=add(mkHatch(rectPts(r)));commit();askRoom(o)}}}
       else if(!OP.moved){
-        if(!hatchPts.length){const enc=PG().objs.slice().reverse().find(o=>!o.lock&&(o.t==='rect'&&inPoly(w,rectPts(o))||o.t==='blk'&&!o.host&&inPoly(w,boxCorners(o.p,o.w,o.h,o.rot))));
+        if(t==='ceil'&&!hatchPts.length){const ob=PG().objs.slice().reverse(),cz=ob.find(o=>o.t==='hatch'&&o.cz&&inPoly(w,o.pts));if(cz){showCeilPanel(cz);req();break}
+          const rm=ob.find(o=>!o.lock&&(o.t==='hatch'&&!o.cz&&inPoly(w,o.pts)||o.t==='rect'&&inPoly(w,rectPts(o))));if(rm){pushUndo(OP.pre);const o=add(mkCeil(rm.t==='rect'?rectPts(rm):rm.pts));commit();showCeilPanel(o);hint('Zona plafon mengikuti bentuk ruang · ubah tingginya di panel');break}}
+        if(t==='hatch'&&!hatchPts.length){const enc=PG().objs.slice().reverse().find(o=>!o.lock&&(o.t==='rect'&&inPoly(w,rectPts(o))||o.t==='blk'&&!o.host&&inPoly(w,boxCorners(o.p,o.w,o.h,o.rot))));
           if(enc){pushUndo(OP.pre);enc.pat=S.pat;enc.ps=S.patS;enc.pc=S.patC;if(enc.t==='rect')enc.area=S.area;commit();SEL.clear();SEL.add(enc.id);showSelPanel();hint('Material diisi langsung ke '+(enc.t==='rect'?'Kotak':'blok')+' (tidak terpisah)');break}}
+        if(!hatchPts.length&&t==='hatch'){const ex=PG().objs.slice().reverse().find(o=>o.t==='hatch'&&!o.cz&&inPoly(w,o.pts));if(ex){SEL.clear();SEL.add(ex.id);askRoom(ex);focusIn('#lbl');req();break}}
+        if(!hatchPts.length){const rp=roomFromWalls(w);if(rp==='open'){toast('Ruang belum tertutup dinding — tarik kotak atau ketuk sudut-sudutnya');}else if(rp){pushUndo(OP.pre);const o=add(t==='ceil'?mkCeil(rp):mkHatch(rp));commit();if(t==='ceil'){showCeilPanel(o)}else{askRoom(o);focusIn('#lbl')}hint(t==='ceil'?'Zona plafon mengikuti ruang':'Area ruang dibuat dari dinding · isi Nama ruang lalu Simpan');break}}
         const p=hatchPts.length?constrain(hatchPts[hatchPts.length-1],w).p:snapPt(w).p;
         if(hatchPts.length>=3&&D(p,hatchPts[0])*K()<18)finishHatch();else{hatchPts.push(p);hatchCur=null;showHatchPanel()}}break;
     case'erase':if(JSON.stringify(PG().objs)!==OP.pre){pushUndo(OP.pre);commit()}break;
-    case'block':{updGhost(sx,sy);const g=ghost;ghost=null;if(!g)break;if(g.host==='?'){toast('Pintu/jendela harus diletakkan pada dinding');break}
-      pushUndo(OP.pre);delete g._f;delete g._ghost;const o=add(g);SEL.clear();SEL.add(o.id);commit();showSelPanel();hint('Ketuk lagi untuk menaruh lagi, atau pilih alat lain');break}
+    case'block':{if(PG().sheet&&BLK[S.blk]&&BLK[S.blk].me){ghost=null;placeMeOnElev(w);break}updGhost(sx,sy);const g=ghost;ghost=null;if(!g)break;if(g.host==='?'){toast('Pintu/jendela harus diletakkan pada dinding');break}
+      pushUndo(OP.pre);delete g._f;delete g._ghost;{const L0=(S.opLast||{})[g.k];if(BLK[g.k]&&BLK[g.k].me){g.st=S.meSt||'eks';g.z=meZ(g)}else if(g.host&&L0){g.sl=L0.sl;g.hd=L0.hd}}const o=add(g);SEL.clear();SEL.add(o.id);commit();showSelPanel();hint('Ketuk lagi untuk menaruh lagi, atau pilih alat lain');break}
     case'offset':{const h=hit(sx,sy),o=OFS&&byId(OFS.id);
       if(OP.pick||(!OP.moved&&h&&h.id!==OFS?.id&&canOff(h))){if(h&&canOff(h)){OFS={id:h.id};hint('Ketuk sisi untuk offset '+fmtL(S.offD)+' '+uLbl()+' · tarik untuk jarak bebas · ketuk objek lain untuk ganti')}else{OFS=null;hint(h?'Objek ini tidak bisa di-offset':'Ketuk garis, dinding, kotak, atau area material')}break}
       if(o){const d=OP.moved?OFS.dd:S.offD,res=offGeom(o,w,d);OFS.prev=null;if(res&&res.length){pushUndo(OP.pre);let last=null;res.forEach(r=>{last=add(r)});commit();if(res.length===1&&last.t!=='line')OFS={id:last.id};else if(res.length===1)OFS={id:last.id};hint('Offset '+fmtL(d)+' '+uLbl()+' dibuat — ketuk sisi lagi untuk mengulang')}else toast('Jarak terlalu besar untuk objek ini')}break}
@@ -961,6 +1025,7 @@ function endOp(sx,sy){if(!OP)return;const w=s2w(sx,sy),t=OP.t,sc=PG().scale;snap
             if(win?inside:cross)SEL.add(o.id)});grpExpand(SEL);hint(SEL.size+' objek dipilih')}
         showSelPanel();break}
       if((OP.move&&OP.moved)||OP.handle||OP.scale){if(JSON.stringify(PG().objs)!==OP.pre){pushUndo(OP.pre);commit()}showSelPanel()}break;
+    case'table':{if(!OP.moved){const h=hit(sx,sy,'tbl');if(h){setTool('select');SEL=new Set([h.id]);showTblPanel(h)}else newTblDialog(w)}break}
     case'text':{const h=hit(sx,sy,'text');if(h){SEL.clear();SEL.add(h.id);editText(h)}else textDialog({s:'',f:S.txtF,h:S.txtH},v=>{if(!v.s.trim())return;pushUndo();add({t:'text',p:w,s:v.s,h:v.h,c:S.txtC,f:v.f,r:0});commit()})}break}
   OP=null;req()}
 function polyHitsRect(o,P,r){const R4=[{x:r.x,y:r.y},{x:r.x+r.w2,y:r.y},{x:r.x+r.w2,y:r.y+r.h},{x:r.x,y:r.y+r.h}],inR=p=>p.x>=r.x&&p.x<=r.x+r.w2&&p.y>=r.y&&p.y<=r.y+r.h;
@@ -969,9 +1034,9 @@ function polyHitsRect(o,P,r){const R4=[{x:r.x,y:r.y},{x:r.x+r.w2,y:r.y},{x:r.x+r
   const E=R4.map((p,i)=>[p,R4[(i+1)%4]]);return segs.some(([a,b])=>E.some(([c,d])=>segX(a,b,c,d)))}
 function segX(a,b,c,d){const o=(p,q,r)=>Math.sign((q.x-p.x)*(r.y-p.y)-(q.y-p.y)*(r.x-p.x));return o(a,b,c)!==o(a,b,d)&&o(c,d,a)!==o(c,d,b)}
 function cancelOp(){if(OP)clearTimeout(OP.ht);OP=null;snapMark=null;readout=null;req()}
-function mkLine(a,b){return S.tool==='wall'?{t:'wall',a:{...a},b:{...b},th:S.wallT,f:S.wallFill,pat:S.wallPat,pc:S.wallPc,sd:S.dimNew}:{t:'line',a:{...a},b:{...b},c:S.lineC,w:S.lineW,sd:S.dimNew}}
+function mkLine(a,b){if(S.tool==='pipe')return{t:'line',a:{...a},b:{...b},pp:S.pipeT||'ab',dia:S.pipeD||'',st:S.meSt||'eks',c:(PIPET[S.pipeT]||PIPET.ab).c,w:.5,sd:false};return S.tool==='wall'?{t:'wall',a:{...a},b:{...b},th:S.wallT,f:S.wallFill,pat:S.wallPat,pc:S.wallPc,sd:S.dimNew}:{t:'line',a:{...a},b:{...b},c:S.lineC,w:S.lineW,sd:S.dimNew}}
 function mkHatch(pts){return{t:'hatch',pts:pts.map(p=>({...p})),pat:S.pat,ps:S.patS,c:S.patC,area:S.area,lbl:''}}
-function finishHatch(){if(hatchPts.length<3)return;pushUndo();const o=add(mkHatch(hatchPts));hatchPts=[];hatchCur=null;commit();askRoom(o)}
+function finishHatch(){if(hatchPts.length<3)return;pushUndo();if(S.tool==='ceil'){const o=add(mkCeil(hatchPts));hatchPts=[];hatchCur=null;commit();showCeilPanel(o);return}const o=add(mkHatch(hatchPts));hatchPts=[];hatchCur=null;commit();askRoom(o)}
 function dimOff(w){const{a,b}=dimStage,L=D(a,b),nx=-(b.y-a.y)/L,ny=(b.x-a.x)/L;dimStage.off=(w.x-a.x)*nx+(w.y-a.y)*ny;req()}
 function xform(o,f,info){switch(o.t){
   case'line':case'wall':case'dim':o.a=f(o.a);o.b=f(o.b);if(info.mirror&&o.t==='dim')o.off=-o.off;break;
@@ -980,6 +1045,7 @@ function xform(o,f,info){switch(o.t){
   case'ink':o.pts=o.pts.map(p=>{const q=f({x:p[0],y:p[1]});return[r1(q.x),r1(q.y)]});break;
   case'text':o.p=f(o.p);if(info.rot)o.r=((o.r||0)+info.rot+360)%360;break;
   case'pt':o.p=f(o.p);break;
+  case'tbl':o.p=f(o.p);break;
   case'img':case'blk':case'comp':if(o.host){if(info.mirror)o.sw=-(o.sw||1);break}o.p=f(o.p);if(info.rot)o.rot=((o.rot||0)+info.rot+360)%360;if(info.mirror){o.fx=!o.fx;o.rot=(360-(o.rot||0))%360}break}}
 function grpExpand(ids){const gs=new Set();PG().objs.forEach(o=>{if(ids.has(o.id)&&o.g)gs.add(o.g)});if(gs.size)PG().objs.forEach(o=>{if(o.g&&gs.has(o.g))ids.add(o.id)});return ids}
 function expandSel(){const ids=grpExpand(new Set(SEL));PG().objs.forEach(o=>{if(o.t==='blk'&&o.host&&ids.has(o.host))ids.add(o.id)});return ids}
@@ -990,22 +1056,23 @@ function hitObj(o,w,tol){const sc=PG().scale;switch(o.t){
   case'line':return segD(w,o.a,o.b).d<tol+o.w*sc/2;
   case'wall':{const g=GEO.get(o.id);if(g&&wallPieces(g).some(p=>inPoly(w,piecePoly(g,p))))return true;return segD(w,o.a,o.b).d<tol+o.th/2}
   case'dim':{const L=D(o.a,o.b)||1,nx=-(o.b.y-o.a.y)/L*o.off,ny=(o.b.x-o.a.x)/L*o.off;return segD(w,{x:o.a.x+nx,y:o.a.y+ny},{x:o.b.x+nx,y:o.b.y+ny}).d<tol*1.5}
-  case'rect':return segsOf(o).some(([a,b])=>segD(w,a,b).d<tol);case'hatch':return inPoly(w,o.pts);
+  case'rect':return segsOf(o).some(([a,b])=>segD(w,a,b).d<tol);case'hatch':return!(o.cz&&S.ceilShow===false)&&inPoly(w,o.pts);
   case'ink':{for(let i=0;i<o.pts.length;i++){const a={x:o.pts[i][0],y:o.pts[i][1]},b=o.pts[i+1]?{x:o.pts[i+1][0],y:o.pts[i+1][1]}:a;if(segD(w,a,b).d<tol+o.w*sc/2)return true}return false}
   case'text':return inPoly(w,textBox(o))||textBox(o).some((p,i,P)=>segD(w,p,P[(i+1)%4]).d<tol);
+  case'tbl':return inPoly(w,tblPoly(o));
   case'img':{const q=toLocal(w,o.p,o.rot);return Math.abs(q.x-o.p.x)<=o.w/2&&Math.abs(q.y-o.p.y)<=o.h/2}
   case'blk':{const P=blkPoly(o);return P?(inPoly(w,P)||P.some((p,i)=>segD(w,p,P[(i+1)%P.length]).d<tol)):false}
-  case'comp':{const P=compPoly(o);return inPoly(w,P)||P.some((p,i)=>segD(w,p,P[(i+1)%4]).d<tol)}case'pt':return D(w,o.p)<tol*1.6}return false}
-function hit(sx,sy,only){const w=s2w(sx,sy),tol=12/K(),ob=PG().objs;const order=['pt','text','ink','dim','blkh','blk','comp','line','rect','wall','hatch','img'];
+  case'comp':{const P=compPoly(o);return inPoly(w,P)||P.some((p,i)=>segD(w,p,P[(i+1)%4]).d<tol)}case'pt':return D(w,o.p)<(o.em?Math.max(tol*1.6,6.5*PG().scale):tol*1.6)}return false}
+function hit(sx,sy,only){const w=s2w(sx,sy),tol=12/K(),ob=PG().objs;const order=['pt','text','ink','dim','tbl','blkh','blk','comp','line','rect','wall','hatch','img'];
   for(const pass of[0,1])for(const ty of order){if(only&&ty!==only)continue;for(let i=ob.length-1;i>=0;i--){const o=ob[i];if(!!o.lock!==!!pass)continue;
     const tt=o.t==='blk'&&o.host?'blkh':o.t;if(tt===ty&&hitObj(o,w,tol))return o}}return null}
 function nearSeg(sx,sy){const w=s2w(sx,sy),tol=14/K();let best=null,bd=1e18;PG().objs.forEach(o=>{if(!['line','wall','rect'].includes(o.t))return;
   const ss=o.t==='wall'?[[o.a,o.b]]:segsOf(o);ss.forEach(s=>{const d=segD(w,s[0],s[1]).d-(o.t==='wall'?o.th/2:0);if(d<tol&&d<bd){bd=d;best={o,s}}})});return best}
-function eraseAt(sx,sy){const w=s2w(sx,sy),tol=10/K(),ob=PG().objs;
-  for(let i=ob.length-1;i>=0;i--){const o=ob[i];if(o.lock||o.t==='hatch'||o.t==='img'||o.t==='wall'||o.t==='comp')continue;if(hitObj(o,w,tol)){removeIds([o.id]);req();return}}
+function eraseAt(sx,sy){const w=s2w(sx,sy),tol=(S.eraseR||10)/K(),ob=PG().objs;
+  for(let i=ob.length-1;i>=0;i--){const o=ob[i];if(o.lock||o.t==='hatch'||o.t==='img'||o.t==='wall'||o.t==='comp'||o.t==='tbl')continue;if(hitObj(o,w,tol)){removeIds([o.id]);req();return}}
   for(let i=ob.length-1;i>=0;i--){const o=ob[i];if(o.lock)continue;
     if(o.t==='wall'&&segD(w,o.a,o.b).d<tol+o.th/2){removeIds([o.id]);req();return}
-    if((o.t==='hatch'||o.t==='comp')&&segsOf(o).some(([a,b])=>segD(w,a,b).d<tol)){removeIds([o.id]);req();return}}}
+    if((o.t==='hatch'||o.t==='comp'||o.t==='tbl')&&segsOf(o).some(([a,b])=>segD(w,a,b).d<tol)){removeIds([o.id]);req();return}}}
 
 /* ---------- clipboard & group actions ---------- */
 let CLIP=null;try{CLIP=JSON.parse(localStorage.getItem(KEY+'_clip')||'null')}catch(_){}
@@ -1081,7 +1148,7 @@ const inp=(id,v,cls='')=>`<input type="text" inputmode="decimal" id="${id}" valu
 const val=id=>panel.querySelector('#'+id)?.value;
 const X_=`<button class="btn ic" data-p="x">✕</button>`;
 const xAct=()=>{SEL.clear();hidePanel();req();if(S.tool==='select')renderOpts()};
-function showChainPanel(){const kind=S.tool==='wall'?'Dinding':'Garis';
+function showChainPanel(){const kind=S.tool==='wall'?'Dinding':S.tool==='pipe'?'Pipa':'Garis';
   showPanel(`<span class="t">${kind}</span><span class="u">dari titik ⊕ · Panjang</span>${inp('pl','')}${un()}
    <button class="btn ic" data-p="d0">→</button><button class="btn ic" data-p="d90">↑</button><button class="btn ic" data-p="d180">←</button><button class="btn ic" data-p="d270">↓</button>
    <span class="u">sudut</span>${inp('pa','0')}<span class="u">°</span><button class="btn pri" data-p="mk" data-enter>Buat</button><button class="btn" data-p="done">Selesai</button>`,{
@@ -1093,14 +1160,22 @@ function patOpts(cur,none){return(none?`<option value="none" ${cur==='none'?'sel
 function wallMatHTML(o){return`<span class="br"></span><span class="u">Isi</span>${swRow(WFILL,o.f,'wf')}<span class="u">Pola</span><select class="opsel" data-c="wp">${patOpts(o.pat||'none',1)}</select>${swRow(['#16191d','#6b7078','#b45309','#1d4ed8'],o.pc||'#16191d','wpc')}`}
 function wallMatActs(list){return{wf:b=>{pushUndo();list.forEach(o=>o.f=b.dataset.v);S.wallFill=b.dataset.v;commit();showSelPanel()},
   wp:b=>{pushUndo();list.forEach(o=>o.pat=b.value);S.wallPat=b.value;commit()},wpc:b=>{pushUndo();list.forEach(o=>o.pc=b.dataset.v);S.wallPc=b.dataset.v;commit();showSelPanel()}}}
-function showLinePanel(o){const isW=o.t==='wall';SEL.clear();SEL.add(o.id);
+
+function showPipePanel(o){SEL.clear();SEL.add(o.id);showPanel(`<span class="t">Pipa</span><span class="u">${fmtL(D(o.a,o.b))} ${esc(uLbl())}</span>${Object.keys(PIPET).map(k=>`<button class="chip ${o.pp===k?'on':''}" data-p="pt" data-v="${k}">${PIPET[k].n}</button>`).join('')}
+   <span class="br"></span><span class="u">Ø</span>${['½"','¾"','1"','1¼"','2"','3"','4"'].map(v=>`<button class="chip ${o.dia===v?'on':''}" data-p="pd" data-v="${esc(v)}">${v}</button>`).join('')}${['eks','baru'].map(v=>`<button class="chip ${(o.st||'eks')===v?'on':''}" data-p="ps" data-v="${v}">${v==='eks'?'Eksisting':'Rencana'}</button>`).join('')}
+   <button class="btn" data-p="cont">Sambung ➜</button><button class="btn dan" data-p="del">Hapus</button>${X_}`,{
+   pt:b=>{pushUndo();expandSel().forEach(id=>{const x=byId(id);if(x&&x.pp){x.pp=b.dataset.v;x.c=PIPET[x.pp].c}});S.pipeT=b.dataset.v;commit();showPipePanel(o)},
+   pd:b=>{pushUndo();expandSel().forEach(id=>{const x=byId(id);if(x&&x.pp)x.dia=b.dataset.v});S.pipeD=b.dataset.v;commit();showPipePanel(o)},
+   ps:b=>{pushUndo();expandSel().forEach(id=>{const x=byId(id);if(x&&x.pp)x.st=b.dataset.v});commit();showPipePanel(o)},
+   cont:()=>{pend={...o.b};S.pipeT=o.pp;setTool('pipe',true);showChainPanel();req()},del:()=>{pushUndo();removeIds([o.id]);hidePanel();commit()},x:xAct})}
+function showLinePanel(o){if(o.pp)return showPipePanel(o);const isW=o.t==='wall';SEL.clear();SEL.add(o.id);
   showPanel(`<span class="t">${isW?'Dinding':'Garis'}</span><span class="u">Panjang</span>${inp('pl',fmtL(D(o.a,o.b)))}${un()}<span class="u">Sudut</span>${inp('pa',String(angDeg(o.a,o.b)).replace('.',','))}<span class="u">°</span>
-   ${isW?`<span class="u">Tebal</span>${inp('pt',String(o.th/10).replace('.',','))}<span class="u">cm</span><span class="u">Tinggi 3D</span>${inp('ph',String(r1((o.ht||S.wallH)/1000)).replace('.',','))}<span class="u">m</span>`:''}${sdBtn(o)}
-   <button class="btn pri" data-p="ok" data-enter>Ubah</button><button class="btn" data-p="cont">Sambung ➜</button>${isW?'<button class="btn" data-p="blk">+ Pintu/Jendela</button>':''}<button class="btn dan" data-p="del">Hapus</button>${X_}${isW?wallMatHTML(o):`<span class="br"></span><span class="u">Warna</span>${swRow(COLORS,o.c,'lc')}<span class="u">Tebal</span>${inp('lw',String(o.w).replace('.',','))}<span class="u">mm</span>`}`,{lc:b=>{pushUndo();o.c=b.dataset.v;commit();showLinePanel(o)},
-   ok:()=>{const L=parseL(val('pl')),a=parseN(val('pa'));if(!L)return toast('Panjang tidak valid');pushUndo();o.b=polar(o.a,L,a??0);if(isW){const t=parseN(val('pt'));if(t>0)o.th=t*10;const hh=parseN(val('ph'));if(hh>0)o.ht=hh*1000}else{const w=parseN(val('lw'));if(w>0)o.w=w}commit();hint('Diperbarui')},
+   ${isW?`<span class="u">Tebal</span>${inp('pt',String(o.th/10).replace('.',','))}<span class="u">cm</span><span class="u">Tinggi</span>${wallVar(o)?`<span class="u"><b>${wallHSum(o)}</b></span>`:inp('ph',String(r1((o.ht||S.wallH)/1000)).replace('.',','))+'<span class="u">m</span>'}<button class="btn" data-p="hgt">⇕ Atur tinggi</button>`:''}${sdBtn(o)}
+   <button class="btn pri" data-p="ok" data-enter>Ubah</button><button class="btn" data-p="cont">Sambung ➜</button>${isW?'<button class="btn" data-p="blk">+ Pintu/Jendela</button><button class="btn" data-p="elev">▤ Tampak dinding</button><button class="btn" data-p="area">▦ Luas m²</button>':''}<button class="btn dan" data-p="del">Hapus</button>${X_}${isW?wallMatHTML(o):`<span class="br"></span><span class="u">Warna</span>${swRow(COLORS,o.c,'lc')}<span class="u">Tebal</span>${inp('lw',String(o.w).replace('.',','))}<span class="u">mm</span>`}`,{lc:b=>{pushUndo();o.c=b.dataset.v;commit();showLinePanel(o)},
+   ok:()=>{const L=parseL(val('pl')),a=parseN(val('pa'));if(!L)return toast('Panjang tidak valid');pushUndo();o.b=polar(o.a,L,a??0);if(isW){const t=parseN(val('pt'));if(t>0)o.th=t*10;const hh=parseN(($('#ph')||{}).value);if(hh>0&&!wallVar(o))o.ht=hh*1000}else{const w=parseN(val('lw'));if(w>0)o.w=w}commit();hint('Diperbarui')},
    ...sdAct([o],()=>showLinePanel(o)),
    cont:()=>{pend={...o.b};setTool(o.t,true);showChainPanel();req()},blk:()=>libDialog('Pintu & Jendela'),
-   del:()=>{pushUndo();removeIds([o.id]);hidePanel();commit()},x:xAct,...(isW?wallMatActs([o]):{})})}
+   del:()=>{pushUndo();removeIds([o.id]);hidePanel();commit()},elev:()=>elevDialog([o]),area:()=>wallAreaDialog([o]),hgt:()=>wallHDialog(o),x:xAct,...(isW?wallMatActs([o]):{})})}
 function showRectPanel(o){SEL.clear();SEL.add(o.id);const has=o.pat&&o.pat!=='none';
   showPanel(`<span class="t">Kotak</span><span class="u">Lebar</span>${inp('rw',fmtL(o.w2))}<span class="u">×</span><span class="u">Tinggi</span>${inp('rh',fmtL(o.h))}${un()}
    <button class="btn pri" data-p="ok" data-enter>Ubah</button>${sdBtn(o)}<button class="btn" data-p="walls">▭ Jadikan dinding</button><button class="btn" data-p="exp">Explode</button><button class="btn dan" data-p="del">Hapus</button>${X_}
@@ -1120,12 +1195,16 @@ function showHatchEdit(o){showPanel(`<span class="t">Bidang</span><select class=
   <button class="btn pri" data-p="ok" data-enter>Simpan</button><button class="btn dan" data-p="del">Hapus</button>${X_}`,{
   pat:b=>{pushUndo();o.pat=b.value;if(b.value!=='none')S.pat=b.value;commit()},pc:b=>{pushUndo();o.c=b.dataset.v;commit();showHatchEdit(o)},ol:()=>{pushUndo();o.ol=!o.ol;if(o.ol){o.oc=o.oc||S.lineC;o.ow=o.ow||S.lineW}commit();showHatchEdit(o)},walls:()=>toWallsDialog([o]),area:()=>{pushUndo();o.area=!o.area;commit();showHatchEdit(o)},
   ok:()=>{pushUndo();o.lbl=val('lbl')||'';commit();xAct()},del:()=>{pushUndo();removeIds([o.id]);hidePanel();commit()},x:xAct})}
-function showBlkPanel(o){const B=BLK[o.k];
+const OPPRE={P:[[70,210,0],[80,210,0],[90,210,0],[120,210,0],[160,240,0]],J:[[50,50,170],[60,100,110],[100,150,90],[120,150,90],[150,150,90]],BV:[[40,20,210],[60,30,210],[100,30,210],[120,40,220]],L:[[80,210,0],[100,100,100],[200,240,0]]};
+function showBlkPanel(o){const B=BLK[o.k];if(B&&B.me&&o.host)return showMePanel(o);
   if(o.host){const g=GEO.get(o.host);showPanel(`<span class="t">${esc(B.n)}</span><span class="u">Lebar</span>${inp('bw',fmtL(o.w))}${un()}<span class="u">Jarak dari ujung</span>${inp('ba',fmtL(o.at-o.w/2))}${un()}
-     ${/^jendela/.test(o.k)?`<span class="u">Ambang</span>${inp('bsl',r1((o.sl??900)/10))}<span class="u">cm · Tinggi atas</span>${inp('bhd',r1((o.hd??2100)/10))}<span class="u">cm</span>`:`<span class="u">Tinggi kusen</span>${inp('bhd',r1((o.hd??2100)/10))}<span class="u">cm</span>`}
+     <span class="u">Tinggi</span>${inp('bh2',cmS(opHead(o)-opSill(o)))}<span class="u">cm · Ambang</span>${inp('bsl',cmS(opSill(o)))}<span class="u">cm · Kode</span><input type="text" id="bcd" value="${esc(o.code||'')}" placeholder="${esc(opCodes(PG().objs).get(o.id)||'')}" style="width:64px" autocomplete="off">${o.hm?'':'<span class="u" style="color:#dc2626">belum diukur</span>'}
      <button class="btn pri" data-p="ok" data-enter>Ubah</button>${sdBtn(o)}${B.door?'<button class="btn" data-p="sw">⇅ Arah buka</button>':''}${o.k==='pintu1'?'<button class="btn" data-p="hf">⇆ Engsel</button>':''}
-     <select class="opsel" data-c="kind">${Object.values(BLK).filter(b=>b.host).map(b=>`<option value="${b.k}" ${b.k===o.k?'selected':''}>${b.n}</option>`).join('')}</select><button class="btn" data-p="dup">Duplikat</button><button class="btn dan" data-p="del">Hapus</button>${X_}`,{
-     ok:()=>{const w=parseL(val('bw')),a=parseN(val('ba')),sl=parseN(val('bsl')),hd=parseN(val('bhd'));pushUndo();if(w)o.w=w;if(a!=null)o.at=a*UNITS[S.unit].f+o.w/2;if(g)o.at=clamp(o.at,o.w/2,g.L-o.w/2);if(sl!=null)o.sl=sl*10;if(hd>0)o.hd=hd*10;commit();hint('Diperbarui')},...sdAct([o],()=>showBlkPanel(o)),
+     <select class="opsel" data-c="kind">${Object.values(BLK).filter(b=>b.host).map(b=>`<option value="${b.k}" ${b.k===o.k?'selected':''}>${b.n}</option>`).join('')}</select><button class="btn" data-p="dup">Duplikat</button><button class="btn dan" data-p="del">Hapus</button>${X_}
+     <span class="br"></span><span class="u">Cepat (cm):</span>${(OPPRE[opKind(o)]||[]).map(v=>{const[pw,ph,ps]=v;return`<button class="chip" data-p="pre" data-v="${v}">${pw}×${ph}${ps?' +'+ps:''}</button>`}).join('')}`,{
+     ok:()=>{const w=parseL(val('bw')),a=parseN(val('ba')),sl=parseN(val('bsl')),h2=parseN(val('bh2')),cd=$('#bcd').value.trim();pushUndo();if(w)o.w=w;if(a!=null)o.at=a*UNITS[S.unit].f+o.w/2;if(g)o.at=clamp(o.at,o.w/2,g.L-o.w/2);
+       if(sl!=null&&sl>=0)o.sl=sl*10;else o.sl=opSill(o);if(h2>0)o.hd=o.sl+h2*10;else o.hd=opHead(o);o.hm=1;if(cd)o.code=cd;else delete o.code;S.opLast=S.opLast||{};S.opLast[o.k]={w:o.w,sl:o.sl,hd:o.hd};commit();showBlkPanel(o);hint('Diperbarui')},
+     pre:b=>{const[pw,ph,ps]=b.dataset.v.split(',').map(Number);pushUndo();o.w=pw*10;o.sl=ps*10;o.hd=(ps+ph)*10;o.hm=1;if(g)o.at=clamp(o.at,o.w/2,g.L-o.w/2);S.opLast=S.opLast||{};S.opLast[o.k]={w:o.w,sl:o.sl,hd:o.hd};commit();showBlkPanel(o)},...sdAct([o],()=>showBlkPanel(o)),
      sw:()=>{pushUndo();o.sw=-(o.sw||1);commit()},hf:()=>{pushUndo();o.hf=-(o.hf||1);commit()},kind:b=>{pushUndo();o.k=b.value;commit();showSelPanel()},
      dup:dupSel,del:delSel,x:xAct})}
   else showPanel(`<span class="t">${esc(B.n)}</span><span class="u">Lebar</span>${inp('bw',fmtL(o.w))}<span class="u">×</span>${inp('bh',fmtL(o.h))}${un()}<span class="u">Rotasi</span>${inp('br',String(o.rot||0))}<span class="u">°</span>
@@ -1147,23 +1226,23 @@ function showCompPanel(o){const d=(P.defs||{})[o.def];showPanel(`<span class="t"
    <span class="br"></span><span class="u">${PG().objs.filter(x=>x.t==='comp'&&x.def===o.def).length} salinan di halaman ini · edit satu = semua ikut berubah</span>`,{
    ok:()=>{const r=parseN(val('cr'));if(r==null)return;pushUndo();o.rot=((r%360)+360)%360;commit()},r90:()=>rotSel(90),mir:mirSel,ed:()=>editComp(o),exp:explodeSel,dup:dupSel,del:delSel,x:xAct,
    ren:()=>nameDialog('Ganti nama komponen','Nama',d?.name||'',n=>{if(d){d.name=n;defsDirty();commit();showCompPanel(o)}})})}
-function showPtPanel(o){showPanel(`<span class="t">Titik survey</span><span class="u">Label</span><input type="text" id="pl2" class="wide" value="${esc(o.lbl)}"><button class="btn pri" data-p="ok" data-enter>Simpan</button><button class="btn" data-p="line">Mulai garis dari sini</button><button class="btn dan" data-p="del">Hapus</button>${X_}`,{
+function showPtPanel(o){if(o.em)return showEmPanel(o);showPanel(`<span class="t">Titik survey</span><span class="u">Label</span><input type="text" id="pl2" class="wide" value="${esc(o.lbl)}"><button class="btn pri" data-p="ok" data-enter>Simpan</button><button class="btn" data-p="line">Mulai garis dari sini</button><button class="btn dan" data-p="del">Hapus</button>${X_}`,{
    ok:()=>{pushUndo();o.lbl=val('pl2')||'';commit()},line:()=>{setTool('line');pend={...o.p};showChainPanel();req()},del:delSel,x:xAct})}
 function showSelPanel(){const objs=selObjs();if(!objs.length){hidePanel();if(S.tool==='select')renderOpts();return}
   if(S.tool==='select')renderOpts();
   if(objs.length===1){const o=objs[0];
     if(o.lock)return showPanel(`<span class="t">🔒 Terkunci</span><span class="u">${esc(TNAME[o.t]||'')}</span><button class="btn pri" data-p="un">Buka kunci</button>${X_}`,{un:()=>lockSel(false),x:xAct});
-    if(o.t==='line'||o.t==='wall')return showLinePanel(o);if(o.t==='rect')return showRectPanel(o);if(o.t==='hatch')return showHatchEdit(o);if(o.t==='blk')return showBlkPanel(o);if(o.t==='img')return showImgPanel(o);if(o.t==='comp')return showCompPanel(o);if(o.t==='pt')return showPtPanel(o)}
+    if(o.t==='tbl')return showTblPanel(o);if(o.t==='line'||o.t==='wall')return showLinePanel(o);if(o.t==='rect')return showRectPanel(o);if(o.t==='hatch')return o.cz?showCeilPanel(o):showHatchEdit(o);if(o.t==='blk')return showBlkPanel(o);if(o.t==='img')return showImgPanel(o);if(o.t==='comp')return showCompPanel(o);if(o.t==='pt')return showPtPanel(o)}
   const walls=objs.filter(o=>o.t==='wall'),inks=objs.filter(o=>o.t==='ink'),one=objs.length===1?objs[0]:null;
   const title=one?TNAME[one.t]:objs.length+' objek';
   showPanel(`<span class="t">${esc(title)}</span>${one&&one.t==='dim'?`<span class="u">${fmtDim(D(one.a,one.b))}</span>`:''}${one&&one.t==='text'?'<button class="btn" data-p="edit">Ubah teks</button>':''}
     ${inks.length?`<button class="btn" data-p="hw">✍︎ Jadikan teks</button>`:''}<button class="btn" data-p="dup">Duplikat</button><button class="btn" data-p="copy">Salin</button><button class="btn" data-p="r90">⟲ 90°</button><button class="btn" data-p="mir">⇋ Cermin</button>
     <button class="btn" data-p="lock">🔒 Kunci</button><button class="btn dan" data-p="del">Hapus</button>${X_}<span class="br"></span>
-    ${objs.length>1?(objs.every(o=>o.g&&o.g===objs[0].g)?'<button class="btn" data-p="ungrp">⧈ Ungroup</button>':'<button class="btn" data-p="grp">⧉ Group</button>'):''}<button class="btn" data-p="mkc">◈ Jadikan komponen</button>${objs.some(o=>explodeObj(o))?'<button class="btn" data-p="exp">Explode</button>':''}${objs.some(o=>['line','wall','rect','blk','comp'].includes(o.t))?sdBtn(objs.find(o=>['line','wall','rect','blk','comp'].includes(o.t))):''}${objs.every(o=>['line','rect','hatch'].includes(o.t))?'<button class="btn" data-p="walls">▭ Jadikan dinding</button>':''}
+    ${objs.length>1?(objs.every(o=>o.g&&o.g===objs[0].g)?'<button class="btn" data-p="ungrp">⧈ Ungroup</button>':'<button class="btn" data-p="grp">⧉ Group</button>'):''}${walls.length?'<button class="btn" data-p="elev">▤ Tampak dinding</button><button class="btn" data-p="area">▦ Luas m²</button>':''}<button class="btn" data-p="mkc">◈ Jadikan komponen</button>${objs.some(o=>explodeObj(o))?'<button class="btn" data-p="exp">Explode</button>':''}${objs.some(o=>['line','wall','rect','blk','comp'].includes(o.t))?sdBtn(objs.find(o=>['line','wall','rect','blk','comp'].includes(o.t))):''}${objs.every(o=>['line','rect','hatch'].includes(o.t))?'<button class="btn" data-p="walls">▭ Jadikan dinding</button>':''}
     ${walls.length&&walls.length===objs.length?wallMatHTML(walls[0]):`<span class="br"></span><span class="u">Warna</span>${swRow(COLORS,(objs.find(o=>o.c)||{}).c,'gcol')}`}`,{gcol:b=>{pushUndo();objs.forEach(o=>{if(['line','rect','ink','text','blk','hatch'].includes(o.t))o.c=b.dataset.v});commit();showSelPanel()},
-    grp:groupSel,ungrp:ungroupSel,mkc:makeComp,exp:explodeSel,walls:()=>toWallsDialog(objs),...sdAct(objs.filter(o=>['line','wall','rect','blk','comp'].includes(o.t)),showSelPanel),
+    grp:groupSel,ungrp:ungroupSel,elev:()=>elevDialog(objs),area:()=>wallAreaDialog(objs),mkc:makeComp,exp:explodeSel,walls:()=>toWallsDialog(objs),...sdAct(objs.filter(o=>['line','wall','rect','blk','comp'].includes(o.t)),showSelPanel),
     edit:()=>editText(one),hw:()=>hwRecognize(inks.map(o=>o.id),true),dup:dupSel,copy:()=>copySel(),r90:()=>rotSel(90),mir:mirSel,lock:()=>lockSel(true),del:delSel,x:xAct,...wallMatActs(walls)})}
-const TNAME={line:'Garis',wall:'Dinding',rect:'Kotak',hatch:'Bidang / material',dim:'Garis ukur',ink:'Coretan',text:'Teks',img:'Foto',blk:'Blok',comp:'Komponen',pt:'Titik survey'};
+const TNAME={tbl:'Tabel',line:'Garis',wall:'Dinding',rect:'Kotak',hatch:'Bidang / material',dim:'Garis ukur',ink:'Coretan',text:'Teks',img:'Foto',blk:'Blok',comp:'Komponen',pt:'Titik survey'};
 const sdOn=o=>o.t==='blk'||o.t==='comp'?o.sd===true:o.sd!==false;
 const sdBtn=o=>`<button class="btn ${sdOn(o)?'pri':''}" data-p="sd">📏 ${sdOn(o)?'Ukuran tampil':'Ukuran sembunyi'}</button>`;
 const sdAct=(list,again)=>({sd:()=>{pushUndo();const v=!list.every(sdOn);list.forEach(o=>o.sd=v);commit();again()}});
@@ -1188,11 +1267,11 @@ const IC={
  exp:'<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/>',survey:'<path d="M4 20l6-14 6 14"/><path d="M10 6V3M7 13h6"/><circle cx="18" cy="6" r="2.5"/>',offset:'<path d="M4 17L17 4"/><path d="M8 21L21 8" stroke-dasharray="2.5 2.5"/><path d="M10 10l3 3"/>'};
 IC.focus='<path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/>';IC.share='<path d="M12 15V3M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>';
 IC.layers='<path d="M12 4l8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4M4 16l8 4 8-4"/>';IC.back='<path d="M15 5l-7 7 7 7"/>';
-IC.cube='<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/>';
+IC.ceil='<path d="M3 5h18"/><path d="M6 5v4h12V5" stroke-dasharray="2 2"/><path d="M12 12v7M9 16l3 3 3-3"/>';IC.opl='<rect x="6" y="4" width="9" height="16"/><path d="M19 4v16M17.5 6L19 4l1.5 2M17.5 18l1.5 2 1.5-2"/>';IC.lock='<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>';IC.unlock='<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 017.5-2"/>';IC.pipe='<path d="M4 7h9a3 3 0 013 3v10"/><path d="M4 11h7a1 1 0 011 1v8"/><path d="M4 5v8M14 20h4"/>';IC.table='<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 10h18M3 14.5h18M9 5v14M15 5v14"/>';IC.scroll='<rect x="6" y="2.5" width="12" height="8" rx="1"/><rect x="6" y="13.5" width="12" height="8" rx="1"/>';IC.cube='<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/>';
 IC.home='<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>';
-const TOOLS=[['select','Pilih'],['pen','Pena'],['hl','Stabilo'],['line','Garis'],['wall','Dinding'],['rect','Kotak'],['dim','Ukuran'],['hatch','Material'],['offset','Offset'],['block','Blok'],['survey','Survey'],['text','Teks'],['erase','Hapus']];
+const TOOLS=[['select','Pilih'],['pen','Pena'],['hl','Stabilo'],['line','Garis'],['wall','Dinding'],['rect','Kotak'],['dim','Ukuran'],['hatch','Material'],['ceil','Plafon'],['pipe','Pipa'],['table','Tabel'],['offset','Offset'],['block','Blok'],['survey','Survey'],['text','Teks'],['erase','Hapus']];
 const svg=k=>`<svg viewBox="0 0 24 24">${IC[k]}</svg>`;
-function renderTop(){let pg=null;try{pg=PG()}catch(_){}
+function renderTop(){let pg=null;try{pg=PG()}catch(_){}{const bc=$('#backchip');if(bc){const sp=pg&&pg.sheet&&P.pages.find(p=>p.id===pg.src);bc.classList.toggle('show',!!sp);if(sp)bc.textContent='‹ '+sp.name}}
   $('#top').innerHTML=`<div class="hl"><button class="ib" data-a="home" title="Semua proyek">${svg('home')}</button><button class="ib" data-a="pages" title="Halaman / lantai">${svg('layers')}</button>
    <button class="ttl" data-a="pages"><b>${esc(pg?P.name:'')}</b><small>${esc(pg?pg.name:'')}${pg?' · '+(pg.paper==='Custom'?'Custom':pg.paper)+' · 1:'+pg.scale:''}</small></button></div>
    <div class="tools">`+TOOLS.map(([k,n])=>`<button class="tb ${S.tool===k?'on':''}" data-tool="${k}" title="${n}">${svg(k)}<span>${n}</span></button>`).join('')+
@@ -1205,11 +1284,16 @@ function renderRail(){const r=$('#rail');if(!r)return;
    <button class="rb ${S.snap?'act':''}" data-a="snap" title="Snap">${svg('snap')}<span>Snap</span></button>
    <button class="rb ${S.grid?'act':''}" data-a="grid" title="Grid">${svg('grid')}<span>Grid</span></button>
    <button class="rb ${S.hand?'act':''}" data-a="hand" title="Jari menggeser objek">${svg('finger')}<span>Tangan</span></button>
+   <button class="rb ${S.opLbl!=='off'?'act':''}" data-a="opLbl" title="Label tinggi pintu/jendela">${svg('opl')}<span>${{full:'Tinggi',code:'Kode',off:'Tinggi'}[S.opLbl]}</span></button>
+   <button class="rb ${S.ceilShow!==false?'act':''}" data-a="ceilShow" title="Tampilkan zona plafon">${svg('ceil')}<span>Plafon</span></button>
+   <button class="rb ${S.fingerDraw?'act':''}" data-a="fingerDraw" title="Gambar dengan jari (tanpa pen)">${svg('pen')}<span>${S.fingerDraw?'Jari: gambar':'Jari: geser'}</span></button>
+   <button class="rb ${S.lockAll?'act lk':''}" data-a="lockAll" title="Kunci semua gambar">${svg(S.lockAll?'lock':'unlock')}<span>${S.lockAll?'Terkunci':'Kunci'}</span></button>
+   <button class="rb ${S.pgMode==='all'?'act':''}" data-a="pgMode" title="Satu halaman / semua halaman (gulir)">${svg('scroll')}<span>${S.pgMode==='all'?'Semua':'1 hal'}</span></button>
    <i></i><button class="rb" data-a="fit" title="Pas layar">${svg('fit')}<span>Pas</span></button>
    <button class="rb" data-a="focus" title="Mode fokus (ketuk 4 jari)">${svg('focus')}<span>Fokus</span></button>`}
 function withRecent(list){return[...list,...(S.recentC||[]).filter(c=>!list.includes(c))]}
 function sws(list,cur,key){const L=withRecent(list);if(cur&&!L.includes(cur))L.push(cur);return L.map(c=>`<button class="sw ${c===cur?'on':''}" style="background:${c}" data-set="${key}" data-v="${c}"></button>`).join('')+`<button class="sw pick" data-pick="${key}" title="Warna bebas (RGB)"></button>`}
-const CUST={svRot:['Rotasi denah ukur','°'],penW:['Tebal pena','mm'],hlW:['Lebar stabilo','mm'],lineW:['Tebal garis','mm'],wallT:['Tebal dinding','cm',v=>v*10,v=>v/10],txtH:['Tinggi huruf','mm'],patS:['Skala pola','×'],blkRot:['Rotasi blok','°'],
+const CUST={ceilZ:['Tinggi plafon','cm',v=>v*10,v=>v/10],svRot:['Rotasi denah ukur','°'],penW:['Tebal pena','mm'],hlW:['Lebar stabilo','mm'],lineW:['Tebal garis','mm'],wallT:['Tebal dinding','cm',v=>v*10,v=>v/10],txtH:['Tinggi huruf','mm'],patS:['Skala pola','×'],blkRot:['Rotasi blok','°'],
   offD:['Jarak offset',()=>uLbl(),v=>v*UNITS[S.unit].f,v=>v/UNITS[S.unit].f]};
 function chips(list,cur,key,fmt){let h=list.map(v=>`<button class="chip ${v==cur?'on':''}" data-set="${key}" data-v="${v}">${fmt?fmt(v):v}</button>`).join('');
   if(CUST[key]){if(!list.some(v=>v==cur))h+=`<button class="chip on" data-cust="${key}">${fmt?fmt(cur):cur}</button>`;h+=`<button class="chip" data-cust="${key}">✎ Custom</button>`}return h}
@@ -1228,50 +1312,57 @@ function colorDialog(cur,cb){let col=/^#[0-9a-f]{6}$/i.test(cur||'')?cur:'#16191
   $('#cpn').addEventListener('input',e=>set(e.target.value,'n'));$('#cph').addEventListener('input',e=>{let v=e.target.value.trim();if(!v.startsWith('#'))v='#'+v;if(/^#[0-9a-f]{6}$/i.test(v))set(v,'h')});
   [0,1,2].forEach(i=>$('#cr'+i).addEventListener('input',()=>set('#'+[0,1,2].map(j=>(+$('#cr'+j).value).toString(16).padStart(2,'0')).join(''),'r')));set(col)}
 function numDialog(title,unit,init,cb){openDlg(`<h2>${esc(title)}</h2><label>Nilai (${esc(unit)})</label><input type="text" inputmode="decimal" id="nv" value="${esc(init)}" autocomplete="off"><div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Terapkan</button></div>`,
-  {x:closeDlg,ok:()=>{const v=parseN($('#nv').value);if(v==null||(v<=0&&unit!=='°'))return toast('Nilai tidak valid');closeDlg();cb(v)}});setTimeout(()=>{const i=$('#nv');if(i){i.focus();i.select()}},60)}
+  {x:closeDlg,ok:()=>{const v=parseN($('#nv').value);if(v==null||(v<=0&&unit!=='°'))return toast('Nilai tidak valid');closeDlg();cb(v)}});focusIn('#nv',1)}
 function nameDialog(title,label,init,cb){openDlg(`<h2>${esc(title)}</h2><label>${esc(label)}</label><input type="text" id="nm" value="${esc(init)}" autocomplete="off"><div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">OK</button></div>`,
-  {x:closeDlg,ok:()=>{const v=$('#nm').value.trim();if(!v)return;closeDlg();cb(v)}});setTimeout(()=>{const i=$('#nm');if(i){i.focus();i.select()}},60)}
+  {x:closeDlg,ok:()=>{const v=$('#nm').value.trim();if(!v)return;closeDlg();cb(v)}});focusIn('#nm',1)}
 function scaleSel(){const sc=PG().scale,L=SCALES.includes(sc)?SCALES:[...SCALES,sc].sort((a,b)=>a-b);return`<span class="lbl">Skala</span><select class="opsel" data-sel="scale">${L.map(s=>`<option value="${s}" ${s==sc?'selected':''}>1 : ${s}</option>`).join('')}<option value="custom">Custom…</option></select>`}
 function stepSel(){const L=[[0,'Tidak'],[10,'1 cm'],[50,'5 cm'],[100,'10 cm']];if(!L.some(x=>x[0]==S.step))L.push([S.step,S.step/10+' cm']);return`<span class="lbl">Bulatkan</span><select class="opsel" data-sel="step">${L.map(([v,n])=>`<option value="${v}" ${v==S.step?'selected':''}>${n}</option>`).join('')}<option value="custom">Custom…</option></select>`}
+const rng=(k,mn,mx,st,fmt)=>`<span class="rngw"><input type="range" class="rng" data-range="${k}" min="${mn}" max="${mx}" step="${st}" value="${S[k]}"><b class="rngv" data-rv="${k}">${fmt(S[k])}</b></span>`;
+const RNGF={penW:v=>r1(v*100)/100+' mm',hlW:v=>r1(v)+' mm',eraseR:v=>Math.round(v)+' px'};
 function renderOpts(){const o=$('#opts'),t=S.tool;let h='';const dimC=`<button class="chip ${S.dimNew?'on':''}" data-set="dimNew" data-v="${!S.dimNew}">📏 Ukuran ${S.dimNew?'tampil':'sembunyi'}</button>`;
   const unitSel=`<span class="lbl">Satuan</span><select class="opsel" data-sel="unit">${Object.keys(UNITS).map(u=>`<option ${u===S.unit?'selected':''}>${u}</option>`).join('')}</select>`;
-  if(t==='pen')h=sws(COLORS,S.penC,'penC')+'<span class="lbl">Tebal</span>'+chips([0.25,0.5,1,2],S.penW,'penW',v=>v+' mm')+'<span class="lbl">Rapikan bentuk</span>'+chips(['auto','hold','off'],S.shape,'shape',v=>({auto:'Otomatis',hold:'Tahan pena',off:'Mati'})[v])+'<span class="lbl">Coret-hapus</span>'+chips(['on','off'],S.scrib,'scrib',v=>({on:'Nyala',off:'Mati'})[v])+'<span class="lbl">Tulisan → font</span>'+chips(['off','auto','on'],S.hw,'hw',v=>({off:'Mati',auto:'Auto',on:'Nyala'})[v]);
-  else if(t==='hl')h=sws(HLCOL,S.hlC,'hlC')+'<span class="lbl">Lebar</span>'+chips([3,5,8],S.hlW,'hlW',v=>v+' mm');
-  else if(t==='line'||t==='rect')h=dimC+sws(COLORS,S.lineC,'lineC')+'<span class="lbl">Tebal pena</span>'+chips([0.18,0.25,0.35,0.5,0.7],S.lineW,'lineW',v=>v+' mm')+stepSel()+scaleSel();
+  if(t==='pen')h=sws(COLORS,S.penC,'penC')+'<span class="lbl">Tebal</span>'+rng('penW',0.1,4,0.05,RNGF.penW)+'<span class="lbl">Rapikan bentuk</span>'+chips(['auto','hold','off'],S.shape,'shape',v=>({auto:'Otomatis',hold:'Tahan pena',off:'Mati'})[v])+'<span class="lbl">Coret-hapus</span>'+chips(['on','off'],S.scrib,'scrib',v=>({on:'Nyala',off:'Mati'})[v])+'<span class="lbl">Tulisan → font</span>'+chips(['off','auto','on'],S.hw,'hw',v=>({off:'Mati',auto:'Auto',on:'Nyala'})[v]);
+  else if(t==='hl')h=sws(HLCOL,S.hlC,'hlC')+'<span class="lbl">Lebar</span>'+rng('hlW',1,20,0.5,RNGF.hlW);
+  else if(t==='line'||t==='rect')h=(t==='rect'?'<span class="lbl">Tarik dari</span>'+chips(['corner','center'],S.rectC?'center':'corner','rectC',v=>v==='center'?'⊕ As tengah':'◰ Sudut'):'')+dimC+sws(COLORS,S.lineC,'lineC')+'<span class="lbl">Tebal pena</span>'+chips([0.18,0.25,0.35,0.5,0.7],S.lineW,'lineW',v=>v+' mm')+stepSel()+scaleSel();
   else if(t==='wall')h=dimC+'<span class="lbl">Tebal</span>'+chips([100,150,200,300],S.wallT,'wallT',v=>r1(v/10)+' cm')+'<span class="lbl">Isi</span>'+sws(WFILL,S.wallFill,'wallFill')+`<span class="lbl">Pola</span><select class="opsel" data-sel="wallPat">${patOpts(S.wallPat,1)}</select>`+sws(['#16191d','#6b7078'],S.wallPc,'wallPc')+stepSel()+scaleSel();
   else if(t==='dim')h='<button class="chip" data-a="dimStyle">Aa Gaya ukuran…</button><span class="lbl">Tarik titik ke titik, atau ketuk garis/dinding</span>'+unitSel+scaleSel();
   else if(t==='hatch')h=`<span class="lbl">Pola</span><select class="opsel" data-sel="pat">${patOpts(S.pat)}</select>`+sws(['#6b7078','#16191d','#b45309','#15803d','#1d4ed8'],S.patC,'patC')+'<span class="lbl">Skala pola</span>'+chips([0.5,1,2],S.patS,'patS',v=>'×'+v)+`<button class="chip ${S.area?'on':''}" data-set="area" data-v="${!S.area}">Luas m²</button>`;
+  else if(t==='pipe')h='<span class="lbl">Jenis</span>'+chips(Object.keys(PIPET),S.pipeT||'ab','pipeT',v=>PIPET[v].n)+'<span class="lbl">Ø</span>'+chips(['½"','¾"','1"','1¼"','2"','3"','4"'],S.pipeD,'pipeD')+'<span class="lbl">Status</span>'+chips(['eks','baru'],S.meSt||'eks','meSt',v=>v==='eks'?'Eksisting':'Rencana')+stepSel();
+  else if(t==='table')h='<span class="lbl">Ketuk di kertas untuk menaruh tabel: kosong, data ruangan otomatis, atau daftar kusen otomatis</span>';
+  else if(t==='ceil')h='<span class="lbl">Tinggi plafon</span>'+chips([2400,2600,2800,3000,3200],S.ceilZ,'ceilZ',v=>'+'+fmtH(v))+'<span class="lbl">Tarik kotak · ketuk titik-titik sudut · atau ketuk di dalam ruang (area material/kotak) · drop ceiling = zona di dalam zona</span>';
   else if(t==='offset')h='<span class="lbl">Jarak</span>'+chips([50,100,150,200,500],S.offD,'offD',v=>fmtL(v)+' '+uLbl())+'<span class="lbl">1) Ketuk objek  2) Ketuk sisi = jarak di atas · atau tarik = jarak bebas</span>';
-  else if(t==='block'){const B=BLK[S.blk],isC=String(S.blk).startsWith('comp:');h=`<button class="chip on" data-a="lib">▦ Pustaka blok</button><span class="lbl">Aktif:</span><b>${esc(blkName(S.blk))}</b><button class="chip ${S.dimBlk?'on':''}" data-set="dimBlk" data-v="${!S.dimBlk}">📏 Ukuran ${S.dimBlk?'tampil':'sembunyi'}</button>`+(isC||B&&!B.host?'<span class="lbl">Rotasi</span>'+chips([0,90,180,270],S.blkRot,'blkRot',v=>v+'°'):'<span class="lbl">Ketuk pada dinding — dinding otomatis terpotong</span>')}
+  else if(t==='block'){const B=BLK[S.blk],isC=String(S.blk).startsWith('comp:');h=`<button class="chip on" data-a="lib">▦ Pustaka blok</button><span class="lbl">Aktif:</span><b>${esc(blkName(S.blk))}</b>${B&&B.me&&PG().sheet?'<span class="lbl">Ketuk di gambar tampak untuk memasang (tinggi = posisi ketukan)</span>':''}${B&&B.me?'<span class="lbl">Status</span>'+chips(['eks','baru'],S.meSt||'eks','meSt',v=>v==='eks'?'Eksisting':'Rencana'):''}<button class="chip ${S.dimBlk?'on':''}" data-set="dimBlk" data-v="${!S.dimBlk}">📏 Ukuran ${S.dimBlk?'tampil':'sembunyi'}</button>`+(isC||B&&!B.host?'<span class="lbl">Rotasi</span>'+chips([0,90,180,270],S.blkRot,'blkRot',v=>v+'°'):'<span class="lbl">Ketuk pada dinding — dinding otomatis terpotong</span>')}
   else if(t==='text')h=sws(COLORS,S.txtC,'txtC')+'<span class="lbl">Tinggi</span>'+chips([2.5,3.5,5,7],S.txtH,'txtH',v=>v+' mm')+`<span class="lbl">Font</span><select class="opsel" data-sel="txtF">${Object.entries(FONTS).map(([k,f])=>`<option value="${k}" ${k===S.txtF?'selected':''}>${f[0]}</option>`).join('')}</select>`;
   else if(t==='survey')h=`<button class="chip ${SV&&SV.mode==='room'?'on':''}" data-a="svRoom">▢ Ruang dari ukuran</button><button class="chip ${SV&&SV.mode==='tri'?'on':''}" data-a="svTri">⊙ Titik dari 2 jarak</button>`+(SV&&SV.mode==='room'?'<span class="lbl">Putar</span>'+chips([0,90,180,270],S.svRot,'svRot',v=>v+'°')+'<span class="lbl">Ketuk untuk menaruh sudut A</span>':'<span class="lbl">Untuk gambar as-built: masukkan ukuran hasil meteran, aplikasi yang menyusun bentuknya</span>');
-  else if(t==='erase')h='<span class="lbl">Gosok objek untuk menghapus. Dinding/material terhapus bila tepinya disentuh. Objek terkunci aman.</span>';
+  else if(t==='erase')h='<span class="lbl">Ukuran penghapus</span>'+rng('eraseR',4,80,1,RNGF.eraseR)+'<span class="lbl">Gosok objek untuk menghapus. Dinding/material terhapus bila tepinya disentuh. Objek terkunci aman.</span>';
   else if(t==='calib')h='<span class="lbl">Kalibrasi foto: ketuk dua titik yang jaraknya diketahui.</span><button class="chip" data-a="calX">Batal</button>';
   else{const n=SEL.size;h=`<button class="chip" data-a="selAll">Pilih semua</button><button class="chip" data-a="copy" ${n?'':'disabled'}>Salin</button><button class="chip" data-a="paste" ${CLIP?'':'disabled'}>Tempel</button><button class="chip" data-a="dup" ${n?'':'disabled'}>Duplikat</button><button class="chip" data-a="rot" ${n?'':'disabled'}>⟲ 90°</button><button class="chip" data-a="del" ${n?'':'disabled'}>Hapus</button><button class="chip" data-a="unlockAll">Buka semua kunci</button><span class="lbl">Tarik kiri→kanan = window, kanan→kiri = crossing</span>`}
   o.innerHTML=h}
 $('#stage').prepend($('#opts'));
 $('#top').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.tool)return setTool(b.dataset.tool);ACT[b.dataset.a]?.()});
+$('#backchip').addEventListener('click',()=>{const pg=PG(),i=P.pages.findIndex(p=>p.id===pg.src);if(i<0)return;P.cur=i;SEL.clear();hidePanel();fit();renderTop();renderPages&&renderPages();req()});
 $('#rail').addEventListener('click',e=>{const b=e.target.closest('button');if(b)ACT[b.dataset.a]?.()});
 $('#ctx').addEventListener('click',e=>{const b=e.target.closest('[data-cx]');if(!b)return;hideCtx();({paste:pasteClip,selAll:selectAll,undo,fit:()=>{fit();req();save()}})[b.dataset.cx]()});
 $('#opts').addEventListener('click',e=>{const a=e.target.closest('[data-a]');if(a)return ACT[a.dataset.a]?.();
   const pk=e.target.closest('[data-pick]');if(pk){const k=pk.dataset.pick;return colorDialog(S[k],c=>{S[k]=c;applyKeyToSel(k,c);save();renderOpts();req()})}
   const cu=e.target.closest('[data-cust]');if(cu){const k=cu.dataset.cust,[t,u,to,from]=CUST[k];return numDialog(t,typeof u==='function'?u():u,String(r1(from?from(S[k]):S[k])).replace('.',','),v=>{S[k]=to?to(v):v;if(k==='blkRot'){S[k]=((v%360)+360)%360;if(ghost)ghost.rot=S[k]}applyKeyToSel(k,S[k]);save();renderOpts();req()})}
   const b=e.target.closest('[data-set]');if(!b)return;let v=b.dataset.v;const k=b.dataset.set;
-  if(['penW','hlW','lineW','wallT','patS','txtH','blkRot','offD','svRot'].includes(k))v=parseFloat(v);if(k==='area'||k==='dimNew'||k==='dimBlk')v=v==='true';S[k]=v;
+  if(['penW','hlW','lineW','wallT','patS','txtH','blkRot','offD','svRot','ceilZ'].includes(k))v=parseFloat(v);if(k==='area'||k==='dimNew'||k==='dimBlk')v=v==='true';if(k==='rectC')v=v==='center';S[k]=v;
   applyKeyToSel(k,v);
   if(k==='hw')hint({off:'Tulisan tetap coretan',auto:'Tulisan yang terlihat seperti kata diubah jadi font',on:'Semua coretan Pena diubah jadi font'}[v]);
   if(k==='blkRot'&&ghost)ghost.rot=v;
   if(k==='shape')hint({auto:'Garis, lingkaran, kotak, segitiga dirapikan otomatis saat pena diangkat',hold:'Gambar bentuk lalu tahan pena sebentar untuk merapikan',off:'Coretan dibiarkan apa adanya'}[v]);
   if(k==='scrib')hint(v==='on'?'Coret zig-zag di atas tulisan untuk menghapusnya':'Coret-hapus mati');
   save();renderOpts();req()});
-$('#opts').addEventListener('change',e=>{const s=e.target.closest('[data-sel]');if(!s)return;const k=s.dataset.sel;
+$('#opts').addEventListener('input',e=>{const r=e.target.closest('[data-range]');if(!r)return;const k=r.dataset.range,v=parseFloat(r.value);S[k]=v;const l=$('#opts [data-rv="'+k+'"]');if(l)l.textContent=RNGF[k](v);req()});
+$('#opts').addEventListener('change',e=>{const r=e.target.closest('[data-range]');if(r){const k=r.dataset.range;applyKeyToSel(k,S[k]);save();return}const s=e.target.closest('[data-sel]');if(!s)return;const k=s.dataset.sel;
   if(k==='scale'){if(s.value==='custom')return numDialog('Skala 1 : N','N',PG().scale,v=>setScale(Math.round(v)));setScale(+s.value)}
   else if(k==='step'){if(s.value==='custom')return numDialog('Pembulatan panjang','cm',S.step/10,v=>{S.step=v*10;save();renderOpts()});S.step=+s.value}
   else{S[k]=s.value;applyKeyToSel(k,s.value)}save();renderOpts();req()});
 function setScale(sc){PG().scale=sc;commit();renderOpts();toast('Skala 1 : '+sc+' — ukuran nyata objek tetap')}
 let PENBACK=null;
 function setTool(t,keep,quiet){PENBACK=null;S.tool=t;OFS=null;if(t!=='survey')SV=null;if(!keep)pend=null;hatchPts=[];hatchCur=null;dimStage=null;ghost=null;CAL=null;if(t!=='select')SEL.clear();hidePanel();renderTop();renderOpts();save();req();
-  const H={a:0,line:'Tarik garis dengan Pencil, atau ketuk titik awal lalu ketik panjang',wall:'Tarik dinding (garis as). Sudut & pertemuan T otomatis menyatu',rect:'Tarik kotak, lalu ketik lebar × tinggi',hatch:'Tarik area, atau ketuk titik sudut satu per satu',dim:'Ketuk garis/dinding untuk ukuran otomatis',text:'Ketuk di kertas untuk menulis teks',block:'Ketuk di kertas untuk menaruh '+blkName(S.blk),offset:'Offset: ketuk garis, dinding, kotak, atau area material'};if(H[t]&&!keep&&!quiet)hint(H[t])}
+  const H={a:0,line:'Tarik garis dengan Pencil, atau ketuk titik awal lalu ketik panjang',wall:'Tarik dinding (garis as). Sudut & pertemuan T otomatis menyatu',rect:'Tarik kotak, lalu ketik lebar × tinggi',hatch:'Tarik area, atau ketuk titik sudut satu per satu',pipe:'Pipa: tarik per ruas, atau ketuk titik demi titik (seperti Garis)',table:'Ketuk di kertas untuk menaruh tabel',ceil:'Plafon: tarik kotak, ketuk sudut-sudut, atau ketuk di dalam ruang',dim:'Ketuk garis/dinding untuk ukuran otomatis',text:'Ketuk di kertas untuk menulis teks',block:'Ketuk di kertas untuk menaruh '+blkName(S.blk),offset:'Offset: ketuk garis, dinding, kotak, atau area material'};if(H[t]&&!keep&&!quiet)hint(H[t])}
 const ACT={
  pages:()=>{const d=$('#drawer');d.classList.toggle('show');if(d.classList.contains('show'))renderPages()},
  undo,redo,
@@ -1279,12 +1370,17 @@ const ACT={
  snap:()=>{S.snap=!S.snap;renderRail();save();hint(S.snap?'Snap ke ujung/tengah/garis aktif':'Snap mati')},
  grid:()=>{S.grid=!S.grid;renderRail();save();req()},
  hand:()=>{S.hand=!S.hand;renderRail();save();hint(S.hand?'Tangan nyala: sentuh & geser objek dengan jari (jari tidak pernah menulis)':'Tangan mati: jari hanya menggeser kertas & zoom')},
- fit:()=>{fit();req();save()},focus:toggleFocus,menu:()=>menuDialog(),export:()=>exportDialog(),newPage:()=>pageDialog(null),
+ fit:()=>{fit();req();save()},focus:toggleFocus,
+ pgMode:()=>{S.pgMode=S.pgMode==='all'?'one':'all';renderRail();save();if(S.pgMode==='all'){const v=V();if(v){v.oy=Math.min(v.oy,40)}}else fit();req();hint(S.pgMode==='all'?'Semua halaman: gulir ke atas/bawah untuk pindah halaman, gambar langsung di halaman mana pun':'Satu halaman')},
+ fingerDraw:()=>{S.fingerDraw=!S.fingerDraw;renderRail();save();hint(S.fingerDraw?'Jari menggambar seperti pen (semua alat) · 2 jari = geser & zoom · ketuk 2 jari = undo':'Jari hanya menggeser & zoom; menggambar pakai pen')},
+ lockAll:()=>{S.lockAll=!S.lockAll;renderRail();save();hint(S.lockAll?'Semua gambar dikunci: jari & Pencil tidak bisa menggeser objek (tetap bisa memilih & mengisi ukuran)':'Kunci dibuka: objek bisa digeser lagi')},
+ opLbl:()=>{S.opLbl={full:'code',code:'off',off:'full'}[S.opLbl||'full'];renderRail();save();req();hint({full:'Label pintu/jendela: kode + lebar×tinggi + ambang (cm)',code:'Label pintu/jendela: kode saja',off:'Label pintu/jendela disembunyikan'}[S.opLbl])},
+ ceilShow:()=>{S.ceilShow=S.ceilShow===false;renderRail();save();req();hint(S.ceilShow?'Zona plafon ditampilkan':'Zona plafon disembunyikan')},menu:()=>menuDialog(),export:()=>exportDialog(),newPage:()=>pageDialog(null),
  photo:()=>$('#photo').click(),lib:()=>libDialog(),dimStyle:()=>dimStyleDialog(),
  selAll:selectAll,copy:()=>copySel(),paste:pasteClip,dup:dupSel,rot:()=>rotSel(90),del:delSel,
  unlockAll:()=>{const L=PG().objs.filter(o=>o.lock);if(!L.length)return toast('Tidak ada objek terkunci');pushUndo();L.forEach(o=>o.lock=false);commit();toast(L.length+' objek dibuka kuncinya')},
  calX:()=>{const p=CAL?.prev||'select';CAL=null;setTool(p)},
- svRoom:()=>{if(S.tool!=='survey')setTool('survey');roomDialog()},svTri:()=>{if(S.tool!=='survey')setTool('survey');SV={mode:'tri',stage:0};renderOpts();hint('Ketuk titik acuan A (mis. sudut dinding yang sudah ada)');req()},projects:()=>showHome(),v3d:()=>open3D(),home:()=>showHome(),backup:backupDialog,kop:kopDialog};
+ svRoom:()=>{if(S.tool!=='survey')setTool('survey');roomDialog()},svTri:()=>{if(S.tool!=='survey')setTool('survey');SV={mode:'tri',stage:0};renderOpts();hint('Ketuk titik acuan A (mis. sudut dinding yang sudah ada)');req()},projects:()=>showHome(),impx:()=>$('#impf').click(),v3d:()=>open3D(),home:()=>showHome(),backup:backupDialog,kop:kopDialog};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&b.isConnected&&!b.closest('#top')&&!b.closest('#opts')&&!b.closest('#rail')&&ACT[b.dataset.a])ACT[b.dataset.a]()});
 
 /* ---------- pages drawer ---------- */
@@ -1292,12 +1388,12 @@ function thumb(pg){const[PW,PH]=pdim(pg);const z=Math.min(124/PW,88/PH);const c=
   const keep=GEO;render(c.getContext('2d'),pg,{z,ox:0,oy:0},{d:1,cw:c.width,ch:c.height,exp:true});GEO=keep;return c.toDataURL()}
 function renderPages(){const pn=$('#projName');if(pn)pn.textContent=P.name;$('#plist').innerHTML=P.pages.map((p,i)=>`<div class="pg ${i===P.cur?'on':''}" data-i="${i}"><img class="th" src="${thumb(p)}"><div><div class="nm">${esc(p.name)}</div><div class="mt">${p.paper} ${p.orient==='L'?'landscape':'portrait'} · 1:${p.scale}</div></div><button class="ed" data-e="${i}">⋯</button></div>`).join('')}
 $('#plist').addEventListener('click',e=>{const ed=e.target.closest('[data-e]');if(ed)return pageDialog(P.pages[+ed.dataset.e]);const p=e.target.closest('.pg');if(p)goPage(+p.dataset.i)});
-function goPage(i){P.cur=i;pend=null;hatchPts=[];dimStage=null;SEL.clear();hidePanel();if(!PG().view)fit();renderPages();renderOpts();save();req();$('#drawer').classList.remove('show')}
+function goPage(i){if(allMode()){syncViews();const v=PG().view;P.cur=i;const w=P.pages[i].view;if(w&&v){w.oy=40;w.ox=v.ox+(w.ox-v.ox)}}else P.cur=i;pend=null;hatchPts=[];dimStage=null;SEL.clear();hidePanel();if(!PG().view)fit();renderTop();renderPages();renderOpts();save();req();$('#drawer').classList.remove('show')}
 
 /* ---------- dialogs ---------- */
 const modal=$('#modal'),dlg=$('#dlg');let DA={};
 function openDlg(html,acts,wide){dlg.className='dlg'+(wide?' wide':'');dlg.innerHTML=html;DA=acts||{};modal.classList.add('show')}
-function closeDlg(){modal.classList.remove('show');DA={}}
+function closeDlg(){modal.classList.remove('show');DA={};if(HEDIT){HEDIT=null;req()}}
 dlg.addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(b&&DA[b.dataset.d])DA[b.dataset.d](b)});
 dlg.addEventListener('change',e=>{const b=e.target.closest('[data-dc]');if(b&&DA[b.dataset.dc])DA[b.dataset.dc](b)});
 dlg.addEventListener('input',e=>{const b=e.target.closest('[data-dc]');if(b&&b.dataset.dc==='upd'&&b.type!=='checkbox'&&DA.upd)DA.upd(b)});
@@ -1306,7 +1402,7 @@ function textDialog(init,cb){openDlg(`<h2>Teks</h2><textarea id="tx" placeholder
   <div class="row"><div><label>Font</label><select id="tf">${Object.entries(FONTS).map(([k,f])=>`<option value="${k}" ${k===init.f?'selected':''}>${f[0]}</option>`).join('')}</select></div>
   <div><label>Tinggi huruf (mm di kertas, bebas)</label><input type="text" inputmode="decimal" id="th" value="${String(init.h).replace('.',',')}"></div></div>
   <div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Simpan</button></div>`,
-  {x:closeDlg,ok:()=>{const v={s:$('#tx').value,f:$('#tf').value,h:parseN($('#th').value)||init.h||3.5};S.txtF=v.f;S.txtH=v.h;closeDlg();cb(v)}});setTimeout(()=>$('#tx')?.focus(),60)}
+  {x:closeDlg,ok:()=>{const v={s:$('#tx').value,f:$('#tf').value,h:parseN($('#th').value)||init.h||3.5};S.txtF=v.f;S.txtH=v.h;closeDlg();cb(v)}});focusIn('#tx')}
 function paperOpts(cur){return PAPER_GROUPS.map(([g,L])=>`<optgroup label="${g}">${L.map(k=>`<option ${k===cur?'selected':''}>${k}</option>`).join('')}</optgroup>`).join('')+`<option value="Custom" ${cur==='Custom'?'selected':''}>Custom (bebas)…</option>`}
 function kopOpts(cur){return[...KOP_BUILTIN,...S.kopTpls].map(t=>`<option value="${t.id}" ${t.id===cur?'selected':''}>${esc(t.name)}${S.kopTpls.includes(t)?' ★':''}</option>`).join('')}
 function pageDialog(pg){const isNew=!pg;const cp=PG();const p=pg||{name:'Denah Lantai '+(P.pages.length+1),paper:cp.paper,orient:cp.orient,scale:cp.scale,kop:cp.kop||'klasik',cw:cp.cw||420,ch:cp.ch||297};
@@ -1398,23 +1494,25 @@ function calibDialog(L){openDlg(`<h2>Kalibrasi skala foto</h2><p>Jarak dua titik
   <label>Ukuran sebenarnya (${esc(uLbl())})</label><input type="text" inputmode="decimal" id="cl" placeholder="mis. 3,5">
   <div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Terapkan</button></div>`,{
   x:()=>{closeDlg();ACT.calX()},ok:()=>{const real=parseL($('#cl').value);const o=byId(CAL.id);if(!real||!o)return toast('Isi ukuran');const f=real/L,P1=CAL.pts[0];pushUndo();
-    o.w*=f;o.h*=f;o.p={x:P1.x+(o.p.x-P1.x)*f,y:P1.y+(o.p.y-P1.y)*f};closeDlg();const prev=CAL.prev;CAL=null;setTool('select');SEL.add(o.id);commit();showSelPanel();toast('Foto diskalakan ×'+f.toFixed(3).replace('.',','))}});setTimeout(()=>$('#cl')?.focus(),60)}
+    o.w*=f;o.h*=f;o.p={x:P1.x+(o.p.x-P1.x)*f,y:P1.y+(o.p.y-P1.y)*f};closeDlg();const prev=CAL.prev;CAL=null;setTool('select');SEL.add(o.id);commit();showSelPanel();toast('Foto diskalakan ×'+f.toFixed(3).replace('.',','))}});focusIn('#cl')}
 function menuDialog(){openDlg(`<h2>Menu</h2>
   <label>Nama proyek (muncul di KOP)</label><input type="text" id="pj" value="${esc(P.name)}">
   <div class="row"><div><label>Satuan ukuran</label><select id="un">${Object.keys(UNITS).map(u=>`<option ${u===S.unit?'selected':''}>${u}</option>`).join('')}</select></div>
+  <div><label>Ketuk 2/3 jari = Undo/Redo</label><select id="tg"><option value="1" ${S.tapGest!==false?'selected':''}>Nyala</option><option value="0" ${S.tapGest===false?'selected':''}>Mati</option></select></div>
   <div><label>Label panjang garis</label><select id="sl"><option value="1" ${S.showLen?'selected':''}>Tampil</option><option value="0" ${!S.showLen?'selected':''}>Sembunyi</option></select></div></div>
   <div class="list" style="margin-top:14px">
    <button data-d="proj"><b>▦ Semua proyek (layar awal)</b><small>Buka, buat, duplikat, hapus proyek · tersinkron antar perangkat</small></button>
    <button data-d="page"><b>Kertas & skala halaman ini</b><small>A0–A5, F4, Letter, Legal, Tabloid, ARCH, atau ukuran bebas</small></button>
    <button data-d="kop"><b>KOP gambar</b><small>Pilih template modern, ubah isi & tampilan, simpan template sendiri, atau hilangkan</small></button>
    <button data-d="ds"><b>Aa Gaya ukuran & label</b><small>Font, tinggi huruf bebas, warna RGB, satuan & tulisannya, desimal</small></button>
+   <button data-d="impx"><b>⤒ Impor PDF / DWG / DXF / gambar</b><small>Masukkan gambar kerja, denah lama, atau file AutoCAD ke halaman ini</small></button>
    <button data-d="exp"><b>Ekspor…</b><small>PDF, DXF untuk AutoCAD & SketchUp, PNG</small></button>
    <button data-d="bk"><b>⤓ Cadangkan ke iCloud / Google Drive</b><small>Semua proyek + foto dalam satu file · terakhir: ${S.lastBackup?fmtDate(S.lastBackup)+' '+hhmm(S.lastBackup):'belum pernah'}</small></button>
    <button data-d="imp"><b>Pulihkan dari cadangan…</b><small>Buka file .json cadangan</small></button>
    ${window.DS_NATIVE?'<button data-d="acct"><b>☁ Akun sinkron & kunci API</b><small>Masuk agar proyek muncul di semua perangkat · tulisan tangan → font</small></button>':''}<button data-d="help"><b>Cara pakai</b><small>Gerakan jari & Pencil</small></button></div>
   <div class="acts"><button class="btn pri" data-d="ok">Tutup</button></div>`,{acct:()=>window.DS_NATIVE.accountDialog({openDlg,closeDlg,toast,esc,$}),
-  ok:()=>{const n=$('#pj').value.trim();if(n)P.name=n;S.unit=$('#un').value;S.showLen=$('#sl').value==='1';closeDlg();renderOpts();renderPages();cloudMeta();commit()},
-  proj:()=>{closeDlg();showHome()},page:()=>pageDialog(PG()),kop:kopDialog,ds:dimStyleDialog,exp:exportDialog,bk:backupDialog,imp:()=>$('#file').click(),help:helpDlg})}
+  ok:()=>{const n=$('#pj').value.trim();if(n)P.name=n;S.unit=$('#un').value;S.tapGest=$('#tg').value==='1';S.showLen=$('#sl').value==='1';closeDlg();renderOpts();renderPages();cloudMeta();commit()},
+  proj:()=>{closeDlg();showHome()},page:()=>pageDialog(PG()),kop:kopDialog,ds:dimStyleDialog,exp:exportDialog,bk:backupDialog,imp:()=>$('#file').click(),impx:()=>{closeDlg();$('#impf').click()},help:helpDlg})}
 function backupDialog(){openDlg(`<h2>Cadangkan ke iCloud / Google Drive</h2>
   <p>Membuat satu file berisi <b>semua proyek, halaman, foto, template KOP & gaya</b>. Setelah menekan tombol, iPad menampilkan lembar bagikan:</p>
   <p>• <b>iCloud Drive</b>: pilih “Simpan ke File” → iCloud Drive → folder (mis. “Denah Skala”).<br>• <b>Google Drive</b>: pilih aplikasi Google Drive (atau Simpan ke File → Drive bila Drive aktif di app File).</p>
@@ -1456,6 +1554,21 @@ function helpDlg(){openDlg(`<h2>Cara pakai</h2>
   <p><b>Offset:</b> alat Offset → ketuk garis/dinding/kotak/area → ketuk sisi (jarak tetap) atau tarik (jarak bebas).</p>
   <p><b>Gesture jari (ala Notability):</b> ketuk 1 jari = pindah ke <b>Pilih</b> & pilih objek · ketuk 2 jari = Undo · ketuk 3 jari = Redo · ketuk 4 jari = mode fokus (sembunyikan menu) · tekan lama di tempat kosong = menu Tempel/Pilih semua · cubit = zoom.</p>
   <p><b>Pena pintar:</b> garis, lingkaran, elips, kotak, segitiga dirapikan otomatis (atau pilih <i>Tahan pena</i>: gambar lalu tahan sebentar). Undo mengembalikan coretan asli. Coret zig-zag di atas tulisan = hapus.</p>
+  <p><b>Impor:</b> Menu → <i>Impor PDF / DWG / DXF / gambar</i>. PDF masuk sebagai gambar berskala (isi skala PDF, atau Kalibrasi skala). DWG/DXF masuk sebagai garis, kurva & teks yang bisa di-snap, diukur, dan di-offset (satu grup).</p>
+  <p><b>Tinggi pintu/jendela/BV:</b> ketuk bukaan → isi Lebar, Tinggi, Ambang (atau tombol Cepat). Label di denah: kode + lebar×tinggi + ambang (cm); merah/“?” = belum diukur. Nilai terakhir dipakai untuk bukaan berikutnya. Tombol <b>Tinggi</b> di bilah kanan: lengkap / kode / sembunyi.</p>
+  <p><b>Plafon & drop ceiling:</b> alat <b>Plafon</b> → ketuk di dalam ruang (area material/kotak), tarik kotak, atau ketuk sudut-sudut. Zona di dalam zona = drop ceiling, masing-masing dengan tinggi sendiri.</p>
+  <p><b>Tampak dinding:</b> pilih dinding → <b>▤ Tampak dinding</b> → pilih sisi Anda berdiri. Halaman baru berisi bukaan pada tinggi sebenarnya, garis plafon bertingkat, dan ukuran tinggi otomatis. Ulangi untuk memperbarui.</p>
+  <p><b>Tinggi dinding tidak rata:</b> pilih dinding → <b>⇕ Atur tinggi</b> → isi tinggi di ujung A, ujung B, dan titik tengah. Dipakai di tampak, 3D, dan hitungan luas.</p>
+  <p><b>Titik listrik & air (ME):</b> Blok → kategori <i>Listrik & Air</i> (stop kontak, saklar, AC, TV, lampu dinding, MCB, kran, air bersih/kotor, shower). Taruh di sisi dinding, isi tinggi dari lantai, pilih <b>Eksisting</b> atau <b>Rencana</b>. Saat membuat tampak pilih ME: semua / eksisting / rencana.</p>
+  <p><b>Luas dinding (m²):</b> pilih dinding (bisa banyak) → <b>▦ Luas m²</b>. Pintu, jendela, BV & bukaan tidak dihitung; bisa dibatasi tinggi tertentu (mis. wallpanel 120 cm).</p>
+  <p><b>Pipa:</b> alat <b>Pipa</b> → pilih jenis (air bersih, air kotor, air hujan/AC, vent, gas), Ø, dan status Eksisting/Rencana, lalu tarik per ruas atau ketuk titik demi titik.</p>
+  <p><b>Tabel:</b> alat <b>Tabel</b> → ketuk kertas → <i>Data ruangan otomatis</i> (luas lantai, keliling, dinding bersih, plafon, titik listrik & plumbing, panjang pipa per ruang bernama), <i>Daftar kusen</i>, atau tabel kosong yang bisa diisi. Ruang = area Material/Kotak yang diberi nama.</p>
+  <p><b>Semua halaman:</b> tombol <b>1 hal / Semua</b> di bilah kanan — halaman disusun atas-bawah, gulir untuk pindah, gambar langsung di halaman mana pun.</p>
+  <p><b>Tanpa pen (Android/HP):</b> tombol <b>Jari: gambar</b> di bilah kanan — 1 jari menggambar dengan alat apa pun, 2 jari menggeser & zoom, ketuk 2 jari = undo. Matikan (Jari: geser) bila memakai pen.</p>
+  <p><b>ME di tampak:</b> buka lembar tampak → alat Blok → pilih titik ME → ketuk di gambar tampak; tinggi = posisi ketukan, otomatis ikut tercatat di denah. Ketuk simbol ME di tampak untuk ubah tinggi, geser, status, atau hapus.</p>
+  <p><b>Label tampak A–Z:</b> setiap tampak memberi penanda bulat berpanah di denah (huruf + nomor lembar, mis. A/T1). Ketuk penanda untuk membuka tampaknya; di lembar tampak ketuk bulatan huruf di judul (atau tombol ‹ kiri atas) untuk kembali. Beberapa tampak otomatis disusun dalam satu lembar selama muat.</p>
+  <p><b>Tampak gabungan:</b> pilih/grup beberapa dinding (+ kolom) yang satu bidang tampak → <b>▤ Tampak dinding</b>. Tonjolan & ceruk tergambar sebagai tepi, kedalamannya ditulis ↕ (cm).</p>
+  <p><b>Kunci</b> (bilah kanan): semua gambar tidak bisa tergeser oleh jari maupun Pencil, tetap bisa dipilih & diisi ukurannya. Telapak tangan saat menulis diabaikan; ketuk 2/3 jari bisa dimatikan di Menu.</p>
   <p><b>Ukuran per objek:</b> di panel objek, tombol <b>Ukuran tampil/sembunyi</b>; default untuk objek baru diatur di opsi alat.</p>
   <p><b>Grup / Komponen:</b> pilih beberapa objek → Grup, Lepas grup, <b>Jadikan komponen</b> (ubah satu, semua salinan ikut), Edit komponen, Explode. Kolom di dalam dinding memotong & menyatu dengan dinding.</p>
   <p><b>Survei / as-built:</b> alat <b>Survei</b> → <i>Ruang dari ukuran</i> (persegi, 4 sisi + diagonal, atau sisi + sudut; selisih penutupan ditampilkan) dan <i>Titik dari 2 jarak</i> (triangulasi dari 2 titik acuan). Area/garis bisa <b>Jadikan dinding</b>.</p>
@@ -1463,6 +1576,393 @@ function helpDlg(){openDlg(`<h2>Cara pakai</h2>
   <p><b>Proyek:</b> 📁 di panel Halaman. Tersimpan otomatis & tersinkron ke ${SYNC_NAME()}; cadangan ke iCloud/Google Drive lewat Menu.</p>
   <p><b>Pasang seperti app:</b> Safari → Bagikan → Tambah ke Layar Utama.</p>
   <div class="acts"><button class="btn pri" data-d="ok">Mengerti</button></div>`,{ok:()=>{S.seenHelp=true;save();closeDlg()}})}
+
+
+
+
+
+/* ---------- deteksi ruang dari dinding (ketuk di dalam ruang) ---------- */
+function roomFromWalls(w){const ob=PG().objs,G=wallGeo(ob),polys=[];if(!G.size)return null;
+  G.forEach(g=>{wallPieces(g).forEach(p=>polys.push(piecePoly(g,p)))});
+  ob.forEach(o=>{if(o.t==='blk'&&o.host&&BLK[o.k]&&!BLK[o.k].me){const g=G.get(o.host);if(!g)return;const at=clamp(o.at,o.w/2,Math.max(o.w/2,g.L-o.w/2)),a=at-o.w/2,b=at+o.w/2;polys.push([FP(g,1,a),FP(g,1,b),FP(g,-1,b),FP(g,-1,a)])}
+    else if(o.t==='blk'&&!o.host&&o.k==='kolom')polys.push(boxCorners(o.p,o.w,o.h,o.rot))});
+  const all=polys.flat(),bb=bbox(all);if(w.x<bb.x0||w.x>bb.x1||w.y<bb.y0||w.y>bb.y1)return null;const pad=200,X0=bb.x0-pad,Y0=bb.y0-pad,Wd=bb.w+2*pad,Hd=bb.h+2*pad,cs=Math.max(15,Math.ceil(Math.max(Wd,Hd)/1400)),NX=Math.ceil(Wd/cs),NY=Math.ceil(Hd/cs),M=new Uint8Array(NX*NY);
+  polys.forEach(P2=>{const b2=bbox(P2),i0=Math.max(0,Math.floor((b2.x0-X0)/cs)-1),i1=Math.min(NX-1,Math.ceil((b2.x1-X0)/cs)+1),j0=Math.max(0,Math.floor((b2.y0-Y0)/cs)-1),j1=Math.min(NY-1,Math.ceil((b2.y1-Y0)/cs)+1);
+    for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const c={x:X0+(i+.5)*cs,y:Y0+(j+.5)*cs};if(inPoly(c,P2)||P2.some((p,k)=>segD(c,p,P2[(k+1)%P2.length]).d<cs*.55))M[j*NX+i]=1}});
+  const si=Math.floor((w.x-X0)/cs),sj=Math.floor((w.y-Y0)/cs);if(M[sj*NX+si])return null;const F2=new Uint8Array(NX*NY),st=[sj*NX+si];F2[st[0]]=1;let n=0;
+  while(st.length){const k=st.pop(),i=k%NX,j=(k-i)/NX;n++;if(i===0||j===0||i===NX-1||j===NY-1)return'open';for(const q of[k-1,k+1,k-NX,k+NX])if(!M[q]&&!F2[q]){F2[q]=1;st.push(q)}}
+  const E=new Map(),key=(x,y)=>x+','+y,addE=(a,b)=>{E.set(key(a[0],a[1]),b)};
+  for(let j=0;j<NY;j++)for(let i=0;i<NX;i++){if(!F2[j*NX+i])continue;if(!F2[(j-1)*NX+i])addE([i,j],[i+1,j]);if(!F2[j*NX+i+1])addE([i+1,j],[i+1,j+1]);if(!F2[(j+1)*NX+i])addE([i+1,j+1],[i,j+1]);if(!F2[j*NX+i-1])addE([i,j+1],[i,j])}
+  let best=null;const seen=new Set();E.forEach((v,k0)=>{if(seen.has(k0))return;const L=[];let k=k0;while(!seen.has(k)){seen.add(k);const[x,y]=k.split(',').map(Number);L.push({x:X0+x*cs,y:Y0+y*cs});const nx=E.get(k);if(!nx)break;k=key(nx[0],nx[1])}if(!best||L.length>best.length)best=L});
+  if(!best||best.length<4)return null;let Q=dpSimp(best.concat([best[0]]),cs*1.6);Q.pop();
+  const cand=[];polys.forEach(P2=>P2.forEach(p=>cand.push(p)));Q=Q.map(p=>{let bd=cs*3,bp=null;cand.forEach(c=>{const d=D(c,p);if(d<bd){bd=d;bp=c}});return bp?{x:r1(bp.x),y:r1(bp.y)}:{x:r1(p.x),y:r1(p.y)}});
+  Q=Q.filter((p,i)=>D(p,Q[(i+1)%Q.length])>1);const R2=[];Q.forEach((p,i)=>{const a=Q[(i-1+Q.length)%Q.length],b=Q[(i+1)%Q.length];if(segD(p,a,b).d>2)R2.push(p)});return R2.length>=3?R2:null}
+
+/* ---------- titik ME dipasang langsung di tampak ---------- */
+function elevAt(w){const pg=PG();if(!pg.sheet)return null;for(const rec of(P.elevs||[])){if(rec.sheet!==pg.id||!rec.mp)continue;const bb=evBox(pg.objs,rec.lt);if(!bb||w.x<bb.x0||w.x>bb.x1||w.y<bb.y0-200||w.y>bb.y1)continue;
+    const mx=w.x-rec.mp.dx+rec.mp.x0,z=rec.mp.dy-w.y,sg=rec.mp.segs.find(q=>mx>=q.x0-1&&mx<=q.x1+1);if(!sg||z<0)continue;const t=sg.tA+(mx-sg.xa)/((sg.xb-sg.xa)||1)*(sg.tB-sg.tA);return{rec,wid:sg.w,s:sg.s,t,z}}return null}
+function placeMeOnElev(w){const B=BLK[S.blk],hit=elevAt(w);if(!hit)return toast('Ketuk di dalam gambar tampak (di bidang dinding)');const src=P.pages.find(p=>p.id===hit.rec.src);if(!src)return;
+  const wall=src.objs.find(o=>o.id===hit.wid);if(!wall)return toast('Dinding sumber sudah dihapus');const L=D(wall.a,wall.b),z=Math.max(0,Math.round(hit.z/10)*10);
+  src.objs.push({id:uid(),t:'blk',k:S.blk,host:wall.id,at:r1(clamp(hit.t,B.w/2,Math.max(B.w/2,L-B.w/2))),w:B.w,sw:hit.s,hf:1,st:S.meSt||'eks',z,sd:false});S.meLast=S.meLast||{};S.meLast[S.blk]=z;
+  renderElev(hit.rec,{keepView:true,keepTool:true});hint(B.n+' +'+cmS(z)+' cm dipasang · ikut tampil di denah');req()}
+function meEditDialog(id){let src=null,o=null;P.pages.forEach(p=>{const x=p.objs.find(q=>q.id===id);if(x){src=p;o=x}});if(!o)return toast('Titik ME tidak ditemukan');const B=BLK[o.k],sheetId=PG().id,recs=(P.elevs||[]).filter(r=>r.src===src.id&&r.walls.includes(o.host));
+  openDlg(`<h2>${esc(B.n)}</h2><div class="row"><div><label>Tinggi dari lantai (cm)</label><input type="text" inputmode="decimal" id="mez" value="${cmS(meZ(o))}"></div><div><label>Geser kiri/kanan (cm, + ke kanan)</label><input type="text" inputmode="decimal" id="mex" value="0"></div></div>
+   <label>Status</label><select id="mes"><option value="eks" ${(o.st||'eks')==='eks'?'selected':''}>Eksisting</option><option value="baru" ${o.st==='baru'?'selected':''}>Rencana / baru</option></select>
+   <label>Keterangan</label><input type="text" id="mel" value="${esc(o.lbl||'')}" autocomplete="off">
+   <div class="acts"><button class="btn dan" data-d="del">Hapus titik</button><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Simpan</button></div>`,{x:closeDlg,
+   ok:()=>{const z=parseN($('#mez').value),dx=parseN($('#mex').value)||0;if(z!=null&&z>=0)o.z=z*10;o.st=$('#mes').value;o.lbl=$('#mel').value.trim();
+     if(dx){const wl=src.objs.find(q=>q.id===o.host),rec=recs.find(r=>r.sheet===sheetId)||recs[0];if(wl&&rec){const g=wallGeo(src.objs).get(wl.id);if(g){const fr={x:-rec.ns.y,y:rec.ns.x},sgn=Math.sign(-(g.d.x*fr.x+g.d.y*fr.y))||1;o.at=clamp(o.at+sgn*dx*10,o.w/2,Math.max(o.w/2,g.L-o.w/2))}}}
+     closeDlg();redo2()},del:()=>{src.objs=src.objs.filter(q=>q.id!==o.id);closeDlg();redo2()}});
+  function redo2(){P.u=Date.now();const keep=P.cur,v=PG().view?{...PG().view}:null;recs.forEach(r=>renderElev(r,{keepView:true,keepTool:true}));P.cur=keep;if(v)PG().view=v;commit();req()}}
+/* ---------- tabel ---------- */
+let RPG=null;const RDC={};
+function tblCells(o,pg){pg=pg||PG();if(o.auto==='rooms')return roomTable(pg);if(o.auto==='kusen')return kusenTable(pg);return o.cells||[['']]}
+function tblCW(o,cells){const n=Math.max(...cells.map(r=>r.length));const W=[];for(let j=0;j<n;j++){if(!o.auto&&o.cw&&o.cw[j]){W.push(o.cw[j]);continue}let m=6;cells.forEach(r=>{String(r[j]??'').split('\n').forEach(t=>{m=Math.max(m,t.length*o.th*.62+3)})});W.push(Math.min(90,m))}return W}
+function tblGeom(o,pg){pg=pg||PG();const cells=tblCells(o,pg),cw=tblCW(o,cells),sc=pg.scale,rh=o.th*2.2,tt=o.title?o.th*2.2:0;return{cells,cw,rh,tt,W:cw.reduce((a,b)=>a+b,0)*sc,H:(cells.length*rh+tt)*sc,sc}}
+function tblPoly(o){const g=tblGeom(o);return[o.p,{x:o.p.x+g.W,y:o.p.y},{x:o.p.x+g.W,y:o.p.y+g.H},{x:o.p.x,y:o.p.y+g.H}]}
+function drawTbl(R,o){const g=tblGeom(o,RPG||PG()),c=R.c,sc=R.sc,x0=o.p.x;let y=o.p.y;const col=o.c||'#16191d';c.save();
+  if(o.title){wtext(R,o.title,x0,y+g.tt*sc*.5,0,o.th*1.15,col,'left','middle',true,S.ds.font);y+=g.tt*sc}
+  if(!R.vec){c.fillStyle='#f1f5f9';c.fillRect(x0,y,g.W,g.rh*sc)}c.strokeStyle=col;c.lineWidth=R.lw(.18);
+  const H=g.cells.length*g.rh*sc;c.beginPath();for(let i=0;i<=g.cells.length;i++){c.moveTo(x0,y+i*g.rh*sc);c.lineTo(x0+g.W,y+i*g.rh*sc)}let x=x0;for(let j=0;j<=g.cw.length;j++){c.moveTo(x,y);c.lineTo(x,y+H);if(j<g.cw.length)x+=g.cw[j]*sc}c.stroke();
+  c.lineWidth=R.lw(.35);c.strokeRect(x0,y,g.W,H);
+  g.cells.forEach((r,i)=>{let xx=x0;const last=o.auto&&i===g.cells.length-1&&g.cells.length>2;g.cw.forEach((w2,j)=>{const t=String(r[j]??'');if(t){const num=j>0&&/^[-+−]?[\d.,]+( |$)/.test(t);wtext(R,t.split('\n')[0],num?xx+w2*sc-1.2*sc:xx+1.2*sc,y+(i+.5)*g.rh*sc,0,o.th,col,num?'right':'left','middle',i===0||last,S.ds.font)}xx+=w2*sc})});c.restore()}
+function roomTable(pg){const key=(P.u||0)+':'+pg.objs.length;const C=RDC[pg.id];if(C&&C.k===key)return C.v;const v=roomCalc(pg);RDC[pg.id]={k:key,v};return v}
+const MEL=['skt','sklr','skac','tvd','lmpd','mcb'],MEP=['kran','abs','akt','shw'];
+function lineInPoly(Q0,d,T0,T1,P2){const ts=[T0,T1];for(let i=0;i<P2.length;i++){const a=P2[i],b=P2[(i+1)%P2.length],ex=b.x-a.x,ey=b.y-a.y,den=d.x*ey-d.y*ex;if(Math.abs(den)<1e-9)continue;const t=((a.x-Q0.x)*ey-(a.y-Q0.y)*ex)/den,u=((a.x-Q0.x)*d.y-(a.y-Q0.y)*d.x)/den;if(u>=-1e-9&&u<=1+1e-9&&t>T0&&t<T1)ts.push(t)}
+  ts.sort((a,b)=>a-b);const out=[];for(let i=0;i<ts.length-1;i++){if(ts[i+1]-ts[i]<.5)continue;const m=(ts[i]+ts[i+1])/2;if(inPoly({x:Q0.x+d.x*m,y:Q0.y+d.y*m},P2)){const l=out[out.length-1];if(l&&Math.abs(l[1]-ts[i])<.5)l[1]=ts[i+1];else out.push([ts[i],ts[i+1]])}}return out}
+function dedupeFaces(items){const groups=new Map();items.forEach(it=>{let u={x:it.d.x,y:it.d.y};const an=Math.atan2(u.y,u.x);if(an<-1e-9||an>=Math.PI-1e-9)u={x:-u.x,y:-u.y};const nrm={x:-u.y,y:u.x},off=it.Q0.x*nrm.x+it.Q0.y*nrm.y,key=Math.round(Math.atan2(u.y,u.x)*2000)+'|'+Math.round(off);
+    it.du=it.d.x*u.x+it.d.y*u.y;it.sb=it.Q0.x*u.x+it.Q0.y*u.y;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(it)});
+  groups.forEach(L=>{const taken=[];L.forEach(it=>{let s0=it.sb+it.du*it.ta,s1=it.sb+it.du*it.tb;if(s0>s1)[s0,s1]=[s1,s0];let parts=[[s0,s1]];taken.forEach(([a,b])=>{parts=parts.flatMap(([p,q])=>{if(b<=p||a>=q)return[[p,q]];const r=[];if(a>p)r.push([p,a]);if(b<q)r.push([b,q]);return r})});taken.push([s0,s1]);
+    it.iv=parts.filter(([p,q])=>q-p>.5).map(([p,q])=>{const t1=(p-it.sb)/it.du,t2=(q-it.sb)/it.du;return[Math.min(t1,t2),Math.max(t1,t2)]})})});return items}
+function roomCalc(pg){const ob=pg.objs,G=wallGeo(ob),Z=ob.filter(o=>o.t==='hatch'&&o.cz),rooms=[];
+  ob.forEach(o=>{if(o.t==='hatch'&&!o.cz&&o.lbl)rooms.push({nm:o.lbl,poly:o.pts});else if(o.t==='rect'&&o.lbl)rooms.push({nm:o.lbl,poly:rectPts(o)})});
+  const head=['Ruang','Lantai m²','Keliling m','Dinding bersih m²','Plafon','Listrik (titik)','Plumbing (titik)','Pipa (m)'];if(!rooms.length)return[head,['Belum ada ruang bernama — alat Material: ketuk di dalam ruangan, isi Nama ruang, Simpan','','','','','','','']];
+  const top=(p,w,t)=>{let z=null,ba=1e30;Z.forEach(o=>{if(inPoly(p,o.pts)){const A=Math.abs(polyArea(o.pts));if(A<ba){ba=A;z=o.cz}}});return z!=null?z:hAt(w,t)};
+  const tot={fa:0,wa:0,l:0,p:0,pl:{}};const rows=rooms.map(r=>{const P2=r.poly,bb=bbox(P2),fa=Math.abs(polyArea(P2));let per=0;P2.forEach((p,i)=>per+=D(p,P2[(i+1)%P2.length]));let wa=0;
+    const IT=[];G.forEach(g=>{const w=g.w,wb=bbox([w.a,w.b]);if(wb.x1<bb.x0-500||wb.x0>bb.x1+500||wb.y1<bb.y0-500||wb.y0>bb.y1+500)return;
+      const ops=ob.filter(o=>o.t==='blk'&&o.host===w.id&&BLK[o.k]&&!BLK[o.k].me).map(o=>{const at=clamp(o.at,o.w/2,Math.max(o.w/2,g.L-o.w/2));return{a:at-o.w/2,b:at+o.w/2,sl:opSill(o),hd:opHead(o)}});
+      [1,-1].forEach(sd=>{const n={x:g.n.x*sd,y:g.n.y*sd},T0=g.t0[sd],T1=g.t1[sd];if(T1-T0<1)return;const q0=FP(g,sd,0),Q0={x:q0.x+n.x*80,y:q0.y+n.y*80};
+        lineInPoly(Q0,g.d,T0,T1,P2).forEach(([ta,tb])=>IT.push({w,ops,Q0,d:g.d,ta,tb}))})});
+    dedupeFaces(IT).forEach(it=>{const{w,ops,Q0,d}=it,qt=t=>({x:Q0.x+d.x*t,y:Q0.y+d.y*t});it.iv.forEach(([ta,tb])=>{const NN=Math.ceil((tb-ta)/10),st=(tb-ta)/NN;for(let ii=0;ii<NN;ii++){const t=ta+(ii+.5)*st;wa+=Math.max(0,top(qt(t),w,t))*st}
+      ops.forEach(op=>{const a=Math.max(ta,op.a),b=Math.min(tb,op.b);if(b<=a)return;const hm=top(qt((a+b)/2),w,(a+b)/2),hi=Math.min(op.hd,hm);if(hi>op.sl)wa-=(b-a)*(hi-op.sl)})})});
+    const cnt={},bar={L:0,P:0};let nl=0,np=0;ob.forEach(o=>{if(o.t!=='blk'||!o.host||!BLK[o.k]||!BLK[o.k].me)return;const g=G.get(o.host);if(!g)return;const sw=o.sw||1,at=clamp(o.at,0,g.L),p=FP(g,sw,at),q={x:p.x+g.n.x*sw*100,y:p.y+g.n.y*sw*100};if(!inPoly(q,P2))return;
+      const cd=BLK[o.k].cd;cnt[cd]=(cnt[cd]||0)+1;if(MEP.includes(o.k)){np++;if(o.st==='baru')bar.P++}else{nl++;if(o.st==='baru')bar.L++}});
+    const pl={};ob.forEach(o=>{if(o.t!=='line'||!o.pp)return;const L=D(o.a,o.b),n=Math.max(1,Math.ceil(L/50));let ins=0;for(let i=0;i<n;i++){const t=(i+.5)/n;if(inPoly({x:o.a.x+(o.b.x-o.a.x)*t,y:o.a.y+(o.b.y-o.a.y)*t},P2))ins++}if(ins){const k=PIPET[o.pp].cd;pl[k]=(pl[k]||0)+L*ins/n}});
+    const cz=[...new Set(Z.filter(z=>inPoly(centroid(z.pts),P2)).map(z=>z.cz))].sort((a,b)=>b-a);
+    const det=list=>list.filter(k=>cnt[BLK[k].cd]).map(k=>BLK[k].cd+' '+cnt[BLK[k].cd]).join(', ');
+    tot.fa+=fa;tot.wa+=wa;tot.l+=nl;tot.p+=np;Object.keys(pl).forEach(k=>tot.pl[k]=(tot.pl[k]||0)+pl[k]);
+    return[r.nm,m2(fa),String(r1(per/1000)).replace('.',','),m2(wa),cz.length?cz.map(z=>'+'+fmtH(z)).join(' / '):'—',nl?nl+' ('+det(MEL)+')'+(bar.L?' · '+bar.L+' baru':''):'—',np?np+' ('+det(MEP)+')'+(bar.P?' · '+bar.P+' baru':''):'—',Object.keys(pl).length?Object.keys(pl).map(k=>k+' '+String(r1(pl[k]/1000)).replace('.',',')).join(' · '):'—']});
+  rows.push(['TOTAL',m2(tot.fa),'',m2(tot.wa),'',tot.l?String(tot.l):'—',tot.p?String(tot.p):'—',Object.keys(tot.pl).map(k=>k+' '+String(r1(tot.pl[k]/1000)).replace('.',',')).join(' · ')||'—']);return[head,...rows]}
+function kusenTable(pg){const C=opCodes(pg.objs),M=new Map();pg.objs.forEach(o=>{if(!C.has(o.id))return;const cd=C.get(o.id);if(!M.has(cd))M.set(cd,{o,n:0,un:0});const e=M.get(cd);e.n++;if(!o.hm)e.un++});
+  const rows=[...M.entries()].sort((a,b)=>a[0].localeCompare(b[0],undefined,{numeric:true})).map(([cd,e])=>{const o=e.o,sl=opSill(o);return[cd,BLK[o.k].n,cmS(o.w),cmS(opHead(o)-sl),sl?cmS(sl):'0',String(e.n),e.un?e.un+' belum diukur':'']});
+  return[['Kode','Jenis','Lebar cm','Tinggi cm','Ambang cm','Jumlah','Catatan'],...(rows.length?rows:[['—','Belum ada pintu/jendela','','','','','']])]}
+function newTblDialog(w){openDlg(`<h2>Tabel baru</h2><div class="list">
+   <button data-d="rooms"><b>▦ Data ruangan otomatis</b><small>Per ruang bernama: luas lantai, keliling, luas dinding bersih, plafon, jumlah titik listrik & plumbing, panjang pipa — selalu ikut berubah</small></button>
+   <button data-d="kusen"><b>▭ Daftar kusen otomatis</b><small>Kode, jenis, lebar, tinggi, ambang & jumlah pintu/jendela/BV</small></button></div>
+   <label>Atau tabel kosong</label><div class="row"><div><label>Baris</label><input type="text" inputmode="numeric" id="tr" value="5"></div><div><label>Kolom</label><input type="text" inputmode="numeric" id="tc" value="4"></div><div><label>Tinggi huruf (mm)</label><input type="text" inputmode="decimal" id="tth" value="${String(S.tblH).replace('.',',')}"></div></div>
+   <div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Buat tabel kosong</button></div>`,{x:closeDlg,
+   rooms:()=>mk({auto:'rooms',title:'DATA RUANGAN'}),kusen:()=>mk({auto:'kusen',title:'DAFTAR KUSEN'}),
+   ok:()=>{const r=clamp(Math.round(parseN($('#tr').value)||5),1,60),c=clamp(Math.round(parseN($('#tc').value)||4),1,20);mk({cells:Array.from({length:r},(_,i)=>Array.from({length:c},(_,j)=>i===0?'Kolom '+(j+1):'')),cw:Array(c).fill(25)})}});
+  function mk(x){const th=parseN(($('#tth')||{}).value)||S.tblH;S.tblH=th;closeDlg();pushUndo();const o=add({t:'tbl',p:{x:r1(w.x),y:r1(w.y)},th,c:'#16191d',...x});commit();setTool('select');SEL=new Set([o.id]);showTblPanel(o);if(!o.auto)tblEdit(o)}}
+function showTblPanel(o){SEL.clear();SEL.add(o.id);showPanel(`<span class="t">${o.auto==='rooms'?'Data ruangan':o.auto==='kusen'?'Daftar kusen':'Tabel'}</span>
+   ${o.auto?'<button class="btn" data-p="rf">↻ Perbarui</button><button class="btn" data-p="cv">Jadikan tabel biasa</button>':'<button class="btn pri" data-p="ed">✎ Isi tabel</button><button class="btn" data-p="ar">+ Baris</button><button class="btn" data-p="dr">− Baris</button><button class="btn" data-p="ac">+ Kolom</button><button class="btn" data-p="dc">− Kolom</button>'}
+   <span class="u">Huruf</span>${[1.8,2.5,3.5,5].map(v=>`<button class="chip ${o.th==v?'on':''}" data-p="th" data-v="${v}">${String(v).replace('.',',')}</button>`).join('')}<span class="u">Judul</span><input type="text" id="tti" class="wide" value="${esc(o.title||'')}" autocomplete="off"><button class="btn" data-p="tt">OK</button>
+   <button class="btn" data-p="dup">Duplikat</button><button class="btn dan" data-p="del">Hapus</button>${X_}`,{
+   rf:()=>{delete RDC[PG().id];req();hint('Tabel diperbarui')},cv:()=>{pushUndo();o.cells=tblCells(o).map(r=>r.slice());o.cw=tblCW(o,o.cells);delete o.auto;commit();showTblPanel(o)},
+   ed:()=>tblEdit(o),ar:()=>{pushUndo();o.cells.push(Array(o.cells[0].length).fill(''));commit()},dr:()=>{if(o.cells.length<2)return;pushUndo();o.cells.pop();commit()},
+   ac:()=>{pushUndo();o.cells.forEach((r,i)=>r.push(i?'':'Kolom '+(r.length+1)));(o.cw=o.cw||[]).push(25);commit()},dc:()=>{if(o.cells[0].length<2)return;pushUndo();o.cells.forEach(r=>r.pop());if(o.cw)o.cw.pop();commit()},
+   th:b=>{pushUndo();o.th=+b.dataset.v;commit();showTblPanel(o)},tt:()=>{pushUndo();o.title=$('#tti').value.trim();commit()},dup:dupSel,del:delSel,x:xAct})}
+function tblEdit(o){const C=o.cells,cw=o.cw||[];openDlg(`<h2>Isi tabel</h2><p>Baris pertama = judul kolom. Lebar kolom dalam mm kertas.</p><div class="tedit"><table><tr>${C[0].map((_,j)=>`<td><input type="text" inputmode="decimal" class="tw" id="w_${j}" value="${String(cw[j]||25).replace('.',',')}"></td>`).join('')}</tr>
+   ${C.map((r,i)=>`<tr>${r.map((v,j)=>`<td><input type="text" id="c_${i}_${j}" value="${esc(v)}" class="${i?'':'th'}" autocomplete="off"></td>`).join('')}</tr>`).join('')}</table></div>
+   <div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Simpan</button></div>`,{x:closeDlg,ok:()=>{pushUndo();o.cells=C.map((r,i)=>r.map((_,j)=>$('#c_'+i+'_'+j).value));o.cw=C[0].map((_,j)=>parseN($('#w_'+j).value)||25);closeDlg();commit();showTblPanel(o)}});dlg.classList.add('wide')}
+/* ---------- tinggi dinding tidak rata ---------- */
+function wallPts(w){const L=D(w.a,w.b),ha=w.ht||S.wallH,hb=w.hb??ha;return[{d:0,h:ha},...(w.hmid||[]).filter(m=>m.d>0&&m.d<L).sort((a,b)=>a.d-b.d),{d:L,h:hb}]}
+function wallVar(w){return(w.hb!=null&&w.hb!==(w.ht||S.wallH))||!!(w.hmid&&w.hmid.length)}
+function hAt(w,t){const P2=wallPts(w);if(t<=0)return P2[0].h;for(let i=1;i<P2.length;i++)if(t<=P2[i].d){const a=P2[i-1],b=P2[i],f=b.d>a.d?(t-a.d)/(b.d-a.d):0;return a.h+(b.h-a.h)*f}return P2[P2.length-1].h}
+function hAtP(w,g,p){return hAt(w,(p.x-w.a.x)*g.d.x+(p.y-w.a.y)*g.d.y)}
+function wallHmax(w){return Math.max(...wallPts(w).map(p=>p.h))}
+let HEDIT=null;
+function wallHDialog(w){const L=D(w.a,w.b);let rows=wallPts(w).map(r=>({...r}));HEDIT=w.id;req();
+  const read=()=>rows.forEach((r,i)=>{const h=parseN(($('#hh'+i)||{}).value);if(h>0)r.h=h*10;if(i>0&&i<rows.length-1){const d=parseL(($('#hd'+i)||{}).value);if(d!=null)r.d=clamp(d,1,L-1)}});
+  const draw=()=>openDlg(`<h2>Tinggi dinding</h2><p>Panjang ${fmtL(L)} ${esc(uLbl())}. <b>A</b> = ujung awal, <b>B</b> = ujung akhir (lihat tanda di denah). Di antara titik, tinggi berubah lurus (miring).</p>
+     <div class="htab">${rows.map((r,i)=>{const e=i===0||i===rows.length-1;return`<div class="hrow"><b>${i===0?'A':i===rows.length-1?'B':'T'+i}</b><input type="text" inputmode="decimal" id="hd${i}" value="${e?(i?fmtL(L):'0'):fmtL(r.d)}" ${e?'disabled':''}><span>${esc(uLbl())} dari A · tinggi</span><input type="text" inputmode="decimal" id="hh${i}" value="${cmS(r.h)}"><span>cm</span>${e?'':`<button class="btn" data-d="rm" data-i="${i}">✕</button>`}</div>`}).join('')}</div>
+     <div class="acts" style="justify-content:space-between"><span><button class="btn" data-d="add">＋ Titik tengah</button> <button class="btn" data-d="flat">Ratakan</button></span><span><button class="btn" data-d="x">Batal</button> <button class="btn pri" data-d="ok">Simpan</button></span></div>`,{
+     x:()=>{HEDIT=null;closeDlg();req()},
+     add:()=>{read();let bi=0,bl=0;for(let i=0;i<rows.length-1;i++){const l=rows[i+1].d-rows[i].d;if(l>bl){bl=l;bi=i}}rows.splice(bi+1,0,{d:r1((rows[bi].d+rows[bi+1].d)/2),h:r1((rows[bi].h+rows[bi+1].h)/2)});draw()},
+     rm:b=>{read();rows.splice(+b.dataset.i,1);draw()},flat:()=>{read();const h=rows[0].h;rows=[{d:0,h},{d:L,h}];draw()},
+     ok:()=>{read();const mid=rows.slice(1,-1).sort((a,b)=>a.d-b.d);pushUndo();w.ht=rows[0].h;w.hb=rows[rows.length-1].h;w.hmid=mid.map(m=>({d:r1(m.d),h:m.h}));if(w.hb===w.ht&&!w.hmid.length){delete w.hb;delete w.hmid}HEDIT=null;closeDlg();commit();showLinePanel(w);hint('Tinggi dinding disimpan')}});
+  draw()}
+function wallHSum(w){const P2=wallPts(w);return wallVar(w)?'A '+fmtH(P2[0].h)+' → B '+fmtH(P2[P2.length-1].h)+' m'+(P2.length>2?' (+'+(P2.length-2)+' titik)':''):fmtH(P2[0].h)+' m'}
+/* ---------- luas dinding bersih ---------- */
+function segX(p,p2,a,b){const d1=(p2.x-p.x)*(a.y-p.y)-(p2.y-p.y)*(a.x-p.x),d2=(p2.x-p.x)*(b.y-p.y)-(p2.y-p.y)*(b.x-p.x),d3=(b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x),d4=(b.x-a.x)*(p2.y-a.y)-(b.y-a.y)*(p2.x-a.x);return d1*d2<0&&d3*d4<0}
+function wallAreaCalc(walls,ns,zb,zt){const Z=PG().objs.filter(o=>o.t==='hatch'&&o.cz),F=[];
+  const topC=(p,n,w,t)=>{const q={x:p.x+n.x*40,y:p.y+n.y*40};let z=null,ba=1e30;Z.forEach(o=>{if(inPoly(q,o.pts)){const A=Math.abs(polyArea(o.pts));if(A<ba){ba=A;z=o.cz}}});const h=z!=null?z:hAt(w,t);return zt!=null?Math.min(zt,h):h};
+  walls.forEach(w=>{const g=GEO.get(w.id);if(!g)return;[1,-1].forEach(sd=>{const n={x:g.n.x*sd,y:g.n.y*sd},dot=n.x*ns.x+n.y*ns.y;if(dot<-.3)return;
+    if(dot<=.3){const tm=(g.t0[sd]+g.t1[sd])/2,q0=FP(g,sd,tm),q={x:q0.x+n.x*60,y:q0.y+n.y*60},q2={x:q.x+ns.x*1e6,y:q.y+ns.y*1e6};if(walls.some(o=>o!==w&&segX(q,q2,o.a,o.b)))return}F.push({w,g,sd,n})})});
+  let gross=0,op=0;const rows=[];
+  dedupeFaces(F.map(f=>({...f,Q0:FP(f.g,f.sd,0),d:f.g.d,ta:f.g.t0[f.sd],tb:f.g.t1[f.sd]}))).forEach(({w,g,sd,n,iv})=>{let A=0,O2=0,no=0,L=0;iv.forEach(([T0,T1])=>{const Lx=T1-T0;if(Lx<1)return;L+=Lx;const N=Math.max(20,Math.ceil(Lx/10)),st=Lx/N;for(let i=0;i<N;i++){const t=T0+(i+.5)*st;A+=Math.max(0,topC(FP(g,sd,t),n,w,t)-zb)*st}
+    PG().objs.forEach(o=>{if(o.t!=='blk'||o.host!==w.id||!BLK[o.k]||BLK[o.k].me)return;const fr=hostFrame(GEO,o);if(!fr)return;const a=Math.max(T0,fr.at-o.w/2),b=Math.min(T1,fr.at+o.w/2);if(b<=a)return;
+      const lo=Math.max(zb,opSill(o)),hi=Math.min(opHead(o),topC(FP(g,sd,fr.at),n,w,fr.at));if(hi>lo){O2+=(b-a)*(hi-lo);no++}})});
+    if(L<1)return;gross+=A;op+=O2;rows.push({w,L,A,O:O2,no})});return{gross,op,net:gross-op,rows}}
+const m2=v=>(v/1e6).toFixed(2).replace('.',',');
+function wallAreaDialog(objs){const walls=objs.filter(o=>o.t==='wall');if(!walls.length)return toast('Pilih dinding');const main=walls.map(w=>GEO.get(w.id)).filter(Boolean).sort((a,b)=>b.L-a.L)[0];if(!main)return;
+  let sd=1,zb=0,mode='top',zt=1200;
+  const draw=()=>{const ns={x:main.n.x*sd,y:main.n.y*sd},R2=wallAreaCalc(walls,ns,zb,mode==='top'?null:zt),other={x:-ns.x,y:-ns.y},R3=wallAreaCalc(walls,other,zb,mode==='top'?null:zt);
+    openDlg(`<h2>Luas dinding</h2><p>${walls.length} dinding dipilih. Pilih sisi yang dihitung (sisi ruangan yang akan dipasang wallpaper / wallpanel):</p>
+     <div class="tabs">${[1,-1].map(v=>`<button class="chip ${v===sd?'on':''}" data-d="sd" data-v="${v}">Sisi ${sideName(main,v)} · ${m2((v===sd?R2:R3).net)} m²</button>`).join('')}</div>
+     <div class="row"><div><label>Mulai dari tinggi (cm)</label><input type="text" inputmode="decimal" id="azb" value="${cmS(zb)}"></div><div><label>Sampai</label><select id="amd"><option value="top" ${mode==='top'?'selected':''}>Plafon / atas dinding</option><option value="h" ${mode==='h'?'selected':''}>Tinggi tertentu…</option></select></div>${mode==='h'?`<div><label>Tinggi (cm)</label><input type="text" inputmode="decimal" id="azt" value="${cmS(zt)}"></div>`:''}</div>
+     <table class="atab"><tr><th>Bidang</th><th>Lebar muka</th><th>Kotor</th><th>Bukaan</th><th>Bersih</th></tr>${R2.rows.map((r,i)=>`<tr><td>${i+1}</td><td>${fmtL(r.L)} ${esc(uLbl())}</td><td>${m2(r.A)}</td><td>${r.no?'−'+m2(r.O)+' ('+r.no+')':'—'}</td><td>${m2(r.A-r.O)}</td></tr>`).join('')}
+      <tr class="tot"><td colspan="2">Total</td><td>${m2(R2.gross)}</td><td>−${m2(R2.op)}</td><td>${m2(R2.net)} m²</td></tr></table>
+     <p class="abig">Luas bersih: <b>${m2(R2.net)} m²</b></p><p>Pintu, jendela, BV & bukaan tidak dihitung (dipotong sesuai lebar × tinggi aslinya). Tinggi mengikuti zona plafon atau tinggi dinding (termasuk dinding miring). Sisi samping tonjolan/ceruk ikut dihitung. Belum termasuk sisa potong — biasanya tambah 5–10%.</p>
+     <div class="acts"><button class="btn" data-d="cp">Salin hasil</button><button class="btn pri" data-d="x">Tutup</button></div>`,{x:closeDlg,
+     sd:b=>{rd();sd=+b.dataset.v;draw()},cp:()=>{const t='Luas dinding ('+walls.length+' dinding, sisi '+sideName(main,sd)+'): kotor '+m2(R2.gross)+' m², bukaan '+m2(R2.op)+' m², bersih '+m2(R2.net)+' m²';try{navigator.clipboard.writeText(t);toast('Disalin')}catch(_){toast(t)}}});
+    $('#amd').addEventListener('change',()=>{rd();mode=$('#amd').value;draw()});['azb','azt'].forEach(id=>{const e=$('#'+id);if(e)e.addEventListener('change',()=>{rd();draw()})})};
+  const rd=()=>{const a=parseN(($('#azb')||{}).value);if(a!=null&&a>=0)zb=a*10;const b=parseN(($('#azt')||{}).value);if(b>0)zt=b*10};draw()}
+/* ---------- titik ME (listrik & air) ---------- */
+function meSym(c,o,w,th,R){const B=BLK[o.k]||{cd:'?'},sw=o.sw||1,r=1.5*R.sc,y=sw*(th/2+r+0.3*R.sc),col=(o.st||'eks')==='baru'?'#ea580c':'#0f172a';c.stroke();c.save();c.strokeStyle=col;c.fillStyle='#fff';c.lineWidth=R.lw?R.lw(0.25):1;c.beginPath();c.arc(0,y,r,0,7);c.fill();c.stroke();
+  wtext(R,B.cd,0,y,0,B.cd.length>2?1:1.3,col,'center','middle',true,'sans');c.restore();c.beginPath()}
+const meZ=o=>o.z??((S.meLast||{})[o.k]??BLK[o.k].z);
+function showMePanel(o){const B=BLK[o.k],g=GEO.get(o.host);SEL.clear();SEL.add(o.id);showPanel(`<span class="t">${esc(B.n)}</span><span class="u">Tinggi dari lantai</span>${inp('mz',cmS(meZ(o)))}<span class="u">cm · Jarak dari ujung</span>${inp('ma',fmtL(o.at))}${un()}
+   ${['eks','baru'].map(v=>`<button class="chip ${(o.st||'eks')===v?'on':''}" data-p="st" data-v="${v}">${v==='eks'?'Eksisting':'Rencana / baru'}</button>`).join('')}<button class="btn" data-p="sw">⇅ Sisi dinding</button>
+   <button class="btn pri" data-p="ok" data-enter>Ubah</button><button class="btn" data-p="dup">Duplikat</button><button class="btn dan" data-p="del">Hapus</button>${X_}
+   <span class="br"></span><span class="u">Keterangan</span><input type="text" id="mk" class="wide" value="${esc(o.lbl||'')}" placeholder="mis. 2 lubang, 16A" autocomplete="off">`,{
+   ok:()=>{const z=parseN(val('mz')),a=parseL(val('ma'));pushUndo();if(z!=null&&z>=0)o.z=z*10;if(a!=null){o.at=a;if(g)o.at=clamp(o.at,o.w/2,g.L-o.w/2)}o.lbl=$('#mk').value.trim();S.meLast=S.meLast||{};S.meLast[o.k]=o.z;commit();showMePanel(o);hint('Diperbarui')},
+   st:b=>{pushUndo();o.st=b.dataset.v;S.meSt=o.st;commit();showMePanel(o)},sw:()=>{pushUndo();o.sw=-(o.sw||1);commit()},dup:dupSel,del:delSel,x:xAct})}
+/* ---------- tinggi bukaan (kusen) ---------- */
+function opKind(o){return /^pintu/.test(o.k)?'P':/^jendela/.test(o.k)?'J':o.k==='ventilasi'?'BV':'L'}
+function opSill(o){return o.sl??({J:900,BV:2100}[opKind(o)]||0)}
+function opHead(o){return o.hd??(opKind(o)==='BV'?2400:2100)}
+const cmS=v=>String(r1(v/10)).replace('.',',');const fmtH=v=>(v/1000).toFixed(2).replace('.',',');
+function opCodes(ob){const M=new Map(),G={};ob.forEach(o=>{if(o.t!=='blk'||!o.host||!BLK[o.k]||BLK[o.k].me)return;const kd=opKind(o),key=o.k+'|'+Math.round(o.w)+'|'+Math.round(opHead(o)-opSill(o))+'|'+Math.round(opSill(o));G[kd]=G[kd]||new Map();if(!G[kd].has(key))G[kd].set(key,G[kd].size+1);M.set(o.id,o.code||kd+G[kd].get(key))});return M}
+function opText(o,code,full){const sl=opSill(o),h=opHead(o)-sl;let t=code;if(full)t+=' '+cmS(o.w)+'×'+cmS(h)+(sl?' +'+cmS(sl):'');if(!o.hm)t+=' ?';return t}
+function opLabels(R,ob,G){if(S.opLbl==='off')return;const C=opCodes(ob);ob.forEach(o=>{if(o.t!=='blk'||!o.host||BLK[o.k]&&BLK[o.k].me)return;const f=hostFrame(G,o);if(!f)return;
+  const side=BLK[o.k]?.door?-(o.sw||1):-1,off=f.th/2+2.4*R.sc,nx=-Math.sin(f.ang),ny=Math.cos(f.ang);
+  wtext(R,opText(o,C.get(o.id),S.opLbl!=='code'),f.O.x+nx*off*side,f.O.y+ny*off*side,readAng(f.ang),2,o.hm?'#1e40af':'#dc2626','center','middle',true,S.ds.font)})}
+/* ---------- zona plafon ---------- */
+function drawCeil(R,o,prev){const c=R.c,col='#7c3aed';c.save();c.strokeStyle=col;c.lineWidth=R.lw(0.25);c.setLineDash&&c.setLineDash([R.sc*2.2,R.sc*1.2]);pathPoly(c,o.pts);c.stroke();c.setLineDash&&c.setLineDash([]);
+  if(!prev){const p=centroid(o.pts),s2=1.2*R.sc;c.fillStyle=col;c.beginPath();c.moveTo(p.x-s2,p.y-s2*1.5);c.lineTo(p.x+s2,p.y-s2*1.5);c.lineTo(p.x,p.y);c.closePath();c.fill();
+    wtext(R,'+'+fmtH(o.cz),p.x+s2*1.5,p.y-s2*0.75,0,2.4,col,'left','middle',true,S.ds.font);if(o.lbl)wtext(R,o.lbl,p.x+s2*1.5,p.y+s2*1.6,0,1.9,col,'left','middle',false,S.ds.font)}c.restore()}
+function mkCeil(pts){return{t:'hatch',pts:pts.map(p=>({...p})),pat:'none',cz:S.ceilZ,c:'#7c3aed',area:false,lbl:''}}
+function showCeilPanel(o){SEL.clear();SEL.add(o.id);showPanel(`<span class="t">Plafon</span><span class="u">Tinggi dari lantai</span>${inp('cz',cmS(o.cz))}<span class="u">cm</span><span class="u">Keterangan</span><input type="text" id="cl" class="wide" value="${esc(o.lbl||'')}" placeholder="mis. Gypsum, drop ceiling" autocomplete="off">
+   <button class="btn pri" data-p="ok" data-enter>Ubah</button><button class="btn" data-p="dup">Duplikat</button><button class="btn dan" data-p="del">Hapus</button>${X_}<span class="br"></span><span class="u">Cepat:</span>${[2400,2600,2800,3000,3200,3500].map(v=>`<button class="chip ${v===o.cz?'on':''}" data-p="q" data-v="${v}">+${fmtH(v)}</button>`).join('')}`,{
+   ok:()=>{const v=parseN(val('cz'));pushUndo();if(v>0)o.cz=v*10;o.lbl=$('#cl').value.trim();S.ceilZ=o.cz;commit();showCeilPanel(o);hint('Plafon diperbarui')},q:b=>{pushUndo();o.cz=+b.dataset.v;S.ceilZ=o.cz;commit();showCeilPanel(o)},
+   dup:dupSel,del:delSel,x:xAct})}
+function ceilProfile(g,s){const ns={x:g.n.x*s,y:g.n.y*s},Z=PG().objs.filter(o=>o.t==='hatch'&&o.cz),T0=g.t0[s],T1=g.t1[s],N=Math.max(40,Math.min(800,Math.round((T1-T0)/10))),st=(T1-T0)/N;let out=[];let cur=null;
+  for(let i=0;i<N;i++){const tt=T0+(i+.5)*st,p={x:g.w.a.x+g.d.x*tt+ns.x*(g.h+40),y:g.w.a.y+g.d.y*tt+ns.y*(g.h+40)};let best=null,ba=1e30;Z.forEach(o=>{if(inPoly(p,o.pts)){const a=Math.abs(polyArea(o.pts));if(a<ba){ba=a;best=o}}});const z=best?best.cz:null;
+    if(!cur||cur.z!==z){if(cur)cur.t1=tt-st/2;cur={t0:tt-st/2,t1:tt,z};out.push(cur)}else cur.t1=tt}if(cur)cur.t1=T1;if(out.length)out[0].t0=T0;
+  out=out.filter((p,i)=>!(p.z==null&&p.t1-p.t0<4*st&&out.length>1&&(out[i-1]||out[i+1])))  ;const M=[];out.forEach(p=>{const l=M[M.length-1];if(l&&l.z===p.z)l.t1=p.t1;else M.push({...p})});
+  for(let i=0;i<M.length-1;i++)M[i].t1=M[i+1].t0;if(M.length){M[0].t0=T0;M[M.length-1].t1=T1}return M}
+/* ---------- tampak dinding otomatis ---------- */
+function sideName(g,s){const a=Math.atan2(g.n.y*s,g.n.x*s)*180/Math.PI;return[[0,'kanan'],[90,'bawah'],[180,'kiri'],[-180,'kiri'],[-90,'atas']].reduce((b,d)=>Math.abs(a-d[0])<Math.abs(a-b[0])?d:b)[1]}
+function elevModel(walls,cols,ns){const f={x:-ns.x,y:-ns.y},r={x:-f.y,y:f.x},X=p=>p.x*r.x+p.y*r.y,Dp=p=>p.x*f.x+p.y*f.y,F=[],Hmax=Math.max(S.wallH,...walls.map(w=>w.ht||S.wallH));
+  walls.forEach(w=>{const g=GEO.get(w.id);if(!g)return;[1,-1].forEach(sd=>{const n={x:g.n.x*sd,y:g.n.y*sd};if(n.x*ns.x+n.y*ns.y<.3)return;F.push({w,g,s:sd,p0:FP(g,sd,g.t0[sd]),p1:FP(g,sd,g.t1[sd]),tA:g.t0[sd],tB:g.t1[sd],H:wallHmax(w)})})});
+  cols.forEach(o=>{const C=boxCorners(o.p,o.w,o.h,o.rot);for(let i=0;i<4;i++){const a=C[i],b=C[(i+1)%4],L=D(a,b);if(L<1)continue;let n={x:(b.y-a.y)/L,y:-(b.x-a.x)/L};const m={x:(a.x+b.x)/2-o.p.x,y:(a.y+b.y)/2-o.p.y};if(n.x*m.x+n.y*m.y<0)n={x:-n.x,y:-n.y};if(n.x*ns.x+n.y*ns.y<.3)continue;F.push({col:o,p0:a,p1:b,H:Hmax})}});
+  F.forEach(c=>{c.xa=X(c.p0);c.xb=X(c.p1);c.da=Dp(c.p0);c.db=Dp(c.p1);if(c.xa>c.xb){[c.xa,c.xb]=[c.xb,c.xa];[c.da,c.db]=[c.db,c.da];[c.p0,c.p1]=[c.p1,c.p0];[c.tA,c.tB]=[c.tB,c.tA]}c.hf=c.w?(x=>hAt(c.w,c.tA+(c.tB-c.tA)*(c.xb>c.xa?(x-c.xa)/(c.xb-c.xa):0))):(()=>c.H);c.bx=c.w?wallPts(c.w).map(q=>c.xa+(q.d-c.tA)/((c.tB-c.tA)||1)*(c.xb-c.xa)).filter(x=>x>c.xa&&x<c.xb):[]});
+  const V=F.filter(c=>c.xb-c.xa>1);if(!V.length)return null;const x0=Math.min(...V.map(v=>v.xa)),x1=Math.max(...V.map(v=>v.xb)),N=Math.max(60,Math.min(1600,Math.round((x1-x0)/8))),st=(x1-x0)/N,Z=PG().objs.filter(o=>o.t==='hatch'&&o.cz);
+  const sm=[];for(let i=0;i<N;i++){const x=x0+(i+.5)*st;let best=null,bd=1e30;V.forEach((c,k)=>{if(x<c.xa-1e-6||x>c.xb+1e-6)return;const d=c.da+(c.db-c.da)*(x-c.xa)/(c.xb-c.xa);if(d<bd-1){bd=d;best=k}});
+    let z=null;if(best!=null){const c=V[best],t=(x-c.xa)/(c.xb-c.xa),p={x:c.p0.x+(c.p1.x-c.p0.x)*t+ns.x*40,y:c.p0.y+(c.p1.y-c.p0.y)*t+ns.y*40};let ba=1e30;Z.forEach(o=>{if(inPoly(p,o.pts)){const A=Math.abs(polyArea(o.pts));if(A<ba){ba=A;z=o.cz}}})}sm.push({x,f:best,z,d:bd})}
+  const seg=[];sm.forEach(q=>{const l=seg[seg.length-1];if(l&&l.f===q.f)l.x1=q.x+st/2;else seg.push({f:q.f,x0:q.x-st/2,x1:q.x+st/2,d:q.d})});
+  for(let i=0;i<seg.length-1;i++){const A=seg[i],B=seg[i+1];let bx=A.x1,bd=2.5*st;[A.f,B.f].forEach(k=>{if(k!=null)[V[k].xa,V[k].xb].forEach(c=>{if(Math.abs(c-A.x1)<bd){bd=Math.abs(c-A.x1);bx=c}})});A.x1=B.x0=bx}
+  if(seg.length){seg[0].x0=x0;seg[seg.length-1].x1=x1}
+  let prof=[];sm.forEach(q=>{const key=q.f==null?'gap':q.z==null?'n'+q.f:'z'+q.z,l=prof[prof.length-1];if(l&&l.key===key)l.x1=q.x+st/2;else prof.push({key,f:q.f,z:q.f==null?undefined:q.z,x0:q.x-st/2,x1:q.x+st/2})});
+  prof=prof.filter((p,i)=>!(p.z===null&&p.x1-p.x0<4*st&&prof.length>1));const PM=[];prof.forEach(p=>{const l=PM[PM.length-1];if(l&&l.key===p.key)l.x1=p.x1;else PM.push({...p})});for(let i=0;i<PM.length-1;i++)PM[i].x1=PM[i+1].x0;if(PM.length){PM[0].x0=x0;PM[PM.length-1].x1=x1}
+  const mes=[];walls.forEach(w=>{const k=V.findIndex(c=>c.w===w);if(k<0)return;const c=V[k];PG().objs.forEach(o=>{if(o.t!=='blk'||o.host!==w.id||!BLK[o.k]||!BLK[o.k].me||(o.sw||1)!==c.s)return;const fr=hostFrame(GEO,o);if(!fr)return;const x=X(FP(c.g,c.s,fr.at));if(seg.some(g2=>g2.f===k&&x>=g2.x0&&x<=g2.x1))mes.push({o,x,z:meZ(o)})})});
+  const ops=[];walls.forEach(w=>{const k=V.findIndex(c=>c.w===w);if(k<0)return;const c=V[k];PG().objs.forEach(o=>{if(o.t!=='blk'||o.host!==w.id||!BLK[o.k]||BLK[o.k].me)return;const fr=hostFrame(GEO,o);if(!fr)return;const xa=X(FP(c.g,c.s,fr.at-o.w/2)),xb=X(FP(c.g,c.s,fr.at+o.w/2)),a=Math.min(xa,xb),b=Math.max(xa,xb);
+    const vis=seg.filter(g2=>g2.f===k).map(g2=>[Math.max(a,g2.x0),Math.min(b,g2.x1)]).filter(([p,q])=>q-p>5);if(!vis.length)return;ops.push({o,x0:vis[0][0],x1:vis[vis.length-1][1],sl:opSill(o),hd:opHead(o)})})});
+  return{V,seg,prof:PM,ops:ops.sort((a,b)=>a.x0-b.x0),mes,x0,x1,Hmax}}
+function elevInfo(walls,cols,ns){const M=elevModel(walls,cols,ns);if(!M)return'Tidak ada sisi dinding yang menghadap ke sini';const zs=[...new Set(M.prof.filter(p=>p.z).map(p=>'+'+fmtH(p.z)))];return(zs.length?'Plafon '+zs.join(' / '):'Belum ada zona plafon di sisi ini')+' · '+M.ops.length+' bukaan · lebar '+fmtL(M.x1-M.x0)+' '+uLbl()}
+function elevDialog(sel){const objs=Array.isArray(sel)?sel:[sel],walls=objs.filter(o=>o.t==='wall'),cols=objs.filter(o=>o.t==='blk'&&!o.host&&o.k==='kolom');if(!walls.length)return toast('Pilih minimal satu dinding');
+  const main=walls.map(w=>GEO.get(w.id)).filter(Boolean).sort((a,b)=>b.L-a.L)[0];if(!main)return toast('Dinding tidak ditemukan');const nm0=(walls.find(w=>w.lbl)||{}).lbl||'';
+  const sheets=P.pages.filter(p=>p.sheet&&p.src===PG().id);
+  openDlg(`<h2>Tampak dinding</h2><p>${walls.length>1||cols.length?walls.length+' dinding'+(cols.length?' + '+cols.length+' kolom':'')+' digabung jadi <b>satu tampak</b> — tonjolan, ceruk & partisi ikut tergambar.':'Dinding '+fmtL(main.L)+' '+esc(uLbl())+'.'} Di denah akan muncul label tampak (A, B, C…) yang bisa diketuk untuk membuka tampaknya. Anda berdiri di sisi mana?</p>
+   <div class="list">${[1,-1].map(sd=>`<button data-d="${sd>0?'sp':'sn'}"><b>Dari sisi ${sideName(main,sd)} (di gambar)</b><small>${elevInfo(walls,cols,{x:main.n.x*sd,y:main.n.y*sd})}</small></button>`).join('')}</div>
+   <div class="row"><div><label>Lembar tujuan</label><select id="esh"><option value="auto">Otomatis — isi lembar yang masih muat</option>${sheets.map(p=>`<option value="${p.id}">${esc(p.name)} (1:${p.scale})</option>`).join('')}<option value="new">Lembar baru</option></select></div>
+   <div><label>Skala lembar baru</label><select id="esc">${[20,25,50,75,100].map(v=>`<option value="${v}" ${v===50?'selected':''}>1 : ${v}</option>`).join('')}</select></div></div>
+   <div class="row"><div><label>Detail listrik & air (ME)</label><select id="eme"><option value="all">Semua (eksisting + rencana)</option><option value="eks">Eksisting saja</option><option value="baru">Rencana / konsep saja</option><option value="none">Tidak ditampilkan</option></select></div>
+   <div><label>Nama (opsional)</label><input type="text" id="enm" value="${esc(nm0)}" placeholder="mis. R. Tamu sisi utara" autocomplete="off"></div></div>
+   <div class="acts"><button class="btn" data-d="x">Batal</button></div>`,{x:closeDlg,sp:()=>go(1),sn:()=>go(-1)});
+  function go(sd){const sc=+$('#esc').value,nm=$('#enm').value.trim(),sh=$('#esh').value,me=$('#eme').value;if(nm)walls.forEach(w=>w.lbl=nm);closeDlg();
+    const ns={x:main.n.x*sd,y:main.n.y*sd},src=PG(),key=walls.map(w=>w.id).sort().join(',')+'|'+cols.map(c=>c.id).sort().join(',')+'|'+Math.round(Math.atan2(ns.y,ns.x)*180/Math.PI)+(me==='all'?'':'|'+me);P.elevs=P.elevs||[];
+    let rec=P.elevs.find(e=>e.key===key&&e.src===src.id);if(!rec){rec={lt:elevLetter(),key,src:src.id,walls:walls.map(w=>w.id),cols:cols.map(c=>c.id),ns};P.elevs.push(rec)}rec.nm=nm||rec.nm||'';rec.side=sideName(main,sd);rec.me=me;
+    renderElev(rec,{sc,sheet:sh})}}
+function elevLetter(){const used=new Set((P.elevs||[]).map(e=>e.lt));for(let i=0;i<702;i++){const t=i<26?String.fromCharCode(65+i):String.fromCharCode(64+Math.floor(i/26))+String.fromCharCode(65+i%26);if(!used.has(t))return t}return'?'}
+function sheetRef(pg){const L=P.pages.filter(p=>p.sheet);return'T'+(L.indexOf(pg)+1)}
+function evBox(objs,lt){const Q=[];objs.forEach(o=>{if(o.ev!==lt)return;if(o.t==='line'||o.t==='dim'){Q.push(o.a,o.b)}else if(o.t==='rect')Q.push(...rectPts(o));else if(o.t==='text')Q.push(...textBox(o));else if(o.t==='pt')Q.push({x:o.p.x-600,y:o.p.y-600},{x:o.p.x+600,y:o.p.y+600})});return Q.length?bbox(Q):null}
+function renderElev(rec,opt={}){const srcI=P.pages.findIndex(p=>p.id===rec.src);if(srcI<0)return toast('Halaman denah sumber tidak ada');P.cur=srcI;const src=PG();GEO=wallGeo(src.objs);
+  const walls=rec.walls.map(id=>src.objs.find(o=>o.id===id)).filter(Boolean),cols=(rec.cols||[]).map(id=>src.objs.find(o=>o.id===id)).filter(Boolean);if(!walls.length)return toast('Dinding tampak '+rec.lt+' sudah dihapus');
+  const M=elevModel(walls,cols,rec.ns);if(!M)return toast('Tidak ada sisi dinding yang menghadap ke arah itu');try{rec.area=wallAreaCalc(walls,rec.ns,0,null).net}catch(_){}
+  let sh=rec.sheet&&P.pages.find(p=>p.id===rec.sheet&&p.sheet);let old=null;if(sh&&opt.sheet&&opt.sheet!=='auto'&&opt.sheet!==sh.id){sh.objs=sh.objs.filter(o=>o.ev!==rec.lt);sh=null}
+  if(sh){old=evBox(sh.objs,rec.lt);if(old){old.dx=rec.dx0||0;old.dy=rec.dy0||0}sh.objs=sh.objs.filter(o=>o.ev!==rec.lt)}
+  const cands=sh?[sh]:opt.sheet==='new'?[]:opt.sheet&&opt.sheet!=='auto'?P.pages.filter(p=>p.id===opt.sheet):P.pages.filter(p=>p.sheet&&p.src===src.id);
+  let place=null;for(const pg of cands){const B=elevBuild(M,pg.scale,rec,src),pos=sheetSlot(pg,B,old);if(pos){place={pg,B,pos};break}}
+  if(!place){const n=P.pages.filter(p=>p.sheet).length+1;let sc=opt.sc||50;const[pw,ph]=pdim(src);let B=elevBuild(M,sc,rec,src);
+    while((B.w/sc>(pw-36)||B.h/sc>(ph-66))&&sc<500){sc=[20,25,50,75,100,150,200,250,500].find(v=>v>sc)||500;B=elevBuild(M,sc,rec,src)}
+    const pg=newPage('Tampak '+n,src.paper,src.orient,sc);pg.sheet=true;pg.src=src.id;P.pages.push(pg);if(sc!==(opt.sc||50))toast('Tampak '+rec.lt+' terlalu panjang — lembar baru memakai skala 1:'+sc);place={pg,B,pos:sheetSlot(pg,B,null)||{x:18*sc,y:18*sc}}}
+  const{pg,B,pos}=place,dx=pos.x-B.x0,dy=pos.y-B.y0,_mp=(rec.mp={dx,dy,x0:M.x0,segs:M.seg.filter(g2=>g2.f!=null&&M.V[g2.f].w).map(g2=>{const c=M.V[g2.f];return{x0:g2.x0,x1:g2.x1,w:c.w.id,s:c.s,tA:c.tA,tB:c.tB,xa:c.xa,xb:c.xb}})}),gid='ev_'+rec.lt+'_'+uid().slice(0,4);B.O.forEach(o=>{xform(o,p=>({x:r1(p.x+dx),y:r1(p.y+dy)}),{});o.ev=rec.lt;o.g=gid;pg.objs.push(o)});rec.sheet=pg.id;{const eb=evBox(pg.objs,rec.lt);if(eb){rec.dx0=pos.x-eb.x0;rec.dy0=pos.y-eb.y0}}
+  let mk=src.objs.find(o=>o.t==='pt'&&o.em===rec.lt&&!o.back);const f={x:-rec.ns.x,y:-rec.ns.y};
+  if(!mk){const r={x:-f.y,y:f.x},pts=walls.flatMap(w=>[w.a,w.b]),mx=(M.x0+M.x1)/2,mn=Math.max(...pts.map(p=>p.x*rec.ns.x+p.y*rec.ns.y))+14*src.scale;mk=add({t:'pt',p:{x:r1(r.x*mx+rec.ns.x*mn),y:r1(r.y*mx+rec.ns.y*mn)},em:rec.lt,lbl:''})}
+  mk.ang=Math.atan2(f.y,f.x);mk.sref=sheetRef(pg);pg.objs.forEach(o=>{if(o.t==='pt'&&o.back)o.sref=(P.pages.find(p=>p.id===rec.src)||{}).name?'Denah':''});
+  const kv=opt.keepView&&pg.view?{...pg.view}:null;P.cur=P.pages.indexOf(pg);SEL.clear();hidePanel();if(!opt.keepTool&&S.tool!=='select')setTool('select');if(kv)pg.view=kv;else zoomEv(rec.lt);commit();renderTop();renderPages&&renderPages();
+  toast('Tampak '+rec.lt+' di '+pg.name+(B.red?' · bagian merah belum diukur':''))}
+function sheetSlot(pg,B,old){const sc=pg.scale,[PW,PH]=pdim(pg),ux0=18*sc,uy0=18*sc,ux1=(PW-18)*sc,uy1=(PH-48)*sc,gap=8*sc,w=B.x1-B.x0,h=B.y1-B.y0;if(w>ux1-ux0||h>(PH-36)*sc-uy0)return null;
+  const lts=[...new Set(pg.objs.filter(o=>o.ev).map(o=>o.ev))],R=lts.map(l=>evBox(pg.objs,l)).filter(Boolean);
+  const ok=c=>c.x>=ux0-1&&c.y>=uy0-1&&c.x+w<=ux1+1&&c.y+h<=uy1+1&&R.every(r=>c.x+w+gap<=r.x0||c.x>=r.x1+gap||c.y+h+gap<=r.y0||c.y>=r.y1+gap);
+  if(old){const q={x:old.x0+(old.dx||0),y:old.y0+(old.dy||0)};if(ok(q))return q}
+  const C=[{x:ux0,y:uy0}];R.forEach(r=>C.push({x:r.x1+gap,y:r.y0},{x:ux0,y:r.y1+gap},{x:r.x0,y:r.y1+gap}));C.sort((a,b)=>a.y-b.y||a.x-b.x);return C.find(ok)||null}
+function zoomEv(lt,pgObj){const pg=PG(),bb=lt?evBox(pg.objs,lt):null;if(!bb){fit();return}const k=Math.min((CW*.8)/bb.w,(CH*.7)/bb.h),v=pg.view||(pg.view={});v.z=k*pg.scale;v.ox=CW/2-(bb.x0+bb.w/2)*k;v.oy=CH/2-(bb.y0+bb.h/2)*k;req()}
+function gotoElev(o){const rec=(P.elevs||[]).find(e=>e.lt===o.em);if(!rec)return toast('Data tampak '+o.em+' tidak ditemukan');
+  if(o.back){const i=P.pages.findIndex(p=>p.id===rec.src);if(i<0)return;P.cur=i;SEL.clear();hidePanel();const mk=PG().objs.find(x=>x.t==='pt'&&x.em===rec.lt&&!x.back);fit();if(mk){const v=PG().view,K0=v.z/PG().scale*2.5,k=Math.min(K0,v.z*4/PG().scale);v.z=k*PG().scale;v.ox=CW/2-mk.p.x*k;v.oy=CH/2-mk.p.y*k}
+    renderTop();renderPages&&renderPages();req();hint('Denah — penanda tampak '+rec.lt);return}
+  const sh=P.pages.find(p=>p.id===rec.sheet);if(!sh||!sh.objs.some(x=>x.ev===rec.lt))return renderElev(rec,{});P.cur=P.pages.indexOf(sh);SEL.clear();hidePanel();zoomEv(rec.lt);renderTop();renderPages&&renderPages();hint('Tampak '+rec.lt+' — ketuk label '+rec.lt+' untuk kembali ke denah')}
+function showEmPanel(o){SEL.clear();SEL.add(o.id);const rec=(P.elevs||[]).find(e=>e.lt===o.em);showPanel(`<span class="t">Tampak ${esc(o.em)}</span>${rec?`<span class="u">${esc(rec.nm||'')} ${rec.side?'· dari sisi '+rec.side:''}</span>`:''}
+   <button class="btn pri" data-p="go">${o.back?'← Ke denah':'→ Buka tampak'}</button>${rec?'<button class="btn" data-p="upd">↻ Perbarui tampak</button>':''}<span class="u">Huruf</span><input type="text" id="eml" value="${esc(o.em)}" style="width:56px" autocomplete="off"><button class="btn" data-p="ren">Ganti</button>${o.back?'':'<button class="btn dan" data-p="del">Hapus label</button>'}${X_}`,{
+   go:()=>gotoElev(o),upd:()=>{const r=rec;hidePanel();renderElev(r,{})},
+   ren:()=>{const nl=$('#eml').value.trim().toUpperCase();if(!nl||nl===o.em)return;if((P.elevs||[]).some(e=>e.lt===nl))return toast('Huruf '+nl+' sudah dipakai');const ol=o.em;pushUndo();if(rec)rec.lt=nl;P.pages.forEach(pg=>pg.objs.forEach(x=>{if(x.ev===ol)x.ev=nl;if(x.t==='pt'&&x.em===ol)x.em=nl;if(x.t==='text'&&x.ev===nl&&/^TAMPAK /.test(x.s))x.s=x.s.replace('TAMPAK '+ol,'TAMPAK '+nl)}));commit();showEmPanel(o)},
+   del:()=>{pushUndo();removeIds([o.id]);hidePanel();commit()},x:xAct})}
+function elevBuild(M,sc,rec,src){const L=M.x1-M.x0,sx0=M.x0,zs=M.prof.filter(p=>p.z).map(p=>p.z),Ht=Math.max(zs.length?Math.max(...zs):0,...M.V.map(v=>v.H),...M.ops.map(o=>o.hd));
+  const Pt=(x,z)=>({x:r1(x),y:r1(-z)}),O=[],XX=x=>x-sx0,ln=(a,b,wd=.25,c='#16191d')=>O.push({id:uid(),t:'line',a,b,c,w:wd,sd:false});
+  const rc=(x0,z0,x1,z1,wd=.25,c='#16191d')=>{const a=Pt(x0,z1);O.push({id:uid(),t:'rect',x:a.x,y:a.y,w2:r1(x1-x0),h:r1(z1-z0),c,w:wd,sd:false})};
+  const tw=(t,h)=>t.length*h*.6*sc,tx=(x,z,t,h=2.5,c='#16191d',b=false,al='l')=>O.push({id:uid(),t:'text',p:Pt(al==='c'?x-tw(t,h)/2:x,z),s:t,h,c,f:'sans',r:0,b});
+  const dm=(a,b,off)=>O.push({id:uid(),t:'dim',a,b,off});let red=false;const topAt=x=>{const p=M.prof.find(q=>x>=q.x0-1&&x<=q.x1+1&&q.f!=null);return p?(p.z||M.V[p.f].hf(x)):0};
+  ln(Pt(-450,0),Pt(L+450,0),.7);
+  M.seg.forEach((g2,i)=>{if(g2.f==null)return;const x0=XX(g2.x0),x1=XX(g2.x1),pv=M.seg[i-1],nx=M.seg[i+1];
+    if(!pv||pv.f!==g2.f){const h=Math.max(topAt(g2.x0+1),pv&&pv.f!=null?topAt(g2.x0-1):0);ln(Pt(x0,0),Pt(x0,h),.5);if(pv&&pv.f!=null){const dd=Math.abs(pv.d-g2.d);if(dd>15)tx(x0+1.2*sc,350,'↕ '+cmS(dd),1.9,'#6b7078')}}
+    if(!nx||nx.f==null)ln(Pt(x1,0),Pt(x1,topAt(g2.x1-1)),.5)});
+  let pz=null;M.prof.forEach(p=>{if(p.f==null){pz=null;return}const x0=XX(p.x0),x1=XX(p.x1),fc=M.V[p.f],H=fc.hf((p.x0+p.x1)/2);
+    if(p.z){ln(Pt(x0,p.z),Pt(x1,p.z),.5);if(pz!=null&&pz!==p.z)ln(Pt(x0,pz),Pt(x0,p.z),.5);pz=p.z;if(x1-x0>tw('+0,00 plafon',2.2)+80)tx((x0+x1)/2,p.z-1.2*sc,'+'+fmtH(p.z)+' plafon',2.2,'#7c3aed',false,'c')}
+    else{red=true;{const bxs=[p.x0,...fc.bx.filter(x=>x>p.x0&&x<p.x1),p.x1];for(let j=0;j<bxs.length-1;j++)ln(Pt(XX(bxs[j]),fc.hf(bxs[j])),Pt(XX(bxs[j+1]),fc.hf(bxs[j+1])),zs.length?.18:.5,zs.length?'#dc2626':'#16191d');fc.bx.filter(x=>x>p.x0+50&&x<p.x1-50).forEach(x=>{const h=fc.hf(x);ln(Pt(XX(x),h),Pt(XX(x),h+2.5*sc),.13,'#6b7078');tx(XX(x),h+5.2*sc,'+'+fmtH(h),2,'#16191d',false,'c')})}if(zs.length&&x1-x0>700)tx((x0+x1)/2,H-1.2*sc,'plafon ?',2.2,'#dc2626',false,'c');pz=null}});
+  if(!zs.length)tx(L/2,Ht+8*sc,'tinggi plafon belum diisi (alat Plafon)',2,'#dc2626',false,'c');
+  const codes=opCodes(src.objs);M.ops.forEach(({o,x0:a0,x1:a1,sl,hd})=>{const x0=XX(a0),x1=XX(a1),kd=opKind(o),c=o.hm?'#16191d':'#dc2626',m=40;if(!o.hm)red=true;rc(x0,sl,x1,hd,.35,c);
+    if(kd==='J'){rc(x0+m,sl+m,x1-m,hd-m,.18,c);if(x1-x0>=1000)ln(Pt((x0+x1)/2,sl+m),Pt((x0+x1)/2,hd-m),.18,c)}
+    else if(kd==='P'){ln(Pt(x0+m,0),Pt(x0+m,hd-m),.18,c);ln(Pt(x1-m,0),Pt(x1-m,hd-m),.18,c);ln(Pt(x0+m,hd-m),Pt(x1-m,hd-m),.18,c);if(o.k==='pintu2'||o.k==='pintuGeser')ln(Pt((x0+x1)/2,0),Pt((x0+x1)/2,hd-m),.13,c)}
+    else if(kd==='BV'){for(let x=x0+100;x<x1-30;x+=100)ln(Pt(x,sl),Pt(x,hd),.13,c);ln(Pt(x0,(sl+hd)/2),Pt(x1,(sl+hd)/2),.13,c)}
+    else{ln(Pt(x0,sl),Pt(x1,hd),.13,c);ln(Pt(x0,hd),Pt(x1,sl),.13,c)}
+    tx((x0+x1)/2,hd+4*sc,opText(o,codes.get(o.id),false),2.5,o.hm?'#1e40af':'#dc2626',true,'c');if(sl>0)dm(Pt(x1,0),Pt(x1,sl),5*sc);dm(Pt(x1,sl),Pt(x1,hd),5*sc)});
+  const meF=rec.me||'all';let nme=0;if(meF!=='none')M.mes.forEach(({o,x,z})=>{const st=o.st||'eks';if(meF!=='all'&&meF!==st)return;nme++;const n0=O.length;const B=BLK[o.k],c=st==='baru'?'#ea580c':'#0f172a',X0=XX(x),hs=(o.k==='mcb'?4:2.6)*sc/2,ws=(o.k==='mcb'?3:2.6)*sc/2;
+    rc(X0-ws,z-hs,X0+ws,z+hs,.25,c);tx(X0,z+(B.cd.length>2?.6:.75)*sc,B.cd,B.cd.length>2?1.1:1.4,c,true,'c');tx(X0+ws+.6*sc,z+.8*sc,'+'+cmS(z)+(o.lbl?' '+o.lbl:''),1.5,c);for(let k=n0;k<O.length;k++)O[k].meRef=o.id});
+  const xs=[...new Set([0,L,...M.seg.flatMap(g2=>[XX(g2.x0),XX(g2.x1)]),...M.ops.flatMap(p=>[XX(p.x0),XX(p.x1)])].map(v=>Math.round(v)))].sort((a,b)=>a-b);
+  for(let i=0;i<xs.length-1;i++)if(xs[i+1]-xs[i]>5)dm(Pt(xs[i],0),Pt(xs[i+1],0),8*sc);if(xs.length>2)dm(Pt(0,0),Pt(L,0),15*sc);
+  const z0=topAt(M.x0+1),zl=topAt(M.x1-1);if(z0)dm(Pt(0,0),Pt(0,z0),-7*sc);if(zl&&zl!==z0)dm(Pt(L,0),Pt(L,zl),7*sc+(M.ops.some(p=>XX(p.x1)>L-50)?6*sc:0));
+  O.push({id:uid(),t:'pt',p:Pt(6*sc,-27*sc),em:rec.lt,back:1,lbl:''});
+  const meT={eks:' (EKSISTING)',baru:' (RENCANA)'}[rec.me]||'';tx(14*sc,-23.5*sc,'TAMPAK '+rec.lt+meT+(rec.nm?' — '+rec.nm.toUpperCase():'')+(rec.side?'   (dari sisi '+rec.side+')':''),3.5,'#16191d',true);
+  tx(14*sc,-29*sc,'SKALA 1 : '+sc+'  ·  '+uLbl()+(rec.area!=null?'  ·  luas dinding bersih '+m2(rec.area)+' m²':'')+'  ·  ↕ = kedalaman (cm)'+(nme?'  ·  ME: hitam = eksisting, oranye = rencana':'')+(red?'  ·  merah = belum diukur':''),2,'#6b7078');
+  const x0=-(450+14*sc),x1=Math.max(L+450,L+14*sc,14*sc+Math.max(tw('TAMPAK '+rec.lt+' — '+(rec.nm||'')+'   (dari sisi '+(rec.side||'')+')',3.5),tw('SKALA 1 : 100  ·  m  ·  ↕ = kedalaman tonjolan/ceruk (cm)  ·  merah = belum diukur',2)))+6*sc,y0=-(Ht+12*sc),y1=34*sc;
+  return{O,x0,y0,x1,y1,w:x1-x0,h:y1-y0,red}}
+/* ---------- impor PDF / DWG / DXF ---------- */
+const LIBPDF=()=>window.DS_NATIVE?['vendor/pdf.min.js','vendor/pdf.worker.min.js']:['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'];
+const LIBDWG=()=>window.DS_NATIVE?new URL('vendor/dwg/dist/libredwg-web.js',location.href).href:'https://cdn.jsdelivr.net/npm/@mlightcad/libredwg-web@0.8.8/dist/libredwg-web.js';
+function impProg(msg,f){const b=$('#impbar');if(msg==null){b.classList.remove('show');return}b.classList.add('show');$('#impmsg').textContent=msg;$('#impprog').style.width=Math.round((f||0)*100)+'%'}
+$('#impf').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const ext=(f.name.split('.').pop()||'').toLowerCase();
+  try{if(ext==='pdf'||f.type==='application/pdf')await importPDF(f);else if(ext==='dxf')await importCAD(f,'dxf');else if(ext==='dwg')await importCAD(f,'dwg');
+    else if(/^image\//.test(f.type)||/^(jpe?g|png|heic|webp|gif)$/.test(ext)){const dt=new DataTransfer();dt.items.add(f);$('#photo').files=dt.files;$('#photo').dispatchEvent(new Event('change'))}
+    else toast('Format belum didukung: .'+ext+' — pakai PDF, DWG, DXF, atau gambar')}
+  catch(err){impProg(null);console.error(err);toast('Gagal impor: '+(err&&err.message||err))}});
+async function placeImage(blob,pxw,pxh,wWorld,ctr){const iid=uid();await IDB.put(iid,blob);const e2={el:new Image(),ok:false};e2.el.onload=()=>{e2.ok=true;req()};e2.el.src=URL.createObjectURL(blob);IMG.set(iid,e2);
+  const o=add({t:'img',iid,p:ctr,w:wWorld,h:wWorld*pxh/pxw,rot:0,op:1,lock:false});if(ASSETS){ASSETS.upload(blob,{type:blob.type||'image/jpeg'}).then(r=>{o.aid=r.id;commit()}).catch(()=>{})}return o}
+async function importPDF(f){impProg('Memuat pembaca PDF…',.05);const[L1,L2]=LIBPDF();if(!window.pdfjsLib)await loadScript(L1);const pj=window.pdfjsLib;if(!pj)throw new Error('pembaca PDF tidak termuat (perlu internet sekali)');pj.GlobalWorkerOptions.workerSrc=L2;
+  const doc=await pj.getDocument({data:new Uint8Array(await f.arrayBuffer())}).promise;impProg(null);const n=doc.numPages;const p1=await doc.getPage(1),vp=p1.getViewport({scale:1}),mmW=vp.width*25.4/72,mmH=vp.height*25.4/72;
+  openDlg(`<h2>Impor PDF</h2><p>${esc(f.name)} · ${n} halaman · ${r1(mmW)}×${r1(mmH)} mm</p>
+   <div class="row"><div><label>Halaman PDF</label><select id="ipg"><option value="all">Semua (${n})</option>${Array.from({length:n},(_,i)=>`<option value="${i+1}" ${i?'':'selected'}>Halaman ${i+1}</option>`).join('')}</select></div>
+   <div><label>Skala gambar di PDF  1 :</label><input type="text" inputmode="decimal" id="isc" value="${PG().scale}"></div></div>
+   <label>Penempatan</label><select id="ipl"><option value="cur">Di halaman ini</option><option value="new">Tiap halaman PDF → halaman baru</option></select>
+   <label>Ketajaman</label><select id="iq"><option value="2600">Normal (hemat memori)</option><option value="4000" selected>Tajam</option><option value="5600">Sangat tajam</option></select>
+   <p>Bila skala PDF sama dengan skala halaman, ukurannya langsung tepat. Bila tidak tahu skalanya, impor saja lalu pakai <b>Kalibrasi skala</b> pada foto/PDF.</p>
+   <div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Impor</button></div>`,{x:closeDlg,ok:async()=>{
+     const sel=$('#ipg').value,sc=parseN($('#isc').value)||PG().scale,pl=$('#ipl').value,mx=+$('#iq').value;closeDlg();
+     const pages=sel==='all'?Array.from({length:n},(_,i)=>i+1):[+sel];const before=JSON.stringify(PG().objs);let first=true,last=null;
+     for(let i=0;i<pages.length;i++){impProg('Merender halaman '+pages[i]+' dari '+n+'…',(i+.3)/pages.length);const pg=await doc.getPage(pages[i]),v1=pg.getViewport({scale:1}),z=mx/Math.max(v1.width,v1.height),vp2=pg.getViewport({scale:z});
+       const c=document.createElement('canvas');c.width=Math.round(vp2.width);c.height=Math.round(vp2.height);const cx=c.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,c.width,c.height);
+       await pg.render({canvasContext:cx,viewport:vp2}).promise;const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.9));
+       if(pl==='new'&&(pages.length>1||!first)){const np=newPage((f.name.replace(/\.pdf$/i,'')+' hal. '+pages[i]).slice(0,40),PG().paper,PG().orient,PG().scale);P.pages.push(np);P.cur=P.pages.length-1;fit()}
+       else if(first)pushUndo(before);first=false;
+       const wW=v1.width*25.4/72*sc,ctr=s2w(CW/2,CH/2);last=await placeImage(blob,c.width,c.height,wW,ctr);c.width=c.height=0}
+     impProg(null);if(S.tool!=='select')setTool('select');SEL.clear();if(last)SEL.add(last.id);commit();renderPages&&renderPages();showSelPanel();toast(pages.length+' halaman PDF diimpor · kunci lalu gambar di atasnya')}})}
+/* --- parser DXF (teks) --- */
+function dxfClean(t){return String(t).replace(/\\P/gi,'\n').replace(/\\[ACFHQTWfacqhtw][^;]*;/g,'').replace(/\\[LlOoKk]/g,'').replace(/\\S([^;^]*)[\^#]([^;]*);/g,'$1/$2').replace(/%%[cC]/g,'Ø').replace(/%%[dD]/g,'°').replace(/%%[pP]/g,'±').replace(/[{}]/g,'').replace(/\\\\/g,'\\')}
+function tessArc(c,r,a0,a1,ccw=true){let d=a1-a0;if(ccw){while(d<=0)d+=2*Math.PI}else{while(d>=0)d-=2*Math.PI}const n=Math.max(6,Math.ceil(Math.abs(d)/(Math.PI/36))),P=[];for(let i=0;i<=n;i++){const t=a0+d*i/n;P.push({x:c.x+r*Math.cos(t),y:c.y+r*Math.sin(t)})}return P}
+function bulgePts(V,closed){const out=[];const N=closed?V.length:V.length-1;out.push({x:V[0].x,y:V[0].y});let curve=false;
+  for(let i=0;i<N;i++){const a=V[i],b=V[(i+1)%V.length],bu=a.bulge||0;if(Math.abs(bu)>1e-9){curve=true;const th=4*Math.atan(bu),ch=Math.hypot(b.x-a.x,b.y-a.y),r=ch/(2*Math.sin(th/2)),m={x:(a.x+b.x)/2,y:(a.y+b.y)/2},h=r*Math.cos(th/2),nx=-(b.y-a.y)/ch,ny=(b.x-a.x)/ch,c={x:m.x+nx*h,y:m.y+ny*h};
+      const a0=Math.atan2(a.y-c.y,a.x-c.x),a1=Math.atan2(b.y-c.y,b.x-c.x);const A=tessArc(c,Math.abs(r),a0,a1,th>0);A.shift();out.push(...A)}else out.push({x:b.x,y:b.y})}return{pts:out,curve}}
+function ellPts(c,mj,ratio,t0,t1){const mn={x:-mj.y*ratio,y:mj.x*ratio};let d=t1-t0;while(d<=0)d+=2*Math.PI;const n=Math.max(12,Math.ceil(d/(Math.PI/36))),P=[];for(let i=0;i<=n;i++){const t=t0+d*i/n;P.push({x:c.x+mj.x*Math.cos(t)+mn.x*Math.sin(t),y:c.y+mj.y*Math.cos(t)+mn.y*Math.sin(t)})}return P}
+function chaikin(P,it=3){let Q=P;for(let k=0;k<it;k++){const R=[Q[0]];for(let i=0;i<Q.length-1;i++){const a=Q[i],b=Q[i+1];R.push({x:.75*a.x+.25*b.x,y:.75*a.y+.25*b.y},{x:.25*a.x+.75*b.x,y:.25*a.y+.75*b.y})}R.push(Q[Q.length-1]);Q=R}return Q}
+const INSU={1:25.4,2:304.8,4:1,5:10,6:1000,8:0.0000254,9:0.0254,10:914.4,14:100};
+function parseDXF(txt){const L=txt.split(/\r\n|\r|\n/),pr=[];for(let i=0;i+1<L.length;i+=2){const c=parseInt(L[i],10);if(!isNaN(c))pr.push([c,L[i+1].replace(/\s+$/,'')])}
+  const M={units:0,blocks:{},ents:[]};let i=0,sec='',blk=null,poly=null;
+  const ent=()=>{const t=pr[i][1],G=[];i++;while(i<pr.length&&pr[i][0]!==0){G.push(pr[i]);i++}return{t,G}};
+  const g=(G,c,d)=>{const f=G.find(x=>x[0]===c);return f?f[1]:d},n=(G,c,d=0)=>{const v=parseFloat(g(G,c,''));return isNaN(v)?d:v};
+  while(i<pr.length){const[c,v]=pr[i];
+    if(c===0&&v==='SECTION'){sec=pr[i+1]&&pr[i+1][1];i+=2;continue}
+    if(c===0&&v==='ENDSEC'){sec='';i++;continue}
+    if(sec==='HEADER'){if(c===9&&v==='$INSUNITS'){M.units=parseInt(pr[i+1][1],10)||0;i+=2;continue}i++;continue}
+    if(sec!=='BLOCKS'&&sec!=='ENTITIES'){i++;continue}
+    if(c!==0){i++;continue}
+    const e=ent(),G=e.G,list=blk?blk.ents:M.ents;
+    if(e.t==='BLOCK'){blk={name:g(G,2,''),base:{x:n(G,10),y:n(G,20)},ents:[]};continue}
+    if(e.t==='ENDBLK'){if(blk)M.blocks[blk.name]=blk;blk=null;continue}
+    if(sec==='ENTITIES'&&g(G,67,'0').trim()==='1')continue;
+    if(e.t==='SEQEND'){if(poly){const r=bulgePts(poly.V,poly.closed);if(r.pts.length>1)list.push({k:'P',pts:r.pts,closed:poly.closed,curve:r.curve});poly=null}continue}
+    if(e.t==='VERTEX'){if(poly&&!(parseInt(g(G,70,'0'))&128))poly.V.push({x:n(G,10),y:n(G,20),bulge:n(G,42)});continue}
+    if(e.t==='POLYLINE'){const fl=parseInt(g(G,70,'0'))||0;poly=fl&(16|64)?null:{V:[],closed:!!(fl&1)};continue}
+    dxfEnt(e.t,G,list,g,n)}
+  return M}
+function dxfEnt(t,G,list,g,n){
+  if(t==='LINE')list.push({k:'P',pts:[{x:n(G,10),y:n(G,20)},{x:n(G,11),y:n(G,21)}]});
+  else if(t==='LWPOLYLINE'){const V=[];G.forEach(([c,v])=>{if(c===10)V.push({x:parseFloat(v),y:0,bulge:0});else if(c===20&&V.length)V[V.length-1].y=parseFloat(v);else if(c===42&&V.length)V[V.length-1].bulge=parseFloat(v)});const cl=!!((parseInt(g(G,70,'0'))||0)&1);if(V.length>1){const r=bulgePts(V,cl);list.push({k:'P',pts:r.pts,closed:cl,curve:r.curve})}}
+  else if(t==='CIRCLE')list.push({k:'P',pts:tessArc({x:n(G,10),y:n(G,20)},n(G,40),0,2*Math.PI),closed:true,curve:true});
+  else if(t==='ARC')list.push({k:'P',pts:tessArc({x:n(G,10),y:n(G,20)},n(G,40),n(G,50)*Math.PI/180,n(G,51)*Math.PI/180),curve:true});
+  else if(t==='ELLIPSE')list.push({k:'P',pts:ellPts({x:n(G,10),y:n(G,20)},{x:n(G,11),y:n(G,21)},n(G,40,1),n(G,41,0),n(G,42,2*Math.PI)),curve:true});
+  else if(t==='SPLINE'){const F=[],C=[];G.forEach(([c,v])=>{if(c===11)F.push({x:parseFloat(v),y:0});else if(c===21&&F.length)F[F.length-1].y=parseFloat(v);else if(c===10)C.push({x:parseFloat(v),y:0});else if(c===20&&C.length)C[C.length-1].y=parseFloat(v)});const B=F.length>1?chaikin(F,2):C.length>1?chaikin(C,3):null;if(B)list.push({k:'P',pts:B,curve:true})}
+  else if(t==='LEADER'){const V=[];G.forEach(([c,v])=>{if(c===10)V.push({x:parseFloat(v),y:0});else if(c===20&&V.length)V[V.length-1].y=parseFloat(v)});if(V.length>1)list.push({k:'P',pts:V})}
+  else if(t==='TEXT'||t==='ATTRIB'){const al=parseInt(g(G,72,'0'))||parseInt(g(G,74,'0'))||parseInt(g(G,73,'0'));const s=dxfClean(g(G,1,''));if(s.trim())list.push({k:'T',p:al?{x:n(G,11,n(G,10)),y:n(G,21,n(G,20))}:{x:n(G,10),y:n(G,20)},h:n(G,40,2.5),rot:n(G,50)*Math.PI/180,s,top:false})}
+  else if(t==='MTEXT'){let s='';G.forEach(([c,v])=>{if(c===3)s+=v});s+=g(G,1,'');s=dxfClean(s);let rot=n(G,50)*Math.PI/180;const dx=n(G,11,NaN);if(!isNaN(dx))rot=Math.atan2(n(G,21),dx);if(s.trim())list.push({k:'T',p:{x:n(G,10),y:n(G,20)},h:n(G,40,2.5),rot,s,top:true})}
+  else if(t==='INSERT'){list.push({k:'I',name:g(G,2,''),p:{x:n(G,10),y:n(G,20)},sx:n(G,41,1)||1,sy:n(G,42,1)||1,rot:n(G,50)*Math.PI/180})}
+  else if(t==='DIMENSION'){const nm=g(G,2,'');if(nm)list.push({k:'I',name:nm,p:{x:0,y:0},sx:1,sy:1,rot:0,abs:1})}}
+/* --- DWG lewat libredwg (WebAssembly) --- */
+let DWGLIB=null;
+async function dwgModel(buf){impProg('Memuat pembaca DWG (±11 MB, sekali saja)…',.1);
+  if(!DWGLIB){let mod;try{mod=await import(LIBDWG())}catch(e){throw new Error(window.DS_NATIVE?'pembaca DWG tidak termuat':'impor DWG hanya tersedia di aplikasi / PWA. Di sini simpan dulu sebagai DXF (AutoCAD: Save As → DXF)')}
+    try{DWGLIB={m:mod,lib:await mod.LibreDwg.create()}}catch(e){throw new Error(window.DS_NATIVE?'pembaca DWG gagal dijalankan':'impor DWG hanya tersedia di aplikasi / PWA. Di sini simpan dulu sebagai DXF')}}
+  impProg('Membaca DWG…',.5);await new Promise(r=>setTimeout(r,30));const{m,lib}=DWGLIB;const dwg=lib.dwg_read_data(buf,m.Dwg_File_Type.DWG);if(!dwg)throw new Error('file DWG tidak terbaca (versi terlalu baru/rusak?)');const db=lib.convert(dwg);try{lib.dwg_free(dwg)}catch(_){}
+  const M={units:db.header&&db.header.INSUNITS||0,blocks:{},ents:[]};const BR=(db.tables.BLOCK_RECORD&&db.tables.BLOCK_RECORD.entries)||[];const ms=BR.find(b=>/^\*model_space$/i.test(b.name));
+  BR.forEach(b=>{if(/^\*(model|paper)_space/i.test(b.name))return;const L=[];(b.entities||[]).forEach(e=>dwgEnt(e,L));M.blocks[b.name]={name:b.name,base:{x:(b.basePoint||{}).x||0,y:(b.basePoint||{}).y||0},ents:L}});
+  (db.entities||[]).forEach(e=>{if(ms&&e.ownerBlockRecordSoftId&&String(e.ownerBlockRecordSoftId)!==String(ms.handle))return;dwgEnt(e,M.ents)});return M}
+function dwgEnt(e,L){const P=p=>({x:(p&&p.x)||0,y:(p&&p.y)||0});try{switch(e.type){
+  case'LINE':L.push({k:'P',pts:[P(e.startPoint),P(e.endPoint)]});break;
+  case'LWPOLYLINE':case'POLYLINE2D':case'POLYLINE3D':{const V=(e.vertices||[]).filter(v=>!(v.flag&128)).map(v=>({x:v.x,y:v.y,bulge:v.bulge||0}));const cl=!!((e.flag||0)&(1|512));if(V.length>1){const r=bulgePts(V,cl);L.push({k:'P',pts:r.pts,closed:cl,curve:r.curve})}break}
+  case'CIRCLE':L.push({k:'P',pts:tessArc(P(e.center),e.radius,0,2*Math.PI),closed:true,curve:true});break;
+  case'ARC':L.push({k:'P',pts:tessArc(P(e.center),e.radius,e.startAngle,e.endAngle),curve:true});break;
+  case'ELLIPSE':L.push({k:'P',pts:ellPts(P(e.center),P(e.majorAxisEndPoint),e.axisRatio||1,e.startAngle||0,e.endAngle||2*Math.PI),curve:true});break;
+  case'SPLINE':{const F=(e.fitPoints||[]).map(P),C=(e.controlPoints||[]).map(P);const B=F.length>1?chaikin(F,2):C.length>1?chaikin(C,3):null;if(B)L.push({k:'P',pts:B,curve:true});break}
+  case'TEXT':{const s=dxfClean(e.text||'');if(s.trim())L.push({k:'T',p:P(e.halign||e.valign?(e.endPoint&&(e.endPoint.x||e.endPoint.y)?e.endPoint:e.startPoint):e.startPoint),h:e.textHeight||2.5,rot:e.rotation||0,s,top:false});break}
+  case'MTEXT':{const s=dxfClean(e.text||'');const d=e.direction;const rot=d&&(d.x||d.y)?Math.atan2(d.y,d.x):(e.rotation||0);if(s.trim())L.push({k:'T',p:P(e.insertionPoint),h:e.textHeight||2.5,rot,s,top:true});break}
+  case'INSERT':{L.push({k:'I',name:e.name,p:P(e.insertionPoint),sx:e.xScale||1,sy:e.yScale||1,rot:e.rotation||0});(e.attribs||[]).forEach(a=>{const t=a.text||{};const s=dxfClean(t.text||'');if(s.trim())L.push({k:'T',p:P(t.startPoint),h:t.textHeight||2.5,rot:t.rotation||0,s,top:false})});break}
+  case'DIMENSION':if(e.name)L.push({k:'I',name:e.name,p:{x:0,y:0},sx:1,sy:1,rot:0,abs:1});break;
+  case'LEADER':{const V=(e.vertices||[]).map(P);if(V.length>1)L.push({k:'P',pts:V});break}}}catch(_){}}
+/* --- ratakan blok + tempatkan --- */
+function cadFlatten(M,lim=60000){const out=[];const rec=(ents,T,d)=>{for(const e of ents){if(out.length>lim)return;
+    if(e.k==='I'){const b=M.blocks[e.name];if(!b||d>8)continue;const c=Math.cos(e.rot),s2=Math.sin(e.rot);const T2=e.abs?T:(p=>{const x=(p.x-b.base.x)*e.sx,y=(p.y-b.base.y)*e.sy;return T({x:e.p.x+x*c-y*s2,y:e.p.y+x*s2+y*c})});rec(b.ents,T2,d+1)}
+    else if(e.k==='P')out.push({k:'P',pts:e.pts.map(T),closed:e.closed,curve:e.curve});
+    else if(e.k==='T'){const p=T(e.p),q=T({x:e.p.x+Math.cos(e.rot),y:e.p.y+Math.sin(e.rot)}),u=T({x:e.p.x-Math.sin(e.rot)*e.h,y:e.p.y+Math.cos(e.rot)*e.h});out.push({k:'T',p,rot:Math.atan2(q.y-p.y,q.x-p.x),h:Math.hypot(u.x-p.x,u.y-p.y)||e.h,s:e.s,top:e.top})}}};
+  rec(M.ents,p=>p,0);return out}
+async function importCAD(f,kind){impProg('Membaca '+f.name+'…',.05);let M;
+  if(kind==='dxf'){const txt=await f.text();if(/^AutoCAD Binary DXF/.test(txt))throw new Error('DXF biner belum didukung — simpan sebagai DXF ASCII');M=parseDXF(txt)}else M=await dwgModel(new Uint8Array(await f.arrayBuffer()));
+  impProg('Menyusun gambar…',.8);await new Promise(r=>setTimeout(r,20));const E=cadFlatten(M);impProg(null);if(!E.length)return toast('Tidak ada garis/teks di model space file ini');
+  let x0=1e18,y0=1e18,x1=-1e18,y1=-1e18;E.forEach(e=>(e.k==='P'?e.pts:[e.p]).forEach(p=>{if(isFinite(p.x)&&isFinite(p.y)){x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x);y1=Math.max(y1,p.y)}}));
+  const nl=E.filter(e=>e.k==='P').length,nt=E.length-nl,det=INSU[M.units]?Object.entries({mm:1,cm:10,m:1000,inch:25.4,feet:304.8}).find(([,v])=>v===INSU[M.units]):null,du=det?det[0]:((x1-x0)>2000?'mm':(x1-x0)>200?'cm':'m');
+  openDlg(`<h2>Impor ${kind.toUpperCase()}</h2><p>${esc(f.name)} · ${nl} garis/kurva · ${nt} teks · luas gambar ${r1(x1-x0)} × ${r1(y1-y0)} satuan</p>
+   <div class="row"><div><label>Satuan gambar ${det?'(terdeteksi)':'(perkiraan)'}</label><select id="cu">${['mm','cm','m','inch','feet'].map(u=>`<option ${u===du?'selected':''}>${u}</option>`).join('')}</select></div>
+   <div><label>Warna garis</label><select id="cc"><option value="#16191d">Hitam</option><option value="#6b7078">Abu-abu (sebagai latar)</option><option value="#1d4ed8">Biru</option></select></div></div>
+   <label class="chk"><input type="checkbox" id="ct" checked> Impor teks</label><label class="chk"><input type="checkbox" id="cg" checked> Jadikan satu grup (bisa digeser utuh, lalu Lepas grup)</label>
+   <p id="csz"></p><div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Impor</button></div>`,{x:closeDlg,ok:()=>{
+     const uf={mm:1,cm:10,m:1000,inch:25.4,feet:304.8}[$('#cu').value],col=$('#cc').value,wt=$('#ct').checked,grp=$('#cg').checked;closeDlg();
+     const ctr=s2w(CW/2,CH/2),cx=(x0+x1)/2,cy=(y0+y1)/2,T=p=>({x:r1((p.x-cx)*uf+ctr.x),y:r1(-(p.y-cy)*uf+ctr.y)}),gid=grp?'g'+uid():null,sc=PG().scale;pushUndo();let n=0;
+     for(const e of E){if(e.k==='P'){const Q=e.pts.filter(p=>isFinite(p.x)&&isFinite(p.y)).map(T);if(Q.length<2)continue;
+         if(e.curve){const o=add({t:'ink',pts:Q.map(p=>[p.x,p.y]),c:col,w:.18,sh:1});if(gid)o.g=gid;n++}
+         else{const segs=Q.slice(1).map((p,i)=>[Q[i],p]);if(e.closed&&D(Q[0],Q[Q.length-1])>.5)segs.push([Q[Q.length-1],Q[0]]);segs.forEach(([a,b])=>{if(D(a,b)<.05)return;const o=add({t:'line',a,b,c:col,w:.18,sd:false});if(gid)o.g=gid;n++})}}
+       else if(wt){const p=T(e.p),hp=Math.max(.8,r1(e.h*uf/sc*10)/10),rot=-e.rot,top=e.top?p:{x:p.x+Math.sin(rot)*e.h*uf,y:p.y-Math.cos(rot)*e.h*uf};
+         const o=add({t:'text',p:{x:r1(top.x),y:r1(top.y)},s:e.s,h:hp,c:col,f:'sans',r:r1(e.rot*180/Math.PI)});if(gid)o.g=gid;n++}}
+     commit();fit();req();toast(n+' objek diimpor dari '+f.name+(grp?' (satu grup)':''))}});
+  const upd=()=>{const uf={mm:1,cm:10,m:1000,inch:25.4,feet:304.8}[$('#cu').value];$('#csz').textContent='Ukuran nyata ≈ '+fmtL((x1-x0)*uf)+' × '+fmtL((y1-y0)*uf)+' '+uLbl()+' — periksa apakah masuk akal.'};$('#cu').addEventListener('change',upd);upd()}
 
 /* ---------- koreksi bentuk & coret-hapus (ala Notability) ---------- */
 function lineSnap(a,w){let dx=w.x-a.x,dy=w.y-a.y;const L=Math.hypot(dx,dy),ang=Math.atan2(dy,dx),st=Math.PI/4,r=Math.round(ang/st)*st;
@@ -1521,19 +2021,24 @@ const PATCOL={ker30:'#e9e7e1',ker40:'#e9e7e1',ker60:'#ecebe6',ker6030:'#e3e1dc',
 function flatObjs(objs,dep=0){const out=[];objs.forEach(o=>{if(o.t==='comp'&&dep<4){const r=compExplode(o);if(r){r.forEach(q=>{q.id=q._nid||q.id});out.push(...flatObjs(r,dep+1))}}else out.push(o)});return out}
 function build3D(pg){const THREE=window.THREE,grp=new THREE.Group(),edgeM=new THREE.LineBasicMaterial({color:0x2b2f36}),mats={};
   const M=(col,o)=>{const k=col+(o?JSON.stringify(o):'');return mats[k]||(mats[k]=new THREE.MeshLambertMaterial(Object.assign({color:new THREE.Color(col)},o||{})))};
+  const extVar=(Q,zb,tf,col,layer)=>{if(!Q||Q.length<3)return;const P2=polyArea(Q)<0?Q.slice().reverse():Q.slice(),n=P2.length,tops=P2.map(tf),pos=[],V3=(p,z)=>[p.x/1000,z/1000,p.y/1000];
+    THREE.ShapeUtils.triangulateShape(P2.map(p=>new THREE.Vector2(p.x,p.y)),[]).forEach(([a,b,c])=>{pos.push(...V3(P2[a],tops[a]),...V3(P2[c],tops[c]),...V3(P2[b],tops[b]),...V3(P2[a],zb),...V3(P2[b],zb),...V3(P2[c],zb))});
+    for(let i=0;i<n;i++){const a=P2[i],b=P2[(i+1)%n],ta=Math.max(zb,tops[i]),tb=Math.max(zb,tops[(i+1)%n]);pos.push(...V3(a,zb),...V3(b,zb),...V3(b,tb),...V3(a,zb),...V3(b,tb),...V3(a,ta))}
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.computeVertexNormals();const m=new THREE.Mesh(g,M(col,{side:THREE.DoubleSide}));m.userData.layer=layer;grp.add(m);grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,25),edgeM))};
   const ext=(Q,z0,z1,col,layer,o)=>{if(!Q||Q.length<3||z1-z0<1)return;const sh=new THREE.Shape(Q.map(p=>new THREE.Vector2(p.x/1000,-p.y/1000))),g=new THREE.ExtrudeGeometry(sh,{depth:(z1-z0)/1000,bevelEnabled:false});
     g.rotateX(-Math.PI/2);g.translate(0,z0/1000,0);const m=new THREE.Mesh(g,M(col,o));m.userData.layer=layer;grp.add(m);if(!o||!o.transparent)grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,25),edgeM));return m};
   const solid=(geo,col,x,y,z,layer)=>{const m=new THREE.Mesh(geo,M(col));m.position.set(x/1000,y/1000,z/1000);m.userData.layer=layer;grp.add(m);return m};
   const ob=flatObjs(pg.objs),G=wallGeo(ob);let Hmax=S.wallH;
   const lt=c=>{const[r,g,b]=hexRGB(c||'#cccccc');return r+g+b>700?'#efeeea':c};
-  G.forEach(g=>{const w=g.w,H=w.ht||S.wallH;Hmax=Math.max(Hmax,H);wallPieces(g).forEach(p=>ext(piecePoly(g,p),0,H,lt(w.f||'#d9dcdf'),'DINDING'))});
-  ob.forEach(o=>{if(!(o.t==='blk'&&o.host))return;const g=G.get(o.host);if(!g)return;const f=hostFrame(G,o),H=g.w.ht||S.wallH,s0=f.at-o.w/2,e0=f.at+o.w/2,col=lt(g.w.f||'#d9dcdf');
+  G.forEach(g=>{const w=g.w,H=w.ht||S.wallH,vr=wallVar(w);Hmax=Math.max(Hmax,wallHmax(w));wallPieces(g).forEach(p=>vr?extVar(piecePoly(g,p),0,q=>hAtP(w,g,q),lt(w.f||'#d9dcdf'),'DINDING'):ext(piecePoly(g,p),0,H,lt(w.f||'#d9dcdf'),'DINDING'))});
+  ob.forEach(o=>{if(!(o.t==='blk'&&o.host)||BLK[o.k]&&BLK[o.k].me)return;const g=G.get(o.host);if(!g)return;const f=hostFrame(G,o),H=g.w.ht||S.wallH,s0=f.at-o.w/2,e0=f.at+o.w/2,col=lt(g.w.f||'#d9dcdf');
     const quad=(a,b,off)=>[FP(g,1,a),FP(g,1,b),FP(g,-1,b),FP(g,-1,a)].map((p,i)=>off?{x:p.x-g.n.x*(i<2?1:-1)*(g.h-off),y:p.y-g.n.y*(i<2?1:-1)*(g.h-off)}:p);
-    const hd=o.hd||2100;if(/^jendela/.test(o.k)){const sl=o.sl??900;ext(quad(s0,e0),0,sl,col,'DINDING');ext(quad(s0,e0),hd,H,col,'DINDING');ext(quad(s0,e0,15),sl,hd,'#9cc7e6','KACA',{transparent:true,opacity:.35})}
-    else ext(quad(s0,e0),hd,H,col,'DINDING')});
+    const sl=opSill(o),hd=opHead(o),kd=opKind(o);if(sl>0)ext(quad(s0,e0),0,sl,col,'DINDING');if(wallVar(g.w))extVar(quad(s0,e0),hd,q=>hAtP(g.w,g,q),col,'DINDING');else if(hd<H)ext(quad(s0,e0),hd,H,col,'DINDING');
+    if(kd==='J')ext(quad(s0,e0,15),sl,hd,'#9cc7e6','KACA',{transparent:true,opacity:.35});else if(kd==='BV')ext(quad(s0,e0,25),sl,hd,'#b8bdc4','ROSTER',{transparent:true,opacity:.55})});
   const fp=(o,loc)=>loc.map(q=>{const x=o.fx?-q.x:q.x;return rotPt({x:o.p.x+x,y:o.p.y+q.y},o.p,o.rot||0)});
   const R4=(x0,y0,x1,y1)=>[{x:x0,y:y0},{x:x1,y:y0},{x:x1,y:y1},{x:x0,y:y1}];
-  ob.forEach(o=>{if(o.t==='hatch'&&o.pat&&o.pat!=='none')ext(o.pts,-30,0,PATCOL[o.pat]||o.c||'#dddddd','LANTAI');else if(o.t==='rect'&&o.pat&&o.pat!=='none')ext(rectPts(o),-30,0,PATCOL[o.pat]||o.pc||'#dddddd','LANTAI')});
+  if(S.v3ceil)ob.forEach(o=>{if(o.t==='hatch'&&o.cz)ext(o.pts,o.cz,o.cz+15,'#efeaf9','PLAFON',{transparent:true,opacity:.6,side:THREE.DoubleSide})});
+  ob.forEach(o=>{if(o.t==='hatch'&&!o.cz&&o.pat&&o.pat!=='none')ext(o.pts,-30,0,PATCOL[o.pat]||o.c||'#dddddd','LANTAI');else if(o.t==='rect'&&o.pat&&o.pat!=='none')ext(rectPts(o),-30,0,PATCOL[o.pat]||o.pc||'#dddddd','LANTAI')});
   ob.forEach(o=>{if(o.t!=='blk'||o.host)return;const hx=o.w/2,hy=o.h/2,k=o.k,B=BLK[k];if(!B)return;
     if(k==='kolom'){ext(boxCorners(o.p,o.w,o.h,o.rot),0,Hmax,'#8d939b','KOLOM');return}
     if(B.stair){const{n,ri}=stairInfo(o);if(B.stair===1){const tr=o.h/n;for(let i=0;i<n;i++)ext(fp(o,R4(-hx,hy-(i+1)*tr,hx,hy-i*tr)),0,(i+1)*ri,'#d6d3cc','TANGGA');return}
@@ -1553,7 +2058,7 @@ function build3D(pg){const THREE=window.THREE,grp=new THREE.Group(),edgeM=new TH
   const bx=new THREE.Box3().setFromObject(grp);if(!bx.isEmpty()){const sz=new THREE.Vector3(),ct=new THREE.Vector3();bx.getSize(sz);bx.getCenter(ct);const pad=Math.max(sz.x,sz.z)*0.15+1;
     const base=new THREE.Mesh(new THREE.BoxGeometry(sz.x+pad*2,.06,sz.z+pad*2),M('#dfe2e5'));base.position.set(ct.x,-.06,ct.z);base.userData.layer='DASAR';grp.add(base)}
   return grp}
-async function open3D(){if(!PG().objs.length)return toast('Halaman ini masih kosong');$('#v3d').classList.add('show');$('#v3t').textContent='3D — '+PG().name;$('#v3h').value=String(r1(S.wallH/1000)).replace('.',',');
+async function open3D(){if(!PG().objs.length)return toast('Halaman ini masih kosong');$('#v3d').classList.add('show');$('#v3t').textContent='3D — '+PG().name;$('#v3cb').classList.toggle('on',!!S.v3ceil);$('#v3h').value=String(r1(S.wallH/1000)).replace('.',',');
   try{if(!window.THREE)await loadScript(LIB3D()[0]);if(!window.THREE.OrbitControls)await loadScript(LIB3D()[1])}catch(e){toast('Modul 3D gagal dimuat — perlu internet sekali untuk versi web');$('#v3d').classList.remove('show');return}
   const THREE=window.THREE,box=$('#v3c');if(!T3){const r=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));box.appendChild(r.domElement);
     const sc=new THREE.Scene();sc.background=new THREE.Color('#eef0f2');sc.add(new THREE.HemisphereLight(0xffffff,0x8a8f96,.85));const dl=new THREE.DirectionalLight(0xffffff,.65);dl.position.set(6,12,8);sc.add(dl);
@@ -1575,6 +2080,7 @@ function dxf3D(){const THREE=window.THREE,o=[],W=(c,v)=>o.push(String(c),String(
   return{txt:o.join('\r\n'),n:faces.length}}
 $('#v3d').addEventListener('click',e=>{const b=e.target.closest('[data-v3]');if(!b)return;const a=b.dataset.v3;
   if(a==='close')close3D();else if(a==='iso'||a==='top')view3D(a);
+  else if(a==='ceil'){S.v3ceil=!S.v3ceil;b.classList.toggle('on',S.v3ceil);save();rebuild3D()}
   else if(a==='png'){T3.r.render(T3.sc,T3.cam);T3.r.domElement.toBlob(bl=>saveFile(fname(PG().name)+'_3D.png',bl),'image/png')}
   else if(a==='dxf'){const d=dxf3D();saveFile(fname(PG().name)+'_3D.zip',zip([{name:fname(PG().name)+'_3D.dxf',data:d.txt},{name:'BACA_SAYA.txt',data:'Model 3D Denah Skala ('+d.n+' bidang segitiga), satuan milimeter.\r\nSketchUp Pro/Go: File > Import > AutoCAD Files (*.dxf), Options: Units = Millimeters.\r\nAutoCAD: OPEN file .dxf (entitas 3DFACE per layer: DINDING, KACA, LANTAI, KOLOM, TANGGA, FURNITUR, TAMAN).\r\n'}]))}});
 $('#v3h').addEventListener('change',e=>{const v=parseN(e.target.value);if(v>0&&v<30){S.wallH=v*1000;save();rebuild3D()}});
@@ -1619,13 +2125,19 @@ const PRESETS=[['A3',100,'L','A3 · 1:100 · landscape (denah rumah)'],['A3',50,
 function catSel(cur){return`<select id="ncat"><option value="">Tanpa kategori</option>${(S.cats||[]).map(c=>`<option value="${c.id}" ${c.id===cur?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`}
 function newProjDialog(){const dc=HOME.cat!=='all'&&HOME.cat!=='none'?HOME.cat:'';
   openDlg(`<h2>Proyek baru</h2><label>Nama proyek</label><input type="text" id="npn" placeholder="mis. Rumah Bpk. Budi" autocomplete="off">
-   <div class="row"><div><label>Kategori</label>${catSel(dc)}</div></div>
+   <label>Kategori</label><div class="catpick">${catSel(dc)}<button class="btn" data-d="nc">＋ Kategori baru</button></div>
+   <div class="ncrow" id="ncrow"><input type="text" id="ncn" placeholder="Nama kategori baru, mis. Proyek Klien" autocomplete="off"><div class="cswrow">${CATCOL.map((k,i)=>`<button class="sw ${i===(S.cats||[]).length%CATCOL.length?'on':''}" style="background:${k}" data-d="ncc" data-v="${k}"></button>`).join('')}</div></div>
    <label>Kertas & skala halaman pertama</label><select id="npp">${PRESETS.map((p,i)=>`<option value="${i}">${p[3]}</option>`).join('')}</select>
    <label>KOP</label><select id="npk">${kopOpts('klasik')}</select>
-   <div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Buat & buka</button></div>`,{x:closeDlg,ok:()=>{
-     const n=$('#npn').value.trim()||'Proyek Baru',pr=PRESETS[+$('#npp').value],cat=$('#ncat').value,k=$('#npk').value;closeDlg();saveNow();
+   <div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Buat & buka</button></div>`,{x:closeDlg,
+   nc:b=>{const r=$('#ncrow'),on=!r.classList.contains('show');r.classList.toggle('show',on);b.textContent=on?'✕ Batal kategori baru':'＋ Kategori baru';$('#ncat').disabled=on;if(on)focusIn('#ncn')},
+   ncc:b=>{dlg.querySelectorAll('[data-d=ncc]').forEach(x=>x.classList.toggle('on',x===b))},
+   ok:()=>{
+     const n=$('#npn').value.trim()||'Proyek Baru',pr=PRESETS[+$('#npp').value],k=$('#npk').value;let cat=$('#ncat').value;
+     if($('#ncrow').classList.contains('show')){const cn=$('#ncn').value.trim();if(!cn)return toast('Isi nama kategori baru, atau tutup isian kategori');const on=dlg.querySelector('[data-d=ncc].on');cat='c'+uid();S.cats=S.cats||[];S.cats.push({id:cat,name:cn,color:on?on.dataset.v:CATCOL[0]});settingsChanged();HOME.cat=cat}
+     closeDlg();saveNow();
      const p=newProject(n);const pg=p.pages[0];pg.paper=pr[0];pg.scale=pr[1];pg.orient=pr[2];pg.kop=k;if(pr[1]===1)pg.name='Catatan 1';
-     P=p;IDX.list.push({id:p.id,name:p.name,cat,c0:Date.now(),u:p.u,n:1});IDX.cur=p.id;cloudAll(p);cloudMeta();saveNow();hideHome();toast('Proyek "'+n+'" dibuat')}});setTimeout(()=>$('#npn')?.focus(),60)}
+     P=p;IDX.list.push({id:p.id,name:p.name,cat,c0:Date.now(),u:p.u,n:1});IDX.cur=p.id;cloudAll(p);cloudMeta();saveNow();hideHome();toast('Proyek "'+n+'" dibuat')}});focusIn('#npn')}
 function projMenu(id){const e=IDX.list.find(x=>x.id===id);if(!e)return;
   openDlg(`<h2>${esc(e.name)}</h2><div class="list"><button data-d="open"><b>Buka</b></button><button data-d="ren"><b>Ganti nama</b></button>
    <button data-d="cat"><b>Pindah kategori</b><small>${esc(catOf(e.cat)?.name||'Tanpa kategori')}</small></button><button data-d="dup"><b>Duplikat</b></button>
@@ -1645,7 +2157,7 @@ function catDialog(cid,after){const c=cid?catOf(cid):null;let col=c?.color||CATC
    <div class="acts"><button class="btn" data-d="x">Batal</button><button class="btn pri" data-d="ok">Simpan</button></div>`,{x:closeDlg,
    col:b=>{col=b.dataset.v;dlg.querySelectorAll('[data-d=col]').forEach(x=>x.classList.toggle('on',x===b))},
    ok:()=>{const n=$('#cn').value.trim();if(!n)return toast('Isi nama kategori');S.cats=S.cats||[];let id=cid;if(c){c.name=n;c.color=col}else{id='c'+uid();S.cats.push({id,name:n,color:col})}
-     closeDlg();settingsChanged();if(after)after(id);renderHome()}});setTimeout(()=>$('#cn')?.focus(),60)}
+     closeDlg();settingsChanged();if(after)after(id);renderHome()}});focusIn('#cn')}
 function catMenu(cid){const c=catOf(cid);if(!c)return;openDlg(`<h2>${esc(c.name)}</h2><div class="list"><button data-d="ed"><b>Ganti nama / warna</b></button><button data-d="del" style="color:#b91c1c"><b>Hapus kategori</b><small>Proyeknya tidak terhapus, pindah ke Tanpa kategori</small></button></div><div class="acts"><button class="btn" data-d="x">Tutup</button></div>`,{
   x:closeDlg,ed:()=>catDialog(cid),del:()=>{S.cats=S.cats.filter(x=>x.id!==cid);IDX.list.forEach(e=>{if(e.cat===cid){e.cat='';e.u=Date.now()}});if(HOME.cat===cid)HOME.cat='all';closeDlg();settingsChanged();cloudMeta();saveNow();renderHome()}})}
 function homeMenu(){openDlg(`<h2>Denah Skala</h2><div class="list">
@@ -1872,9 +2384,10 @@ async function capsInit(){try{if(!window.claude||!window.claude.use)return;
 
 /* ---------- status / hint / toast ---------- */
 function needBackup(){return IDX.list.some(e=>(e.u||0)>(S.lastBackup||0))&&Date.now()-(S.lastBackup||0)>3*864e5&&IDX.list.some(e=>(e.n||0)>0)&&PG().objs.length>0}
-function status(){const pg=PG();if(!pg||!pg.view)return;const[PW,PH]=pdim(pg);
+function status(){const pg=PG();if(!pg||!pg.view)return;{const bc=$('#backchip');if(bc){const sp=pg.sheet&&P.pages.find(p=>p.id===pg.src);bc.classList.toggle('show',!!sp);if(sp)bc.textContent='‹ '+sp.name}}const[PW,PH]=pdim(pg);
   const tt=$('#top .ttl');if(tt)tt.innerHTML=`<b>${esc(P.name)}</b><small>${esc(pg.name)} · ${pg.paper==='Custom'?'Custom':pg.paper} · 1:${pg.scale}</small>`;
   $('#status').innerHTML=`<span>${pg.paper==='Custom'?r1(PW)+'×'+r1(PH)+' mm':pg.paper} · Skala <b>1 : ${pg.scale}</b></span><span>Area ≈ ${fmtL(PW*pg.scale)} × ${fmtL(PH*pg.scale)} ${esc(uLbl())}</span><span>Zoom ${Math.round(pg.view.z/3.78*100)}%</span>${SEL.size?`<span>${SEL.size} dipilih</span>`:''}<span id="cloud">${LAST_SAVE?'✓ Disimpan '+hhmm(LAST_SAVE)+' · ':''}${CL.st}</span>${needBackup()?'<button class="chip" data-a="backup" style="height:22px;font-size:11px;padding:0 8px">⚠ Cadangkan</button>':''}`}
+function focusIn(q,sel){const i=$(q);if(!i)return;try{i.focus({preventScroll:true})}catch(_){try{i.focus()}catch(__){}}if(sel)setTimeout(()=>{try{i.select()}catch(_){}},40)}
 let hT=0;function hint(s){const h=$('#hint');h.textContent=s;h.classList.add('show');clearTimeout(hT);hT=setTimeout(()=>h.classList.remove('show'),2800)}
 let tT=0;function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2600)}
 

@@ -29,6 +29,14 @@ fs.copyFileSync('node_modules/jspdf/dist/jspdf.umd.min.js', path.join(OUT, 'vend
 // modul 3D (three.js r128) — dimuat saat tombol 3D dibuka, tersedia offline
 fs.copyFileSync('node_modules/three/build/three.min.js', path.join(OUT, 'vendor/three.min.js'));
 fs.copyFileSync('node_modules/three/examples/js/controls/OrbitControls.js', path.join(OUT, 'vendor/OrbitControls.js'));
+// impor PDF (pdf.js) & DWG (libredwg-web, WebAssembly ±11 MB — dimuat hanya saat impor DWG)
+fs.copyFileSync('node_modules/pdfjs-dist/build/pdf.min.js', path.join(OUT, 'vendor/pdf.min.js'));
+fs.copyFileSync('node_modules/pdfjs-dist/build/pdf.worker.min.js', path.join(OUT, 'vendor/pdf.worker.min.js'));
+for (const d of ['dist', 'wasm']) {
+  fs.mkdirSync(path.join(OUT, 'vendor/dwg', d), { recursive: true });
+  for (const f of fs.readdirSync(path.join('node_modules/@mlightcad/libredwg-web', d))) if (/\.(js|wasm)$/.test(f) && !/\.cjs$/.test(f))
+    fs.copyFileSync(path.join('node_modules/@mlightcad/libredwg-web', d, f), path.join(OUT, 'vendor/dwg', d, f));
+}
 
 const fonts = [
   ['Roboto Condensed', 'roboto-condensed', [400, 600]],
@@ -49,7 +57,7 @@ await build({ entryPoints: ['src/native/native.js'], bundle: true, format: 'iife
 // service worker: daftar semua file agar aplikasi jalan offline
 const list = []; const walk = d => { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) walk(p); else list.push('./' + path.relative(OUT, p).split(path.sep).join('/')); } };
 walk(OUT);
-const files = list.filter(f => !/\/_headers$/.test(f));
+const files = list.filter(f => !/\/_headers$/.test(f) && !f.includes('/vendor/dwg/'));
 const version = new Date().toISOString().replace(/\D/g, '').slice(0, 14);
 fs.writeFileSync(path.join(OUT, 'sw.js'), fs.readFileSync('src/pwa/sw.js', 'utf8').replaceAll('__VERSION__', version).replaceAll('__FILES__', JSON.stringify(['./', ...files])));
 fs.writeFileSync(path.join(OUT, 'version.txt'), version + '\n');

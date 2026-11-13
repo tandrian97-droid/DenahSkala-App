@@ -137,6 +137,11 @@ Komputer (PC Windows) hanya dibutuhkan **sekali** saat pemasangan awal.
 - **Tangga parametrik** lurus/L/U. **Tampilan 3D** + unduh .dxf 3D (3DFACE, mm) untuk SketchUp/AutoCAD. Modul 3D (three.js) ikut dikemas di `www/vendor` sehingga jalan offline.
 - **Penyimpanan aman**: simpan otomatis di perangkat + sinkron otomatis ke Firebase (bagian 4). iCloud/Google Drive dipakai lewat **Menu → Cadangan** (satu ketukan). Aplikasi web tidak bisa menyimpan diam-diam ke iCloud/Drive — ini batasan Safari/iOS.
 
+## 3E. Impor PDF / DWG / DXF (v6)
+- Menu → **Impor PDF / DWG / DXF / gambar**. PDF dirender jadi gambar berskala; DWG/DXF jadi garis, kurva, dan teks (satu grup).
+- Pembaca PDF: pdf.js (`www/vendor/pdf*.js`). Pembaca DWG: libredwg-web (WebAssembly ±11 MB di `www/vendor/dwg`, lisensi GPL-3.0), dimuat hanya saat impor DWG lalu disimpan untuk offline.
+- Di halaman artifact claude.ai, impor DWG tidak tersedia (pembatasan keamanan halaman) — pakai DXF, atau versi aplikasi/PWA.
+
 ## 4. Mengaktifkan sinkron antar perangkat (Firebase, opsional, gratis)
 
 Tanpa ini aplikasi tetap jalan: data tersimpan di perangkat dan disalin ke folder aplikasi,
