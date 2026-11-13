@@ -1,0 +1,7 @@
+{
+  "appId": "com.denahskala.app",
+  "appName": "Denah Skala",
+  "webDir": "www",
+  "ios": { "contentInset": "never", "scrollEnabled": false },
+  "android": { "allowMixedContent": false }
+}

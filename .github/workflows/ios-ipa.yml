@@ -1,0 +1,35 @@
+# Membuat file .ipa iOS (tanpa tanda tangan) di Mac milik GitHub — GRATIS, tanpa akun Apple Developer.
+# File .ipa ini dipasang ke iPad/iPhone lewat SideStore (lihat README bagian 3C),
+# SideStore menandatanganinya dengan Apple ID gratis Anda & memperpanjangnya otomatis tiap 7 hari.
+# Jalankan: tab Actions → "iOS IPA (SideStore)" → Run workflow. Hasil: tab Releases → DenahSkala.ipa
+name: iOS IPA (SideStore)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run build && npx cap sync ios
+      - name: Build (tanpa tanda tangan)
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} build
+      - name: Kemas menjadi .ipa
+        run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -qry DenahSkala.ipa Payload
+      - name: Terbitkan di Releases
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh release create "ios-${{ github.run_number }}" DenahSkala.ipa \
+            --title "Denah Skala iOS #${{ github.run_number }}" \
+            --notes "Pasang lewat SideStore: unduh DenahSkala.ipa di iPad → buka SideStore → My Apps → + → pilih file ini."

@@ -1,0 +1,27 @@
+# Membangun APK Android otomatis setiap ada perubahan (atau tekan "Run workflow").
+# Hasil: tab Actions → pilih run → bagian Artifacts → "DenahSkala-Android" (berisi .apk).
+name: Android APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - run: npm ci
+      - run: npm run build && npx cap sync android
+      - name: Nomor versi otomatis
+        run: sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
+      - name: Build APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - run: mv android/app/build/outputs/apk/debug/app-debug.apk DenahSkala-${{ github.run_number }}.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DenahSkala-Android
+          path: DenahSkala-${{ github.run_number }}.apk

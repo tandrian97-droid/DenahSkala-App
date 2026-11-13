@@ -1,0 +1,30 @@
+{
+  "name": "denah-skala",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Denah Skala - catatan + gambar berskala untuk iPad, iPhone & Android",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "sync": "npm run build && npx cap sync",
+    "android": "npm run sync && npx cap open android",
+    "ios": "npm run sync && npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/share": "^8.0.3",
+    "@fontsource/architects-daughter": "^5.3.0",
+    "@fontsource/roboto-condensed": "^5.3.0",
+    "@fontsource/roboto-mono": "^5.3.0",
+    "firebase": "^13.3.0",
+    "jspdf": "^2.5.1",
+    "three": "^0.128.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/ios": "^8.6.0",
+    "esbuild": "^0.28.2"
+  }
+}
