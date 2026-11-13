@@ -229,6 +229,7 @@ body.focus #backchip{display:none!important}
 .abig{font-size:17px;color:var(--ink)!important}.abig b{color:var(--pri);font-size:22px}
 .tedit{overflow:auto;max-height:55vh}.tedit table{border-collapse:collapse}.tedit td{padding:2px}.tedit input{width:120px;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 8px;background:#f8f9fb;font-size:14px}.tedit input.th{font-weight:700}.tedit input.tw{width:120px;background:#eef2ff;text-align:center}
 .rb span{max-width:56px;text-align:center;line-height:1.05}
+#modal{transition:bottom .2s}.dlg{max-height:calc(100% - 24px)}body.kbopen #modal{align-items:flex-end;padding-bottom:10px}#panel{transition:bottom .2s}
 </style>
 </head>
 <body>
@@ -424,7 +425,13 @@ function drawAll(){const L=syncViews();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fil
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.font='600 12px -apple-system,sans-serif';ctx.textBaseline='bottom';L.forEach((r,i)=>{const v=i===P.cur?V():r.pg.view;if(!v||v.oy<-20||v.oy>CH+20)return;ctx.fillStyle=i===P.cur?'#2f6bff':'#7a808a';ctx.fillText((i+1)+' · '+r.pg.name+' · 1:'+r.pg.scale,v.ox,v.oy-6)})}
 function pageAt(sx,sy){const L=syncViews();for(let i=0;i<L.length;i++){const v=i===P.cur?V():L[i].pg.view;if(!v)continue;if(sx>=v.ox&&sx<=v.ox+L[i].PW*v.z&&sy>=v.oy-24&&sy<=v.oy+L[i].PH*v.z+PGGAP*v.z)return i}return -1}
 function curPageKeep(i){if(i===P.cur||i<0)return;P.cur=i;pend=null;hatchPts=[];hatchCur=null;dimStage=null;SEL.clear();hidePanel();renderTop();renderOpts();if($('#drawer').classList.contains('show'))renderPages()}
-function draw(){if(allMode())drawAll();else render(ctx,PG(),V(),{d:DPR,cw:CW,ch:CH,exp:false});status()}
+const GCACHE=new WeakMap();let LASTR=0,SNAP=null,SNAPV=null,SNAPT=0;
+function gestOn(){return G&&(G.k==='pinch'||G.k==='pan'&&G.moved)}
+function draw(){const t0=performance.now(),v=V();
+  if(gestOn()&&SNAP&&SNAPV&&LASTR>12&&(t0-SNAPT<260||LASTR>40&&t0-(window.LASTMV||0)<200)){const f=v.z/SNAPV.z;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#e9ebef';ctx.fillRect(0,0,cv.width,cv.height);ctx.setTransform(f,0,0,f,(v.ox-SNAPV.ox*f)*DPR,(v.oy-SNAPV.oy*f)*DPR);ctx.drawImage(SNAP,0,0);ctx.setTransform(1,0,0,1,0,0);clearTimeout(draw.t);draw.t=setTimeout(req,270);return}
+  if(allMode())drawAll();else render(ctx,PG(),v,{d:DPR,cw:CW,ch:CH,exp:false});LASTR=performance.now()-t0;
+  if(gestOn()){if(!SNAP)SNAP=document.createElement('canvas');if(SNAP.width!==cv.width||SNAP.height!==cv.height){SNAP.width=cv.width;SNAP.height=cv.height}SNAP.getContext('2d').drawImage(cv,0,0);SNAPV={...v};SNAPT=performance.now()}
+  status()}
 function render(c,pg,v,o){
   const sc=pg.scale,k=v.z/sc,d=o.d,[PW,PH]=pdim(pg),W=PW*sc,H=PH*sc,px=1/k;
   c.layer='0';c.setTransform(d,0,0,d,0,0);
@@ -434,7 +441,7 @@ function render(c,pg,v,o){
   const R={c,sc,k,px,exp:o.exp,vec:o.vec,lw:mm=>Math.max(mm*sc,o.vec?0.05*sc:px*(o.exp?1:0.75))};
   c.save();c.beginPath();c.rect(0,0,W,H);c.clip();
   if(S.grid&&!o.exp)drawGrid(R,W,H);
-  const ob=pg.objs,G=wallGeo(ob);if(!o.exp&&!o.passive)GEO=G;
+  const ob=pg.objs,gc=GCACHE.get(pg),G=!o.exp&&gestOn()&&gc&&gc.n===ob.length?gc.g:wallGeo(ob);if(!o.exp)GCACHE.set(pg,{g:G,n:ob.length});if(!o.exp&&!o.passive)GEO=G;
   drawLayered(R,ob,G,0);
   c.layer='KOP';drawKop(R,pg,PW,PH);
   c.restore();
@@ -857,13 +864,13 @@ function lp(e){const r=cv.getBoundingClientRect();if(Math.abs(r.width-CW)>0.5||M
 cv.addEventListener('pointerdown',e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}
   if(allMode()&&!PT.size&&!OP){const q0=lp(e),pi=pageAt(q0.x,q0.y);if(pi>=0&&pi!==P.cur)curPageKeep(pi)}
   const p=lp(e),fd=S.fingerDraw&&e.pointerType==='touch'&&!penDown&&!TT().length&&!(G&&(G.k==='pinch'||G.k==='done')),t=e.pointerType==='touch'&&!fd?'touch':'pen';PT.set(e.pointerId,{...p,t,fp:fd,x0:p.x,y0:p.y,t0:performance.now()});
-  if(e.pointerType==='touch'&&!fd&&S.fingerDraw){const fq=[...PT.values()].find(q=>q.fp);if(fq){if(OP&&!OP.moved){cancelOp();penDown=false;fq.t='touch';fq.fp=false}else{PT.get(e.pointerId).palm=true;return}}}
+  if(e.pointerType==='touch'&&!fd&&S.fingerDraw){const fq=[...PT.values()].find(q=>q.fp);if(fq){if(!OP||!OP.moved||performance.now()-fq.t0<450||Math.hypot(fq.x-fq.x0,fq.y-fq.y0)<40){if(OP)cancelOp();penDown=false;fq.t='touch';fq.fp=false}else{PT.get(e.pointerId).palm=true;return}}}
   if(t==='pen'){if(!fd){lastPen=performance.now();PT.forEach(q=>{if(q.t==='touch')q.palm=true})}if(G){if(G.k==='drag')endDrag(true);else if(G.k==='pan'&&G.moved){const v=V();v.ox=G.ox;v.oy=G.oy}if(G.lp)clearTimeout(G.lp)}hideCtx();penDown=true;G=null;if(PENBACK&&S.tool==='select'){const pb=PENBACK;setTool(pb,false,true);hint('Pencil: '+((TOOLS.find(x=>x[0]===pb)||[0,pb])[1]))}beginOp(p.x,p.y);return}
-  const me=PT.get(e.pointerId);if(penDown||(!S.fingerDraw&&performance.now()-lastPen<900)||(e.width||0)>70||(e.height||0)>70){me.palm=true;return}
+  const me=PT.get(e.pointerId);if(penDown||(!S.fingerDraw&&performance.now()-lastPen<300)||(e.width||0)>110||(e.height||0)>110){me.palm=true;return}
   const T=TT();
   if(T.length>=2){if(OP)cancelOp();hideCtx();const pv=G&&G.k==='pinch'?G:null,t0=pv?pv.t0:(G&&G.tp0)||performance.now();if(G&&G.k==='drag')endDrag(true);else if(G&&G.lp)clearTimeout(G.lp);startPinch(T);G.t0=t0;G.nmax=Math.max(pv?pv.nmax:2,T.length);if(pv)G.mv=pv.mv;return}
   fingerDown(p.x,p.y)});
-cv.addEventListener('pointermove',e=>{const q=PT.get(e.pointerId);const p=lp(e);
+cv.addEventListener('pointermove',e=>{const q=PT.get(e.pointerId);const p=lp(e);window.LASTMV=performance.now();
   if(!q){if(e.pointerType!=='touch'&&S.tool==='block'){updGhost(p.x,p.y);req()}return}e.preventDefault();
   const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];q.x=p.x;q.y=p.y;
   if(q.t==='pen'){if(!q.fp)lastPen=performance.now();if(OP&&(OP.t==='pen'||OP.t==='hl')&&evs.length>1){evs.forEach(ev=>{const pp=lp(ev);moveOp(pp.x,pp.y)})}else moveOp(p.x,p.y);return}
@@ -875,10 +882,10 @@ function upH(e){const q=PT.get(e.pointerId);if(!q)return;PT.delete(e.pointerId);
   if(q.t==='pen'){penDown=false;if(!q.fp)lastPen=performance.now();if(e.type==='pointercancel')cancelOp();else endOp(p.x,p.y);return}
   if(q.palm)return;
   if(G&&G.k==='pinch'){const T=TT();if(T.length<2){const tap=S.tapGest!==false&&performance.now()-G.t0<380&&G.mv<14&&performance.now()-lastPen>900&&G.t0-lastPen>900,nm=G.nmax||2;G=T.length?{k:'done'}:null;
-      if(tap){if(nm===2){undo();hint('Undo')}else if(nm===3){redo();hint('Redo')}else toggleFocus()}save()}return}
+      if(tap){if(nm===2){undo();hint('Undo')}else if(nm===3){redo();hint('Redo')}else toggleFocus()}save();req()}return}
   if(G&&G.k==='done'){if(!TT().length)G=null;return}
   if(G&&G.k==='drag'){const tap=!G.moved&&performance.now()-G.tp0<450,x0=G.x0,y0=G.y0;endDrag(tap);if(tap)fingerTap(x0,y0);return}
-  if(G&&G.k==='pan'){if(G.lp)clearTimeout(G.lp);const tap=!G.moved&&!G.lpDone&&performance.now()-G.tp0<450;G=null;save();if(tap)fingerTap(p.x,p.y);return}}
+  if(G&&G.k==='pan'){if(G.lp)clearTimeout(G.lp);const tap=!G.moved&&!G.lpDone&&performance.now()-G.tp0<450;G=null;save();req();if(tap)fingerTap(p.x,p.y);return}}
 function fingerTap(sx,sy){if(!S.tapSel||S.tool==='calib'||performance.now()-lastPen<900)return;hideCtx();const f=fingerHit(sx,sy),o=f.obj||f.area;if(o&&o.t==='pt'&&o.em){gotoElev(o);return}if(o&&o.meRef){meEditDialog(o.meRef);return}if(S.tool!=='select'){const pv=S.tool;setTool('select');PENBACK=pv}
   if(o){const ids=grpExpand(new Set([o.id]));SEL=new Set(ids);showSelPanel()}else{SEL.clear();hidePanel();renderOpts()}req()}
 function toggleFocus(){document.body.classList.toggle('focus');setTimeout(resize,30);hint(document.body.classList.contains('focus')?'Mode fokus — ketuk 4 jari lagi untuk menampilkan menu':'Menu ditampilkan')}
@@ -1137,7 +1144,7 @@ function selectAll(){SEL=new Set(PG().objs.filter(o=>!o.lock).map(o=>o.id));if(S
 
 /* ---------- panels ---------- */
 const panel=$('#panel');let PA={};
-function showPanel(html,acts){panel.innerHTML=html;PA=acts||{};panel.classList.add('show')}
+function showPanel(html,acts){panel.innerHTML=html;PA=acts||{};panel.classList.add('show');fixInputs(panel);kbAdjust()}
 function hidePanel(){panel.classList.remove('show');PA={}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ce]');if(!b)return;if(b.dataset.ce==='done')finishCEdit();else cancelCEdit()});
 panel.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;if(b.dataset.p==='__pick'){const act=b.dataset.act;return colorDialog(b.dataset.cur,c=>PA[act]&&PA[act]({dataset:{v:c},value:c}))}if(PA[b.dataset.p])PA[b.dataset.p](b)});
@@ -1392,7 +1399,7 @@ function goPage(i){if(allMode()){syncViews();const v=PG().view;P.cur=i;const w=P
 
 /* ---------- dialogs ---------- */
 const modal=$('#modal'),dlg=$('#dlg');let DA={};
-function openDlg(html,acts,wide){dlg.className='dlg'+(wide?' wide':'');dlg.innerHTML=html;DA=acts||{};modal.classList.add('show')}
+function openDlg(html,acts,wide){dlg.className='dlg'+(wide?' wide':'');dlg.innerHTML=html;DA=acts||{};modal.classList.add('show');fixInputs(dlg);kbAdjust()}
 function closeDlg(){modal.classList.remove('show');DA={};if(HEDIT){HEDIT=null;req()}}
 dlg.addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(b&&DA[b.dataset.d])DA[b.dataset.d](b)});
 dlg.addEventListener('change',e=>{const b=e.target.closest('[data-dc]');if(b&&DA[b.dataset.dc])DA[b.dataset.dc](b)});
@@ -2405,7 +2412,20 @@ if(window.ResizeObserver)new ResizeObserver(()=>resize()).observe($('#stage'));
 // iPad: kembalikan halaman ke posisi semula setelah keyboard tertutup (mencegah layar bergeser)
 const unshift=()=>{if(window.scrollX||window.scrollY)window.scrollTo(0,0)};
 document.addEventListener('focusout',()=>setTimeout(unshift,60));
-if(window.visualViewport){visualViewport.addEventListener('resize',()=>{unshift();resize()});visualViewport.addEventListener('scroll',unshift)}
+if(window.visualViewport){visualViewport.addEventListener('resize',()=>{unshift();resize();kbAdjust()});visualViewport.addEventListener('scroll',()=>{unshift();kbAdjust()})}
+/* keyboard: panel & dialog naik di atas keyboard, kolom yang diketik selalu terlihat */
+var IPAD=/iPad/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+function fixInputs(root){root.querySelectorAll('input[type=text],input:not([type]),textarea').forEach(el=>{if(IPAD&&/decimal|numeric/.test(el.getAttribute('inputmode')||''))el.setAttribute('inputmode','text');el.setAttribute('enterkeyhint',el.tagName==='TEXTAREA'?'enter':'done');el.setAttribute('autocorrect','off');el.setAttribute('autocapitalize','off')});
+  root.querySelectorAll('textarea').forEach(t=>{const g=()=>{const mx=Math.max(110,(visualViewport?visualViewport.height:innerHeight)*.45);t.style.height='auto';t.style.height=Math.min(t.scrollHeight+4,mx)+'px'};g();t.addEventListener('input',()=>{g();keepVisible(t)})})}
+function kbH(){const vv=window.visualViewport;return vv?Math.max(0,window.innerHeight-vv.height-vv.offsetTop):0}
+function kbAdjust(){const kb=kbH(),open=kb>80;document.body.classList.toggle('kbopen',open);
+  const st=$('#stage').getBoundingClientRect(),pb=open?Math.max(16,kb-(window.innerHeight-st.bottom)+10):'';panel.style.bottom=open?pb+'px':'';modal.style.bottom=open?kb+'px':'';
+  const a=document.activeElement;if(open&&a&&/INPUT|TEXTAREA/.test(a.tagName))setTimeout(()=>keepVisible(a),40)}
+function keepVisible(el){const box=el.closest('.dlg');if(box){const r=el.getBoundingClientRect(),b=box.getBoundingClientRect();if(r.bottom>b.bottom-12||r.top<b.top+12)box.scrollTop+=(r.top+r.height/2)-(b.top+b.height/2)}
+  if(el.tagName==='TEXTAREA'&&el.selectionEnd===el.value.length)el.scrollTop=el.scrollHeight}
+document.addEventListener('focusin',e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName)){setTimeout(kbAdjust,250);setTimeout(kbAdjust,600)}});
+document.addEventListener('focusout',()=>setTimeout(kbAdjust,300));
+document.addEventListener('input',e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName))keepVisible(e.target)});
 // Penanda posisi Pencil saat melayang (iPad Pro dengan hover) — membantu membidik titik
 cv.addEventListener('pointermove',e=>{if(e.pointerType==='pen'&&!PT.has(e.pointerId)){HOVER=lp(e);req()}});
 cv.addEventListener('pointerleave',()=>{if(HOVER){HOVER=null;req()}});

@@ -16,7 +16,19 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        // Kunci tetap: update APK bisa dipasang di atas versi lama tanpa uninstall (data proyek aman)
+        tetap {
+            storeFile file('denahskala.keystore')
+            storePassword 'denahskala'
+            keyAlias 'denahskala'
+            keyPassword 'denahskala'
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.tetap
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

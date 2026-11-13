@@ -1,10 +1,13 @@
 # Membangun APK Android otomatis setiap ada perubahan (atau tekan "Run workflow").
-# Hasil: tab Actions → pilih run → bagian Artifacts → "DenahSkala-Android" (berisi .apk).
+# Hasil: halaman Releases → "Denah Skala Android #N" → DenahSkala.apk (unduh langsung di HP Android).
+# Ditandatangani kunci tetap (android/app/denahskala.keystore) agar update bisa dipasang di atas versi lama.
 name: Android APK
 on:
   push:
     branches: [main]
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,3 +28,10 @@ jobs:
         with:
           name: DenahSkala-Android
           path: DenahSkala-${{ github.run_number }}.apk
+      - name: Terbitkan di Releases
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          cp DenahSkala-${{ github.run_number }}.apk DenahSkala.apk
+          gh release create "android-${{ github.run_number }}" DenahSkala.apk \
+            --title "Denah Skala Android #${{ github.run_number }}" \
+            --notes "Unduh DenahSkala.apk di HP Android → buka → Instal (izinkan 'instal aplikasi tak dikenal' bila diminta). Update: pasang APK baru di atas yang lama, data tetap aman."
