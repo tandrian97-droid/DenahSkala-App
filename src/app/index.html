@@ -1082,17 +1082,30 @@ function segsOf(o){switch(o.t){case'line':return[[o.a,o.b]];case'tbl':{const P2=
   case'wall':{const g=GEO.get(o.id),S2=[[o.a,o.b]];if(g){S2.push([FP(g,1,g.t0[1]),FP(g,1,g.t1[1])],[FP(g,-1,g.t0[-1]),FP(g,-1,g.t1[-1])])}return S2}
   case'rect':{const P=rectPts(o);return P.map((p,i)=>[p,P[(i+1)%4]])}case'hatch':return o.pts.map((p,i)=>[p,o.pts[(i+1)%o.pts.length]]);
   case'blk':if(o.host)return[];{const P=boxCorners(o.p,o.w,o.h,o.rot);return P.map((p,i)=>[p,P[(i+1)%4]])}case'comp':{const P=compPoly(o);return P.map((p,i)=>[p,P[(i+1)%4]])}default:return[]}}
-function snapPt(w,excl){if(!S.snap)return{p:w,kind:null};const k=K(),ex=excl instanceof Set?excl:new Set(excl?[excl]:[]),ob=PG().objs.filter(o=>!ex.has(o.id));let best=null,bd=16/k;
+/* ---------- garis bantu saat menggambar ---------- */
+let ALNC=null;
+function alnTargets(ex){const pg=PG(),key=pg.id+':'+(P.u||0)+':'+pg.objs.length;let T;if(ALNC&&ALNC.key===key)T=ALNC.T;else{T=[];pg.objs.forEach(o=>{if(o.t==='ink'||o.hid||(o.t==='blk'&&o.host))return;let Q=[];try{Q=keyPts(o)}catch(e){}const b=objBBox(o);if(b)Q=Q.concat([{x:(b.x0+b.x1)/2,y:(b.y0+b.y1)/2}]);Q.forEach(q=>{if(q&&isFinite(q.x))T.push({x:q.x,y:q.y,id:o.id,w:(o.t==='wall'||o.t==='line'||o.t==='pipe')&&(q===o.a||q===o.b)?.4:1})})});if(T.length>8000)T.length=8000;ALNC={key,T}}
+  const X=[...T];hatchPts.forEach(q=>X.push({x:q.x,y:q.y}));if(pend)X.push({x:pend.x,y:pend.y});return ex&&ex.size?X.filter(t=>!ex.has(t.id)):X}
+function alignPt(p,ex,ax){const tol=8/K(),T=alnTargets(ex);let bx=null,by=null;T.forEach(t=>{const wt=t.w||1;if(ax.x){const d0=Math.abs(t.x-p.x),d=d0*wt;if(d0<tol&&d0>1e-6&&(!bx||d<bx.d))bx={d,v:t.x}}if(ax.y){const d0=Math.abs(t.y-p.y),d=d0*wt;if(d0<tol&&d0>1e-6&&(!by||d<by.d))by={d,v:t.y}}});
+  const q={x:bx?bx.v:p.x,y:by?by.v:p.y},G2=[];
+  if(ax.x){let y0=q.y,y1=q.y,hit=false;T.forEach(t=>{if(Math.abs(t.x-q.x)<.5&&D(t,q)>1){hit=true;y0=Math.min(y0,t.y);y1=Math.max(y1,t.y)}});if(hit)G2.push({a:{x:q.x,y:y0},b:{x:q.x,y:y1}})}
+  if(ax.y){let x0=q.x,x1=q.x,hit=false;T.forEach(t=>{if(Math.abs(t.y-q.y)<.5&&D(t,q)>1){hit=true;x0=Math.min(x0,t.x);x1=Math.max(x1,t.x)}});if(hit)G2.push({a:{x:x0,y:q.y},b:{x:x1,y:q.y}})}
+  return{p:q,g:G2.slice(0,4)}}
+const drawAln=()=>S.guides!==false&&S.tool!=='select'&&S.tool!=='eraser'&&S.tool!=='pen'&&S.tool!=='hl';
+function snapPt(w,excl,noAln){if(!S.snap)return{p:w,kind:null};const k=K(),ex=excl instanceof Set?excl:new Set(excl?[excl]:[]),ob=PG().objs.filter(o=>!ex.has(o.id));let best=null,bd=16/k;
   const extra=[...hatchPts];if(pend)extra.push(pend);
   ob.forEach(o=>keyPts(o).forEach(p=>{const d=D(w,p);if(d<bd){bd=d;best={p:{x:p.x,y:p.y},kind:'end'}}}));extra.forEach(p=>{const d=D(w,p);if(d<bd){bd=d;best={p:{...p},kind:'end'}}});
-  if(best)return best;bd=13/k;
+  if(best){if(drawAln()&&!noAln)GUIDES=null;return best}bd=13/k;
   ob.forEach(o=>segsOf(o).forEach(([a,b])=>{const m={x:(a.x+b.x)/2,y:(a.y+b.y)/2},d=D(w,m);if(d<bd){bd=d;best={p:m,kind:'mid'}}}));if(best)return best;bd=9/k;
   ob.forEach(o=>segsOf(o).forEach(([a,b])=>{const r=segD(w,a,b);if(r.d<bd){bd=r.d;best={p:r.q,kind:'on'}}}));
-  return best||{p:w,kind:null}}
-function constrain(a,w,excl){const s=snapPt(w,excl);let p=s.p;
+  if(best){if(drawAln()&&!noAln)GUIDES=null;return best}
+  if(drawAln()&&!noAln){const r=alignPt(w,ex,{x:true,y:true});GUIDES=r.g.length?r.g:null;return{p:r.p,kind:null,aln:r.g.length>0}}
+  return{p:w,kind:null}}
+function constrain(a,w,excl){const s=snapPt(w,excl,true);let p=s.p;
   if(S.ortho!=='off'){const st=S.ortho==='90'?90:45,deg=Math.atan2(p.y-a.y,p.x-a.x)*180/Math.PI,r=Math.round(deg/st)*st*Math.PI/180,ux=Math.cos(r),uy=Math.sin(r);
     let L=(p.x-a.x)*ux+(p.y-a.y)*uy;if(!s.kind)L=roundStep(L);p={x:a.x+ux*L,y:a.y+uy*L};if(s.kind&&D(p,s.p)>0.5)s.kind='on'}
   else if(!s.kind){const L=D(a,p);if(L>0){const Lr=roundStep(L);p={x:a.x+(p.x-a.x)*Lr/L,y:a.y+(p.y-a.y)*Lr/L}}}
+  if(drawAln()){GUIDES=null;if(!s.kind){const dx=p.x-a.x,dy=p.y-a.y,L=Math.hypot(dx,dy);if(L>1){const ux=dx/L,uy=dy/L,ax=S.ortho==='off'?{x:true,y:true}:{x:Math.abs(ux)>.99,y:Math.abs(uy)>.99};if(ax.x||ax.y){const r=alignPt(p,excl instanceof Set?excl:new Set(excl?[excl]:[]),ax);if(r.g.length){if(S.ortho!=='off'){p=ax.x?{x:r.p.x,y:p.y}:{x:p.x,y:r.p.y}}else p=r.p;GUIDES=r.g}}}}}
   return{p,kind:s.kind}}
 
 /* ---------- undo / commit ---------- */
@@ -1253,10 +1266,10 @@ function moveOp(sx,sy){if(!OP)return;const w=s2w(sx,sy);if(!OP.moved&&Math.hypot
       if(S.shape!=='off'&&(!OP.ha||Math.hypot(sx-OP.ha.x,sy-OP.ha.y)>3)){OP.ha={x:sx,y:sy};clearTimeout(OP.ht);OP.ht=setTimeout(holdShape,460)}break}
     case'line':case'wall':case'pipe':if(OP.moved){const c=constrain(OP.a,w);OP.b=c.p;snapMark=c.kind?c:null;setRead(sx,sy,lenRead(OP.a,OP.b))}
       else if(pend){const c=constrain(pend,w);OP.tb=c.p;snapMark=c.kind?c:null;setRead(sx,sy,lenRead(pend,OP.tb))}break;
-    case'rect':if(OP.moved){const s=snapPt(w);let p=s.p;if(!s.kind)p={x:OP.a.x+roundStep(w.x-OP.a.x),y:OP.a.y+roundStep(w.y-OP.a.y)};OP.b=p;snapMark=s.kind?s:null;
+    case'rect':if(OP.moved){const s=snapPt(w);let p=s.p;if(!s.kind&&!s.aln)p={x:OP.a.x+roundStep(w.x-OP.a.x),y:OP.a.y+roundStep(w.y-OP.a.y)};OP.b=p;snapMark=s.kind?s:null;
       setRead(sx,sy,fmtL(Math.abs(p.x-OP.a.x))+' × '+fmtL(Math.abs(p.y-OP.a.y))+' '+uLbl())}break;
     case'dim':if(OP.mode==='off')dimOff(w);else if(OP.moved){const c=constrain(OP.a,w);OP.b=c.p;snapMark=c.kind?c:null;setRead(sx,sy,lenRead(OP.a,OP.b))}break;
-    case'hatch':case'ceil':if(!hatchPts.length&&OP.moved){const s=snapPt(w);OP.b=s.kind?s.p:{x:OP.a.x+roundStep(w.x-OP.a.x),y:OP.a.y+roundStep(w.y-OP.a.y)};snapMark=s.kind?s:null;
+    case'hatch':case'ceil':if(!hatchPts.length&&OP.moved){const s=snapPt(w);OP.b=s.kind||s.aln?s.p:{x:OP.a.x+roundStep(w.x-OP.a.x),y:OP.a.y+roundStep(w.y-OP.a.y)};snapMark=s.kind?s:null;
         const r=rectOP();setRead(sx,sy,fmtL(r.w2)+' × '+fmtL(r.h)+'  =  '+fmtA(r.w2*r.h))}
       else if(hatchPts.length){const c=constrain(hatchPts[hatchPts.length-1],w);hatchCur=c.p;snapMark=c.kind?c:null;setRead(sx,sy,lenRead(hatchPts[hatchPts.length-1],hatchCur))}break;
     case'erase':OP.lx=sx;OP.ly=sy;eraseAt(sx,sy);break;
@@ -1270,7 +1283,7 @@ function moveOp(sx,sy){if(!OP)return;const w=s2w(sx,sy);if(!OP.moved&&Math.hypot
       if(OP.scale&&o){const f=Math.max(0.02,D(o.p,w)/OP.d0);o.w=OP.orig.w*f;o.h=OP.orig.h*f;setRead(sx,sy,'Lebar foto '+fmtL(o.w)+' '+uLbl());break}
       if(OP.move&&OP.moved){moveGroup(OP,w,sx,sy)}break}}
   req()}
-function endOp(sx,sy){if(!OP)return;if(OP.t==='select'&&OP.emTap&&!OP.moved){const o=OP.emTap;OP=null;gotoElev(o);return}if(OP.t==='select'&&OP.meTap&&!OP.moved){const o=OP.meTap;OP=null;meEditDialog(o.meRef);return}const w=s2w(sx,sy),t=OP.t,sc=PG().scale;snapMark=null;readout=null;GUIDES=null;
+function endOp(sx,sy){GUIDES=null;if(!OP)return;if(OP.t==='select'&&OP.emTap&&!OP.moved){const o=OP.emTap;OP=null;gotoElev(o);return}if(OP.t==='select'&&OP.meTap&&!OP.moved){const o=OP.meTap;OP=null;meEditDialog(o.meRef);return}const w=s2w(sx,sy),t=OP.t,sc=PG().scale;snapMark=null;readout=null;GUIDES=null;
   switch(t){
     case'pen':case'hl':{clearTimeout(OP.ht);let pts=OP.pts,sh=OP.sh,shaped=!!OP.shp;
       if(t==='pen'&&!shaped&&S.scrib!=='off'){const ids=scribbleHits(pts);if(ids.length){pushUndo(OP.pre);removeIds(ids);commit();hint(ids.length+' coretan dihapus (coret-hapus)');break}}
@@ -1458,7 +1471,7 @@ function qedOpen(h){const q=$('#qed'),o=h.cg.o,nm={j1:h.cg.J?h.cg.J.l1:'Jarak',j
     const g=GEO.get(ob.host);if(ob.host&&g)ob.at=clamp(ob.at,ob.w/2,Math.max(ob.w/2,g.L-ob.w/2));commit();showSelPanel();hint(nm+' → '+fmtL(nv)+' '+uLbl())};
   if(nkUse()&&inpE.classList.contains('nk'))nkOpen(inpE);else{inpE.focus();inpE.select()}}
 /* ---------- panel: model + 3 gaya ---------- */
-const APPV='14.8';const QTOG={sd:'Tampilkan ukuran',nl:'Label kode & ukuran',wlnk:'Tarik dinding yang tersambung'};
+const APPV='14.9';const QTOG={sd:'Tampilkan ukuran',nl:'Label kode & ukuran',wlnk:'Tarik dinding yang tersambung'};
 let QTAB='';
 function panelMode(){const m=S.pnl==='side'||S.pnl==='left'||!S.pnl?'side':'bar';if(S.tool!=='select'&&S.tool!=='eraser')return'bar';if(window.innerWidth<760)return'bar';return m}
 function tidyPanel2(P,mode){const N=[...P.childNodes].filter(n=>n.nodeType===1||(n.nodeType===3&&n.textContent.trim()));if(!N.length)return;
@@ -1828,7 +1841,7 @@ $('#opts').addEventListener('change',e=>{const r=e.target.closest('[data-range]'
   else{S[k]=s.value;applyKeyToSel(k,s.value)}save();renderOpts();req()});
 function setScale(sc){PG().scale=sc;commit();renderOpts();toast('Skala 1 : '+sc+' — ukuran nyata objek tetap')}
 let PENBACK=null;
-function setTool(t,keep,quiet){PENBACK=null;S.tool=t;OFS=null;if(t!=='survey')SV=null;if(!keep)pend=null;hatchPts=[];hatchCur=null;dimStage=null;ghost=null;CAL=null;if(t!=='select')SEL.clear();hidePanel();renderTop();renderOpts();save();req();
+function setTool(t,keep,quiet){GUIDES=null;PENBACK=null;S.tool=t;OFS=null;if(t!=='survey')SV=null;if(!keep)pend=null;hatchPts=[];hatchCur=null;dimStage=null;ghost=null;CAL=null;if(t!=='select')SEL.clear();hidePanel();renderTop();renderOpts();save();req();
   const H={a:0,line:'Tarik garis dengan Pencil, atau ketuk titik awal lalu ketik panjang',wall:'Tarik dinding (garis as). Sudut & pertemuan T otomatis menyatu',rect:'Tarik kotak, lalu ketik lebar × tinggi',hatch:'Tarik area, atau ketuk titik sudut satu per satu',pipe:'Pipa: tarik per ruas, atau ketuk titik demi titik (seperti Garis)',table:'Ketuk di kertas untuk menaruh tabel',ceil:'Plafon: tarik kotak, ketuk sudut-sudut, atau ketuk di dalam ruang',dim:'Ketuk garis/dinding untuk ukuran otomatis',text:'Ketuk di kertas untuk menulis teks',block:'Ketuk di kertas untuk menaruh '+blkName(S.blk),offset:'Offset: ketuk garis, dinding, kotak, atau area material'};if(H[t]&&!keep&&!quiet)hint(H[t])}
 const ACT={
  pages:()=>{const d=$('#drawer');d.classList.toggle('show');if(d.classList.contains('show'))renderPages()},
@@ -1970,6 +1983,7 @@ function menuDialog(){const seg=(nm,cur,L)=>`<span class="seg">${L.map(([v,t])=>
    <div class="sr"><span>Isian angka</span>${seg('nkm',S.nkp==='os'?'os':'app',[['app','Keypad'],['os','Keyboard']])}</div>
    <div class="sr"><span>Panel objek</span>${seg('pnm',S.pnl==='left'?'left':S.pnl==='bar'||S.pnl==='tab'||S.pnl==='simple'?'bar':'side',[['left','Kiri'],['side','Kanan'],['bar','Bawah']])}</div>
    <div class="sr"><span>Angka ukuran di gambar<small>Ketuk angkanya untuk mengubah</small></span>${swc('cdm',S.cdim!==false)}</div>
+   <div class="sr"><span>Garis bantu meluruskan<small>Saat menggambar & menggeser objek</small></span>${swc('gdm',S.guides!==false)}</div>
    <div class="sr"><span>Label panjang garis</span>${swc('sl',!!S.showLen)}</div>
    <div class="sr"><span>Ketuk 2/3 jari = Undo/Redo</span>${swc('tg',S.tapGest!==false)}</div>
   </div>
@@ -1985,7 +1999,7 @@ function menuDialog(){const seg=(nm,cur,L)=>`<span class="seg">${L.map(([v,t])=>
    <button data-d="imp"><b>Pulihkan dari cadangan…</b><small>Buka file .json cadangan</small></button>
    ${window.DS_NATIVE?'<button data-d="acct"><b>☁ Akun sinkron & kunci API</b><small>Masuk agar proyek muncul di semua perangkat · tulisan tangan → font</small></button>':''}<button data-d="help"><b>Cara pakai</b><small>Gerakan jari & Pencil</small></button></div>
   <div class="acts"><button class="btn pri" data-d="ok">Tutup</button></div>`,{acct:()=>window.DS_NATIVE.accountDialog({openDlg,closeDlg,toast,esc,$}),
-  ok:()=>{const n=$('#pj').value.trim();if(n)P.name=n;const rv=nm=>(document.querySelector(`.dlg input[name=${nm}]:checked`)||{}).value;S.unit=rv('un')||S.unit;S.tapGest=$('#tg').checked;S.nkp=rv('nkm')||'app';S.pnl=rv('pnm')||'side';S.cdim=$('#cdm').checked;S.showLen=$('#sl').checked;closeDlg();renderOpts();renderPages();cloudMeta();commit()},
+  ok:()=>{const n=$('#pj').value.trim();if(n)P.name=n;const rv=nm=>(document.querySelector(`.dlg input[name=${nm}]:checked`)||{}).value;S.unit=rv('un')||S.unit;S.tapGest=$('#tg').checked;S.nkp=rv('nkm')||'app';S.pnl=rv('pnm')||'side';S.cdim=$('#cdm').checked;S.showLen=$('#sl').checked;S.guides=$('#gdm').checked;closeDlg();renderOpts();renderPages();cloudMeta();commit()},
   proj:()=>{closeDlg();showHome()},page:()=>pageDialog(PG()),kop:kopDialog,ds:dimStyleDialog,exp:exportDialog,bk:backupDialog,imp:()=>$('#file').click(),impx:()=>{closeDlg();$('#impf').click()},help:helpDlg})}
 function backupDialog(){openDlg(`<h2>Cadangkan ke iCloud / Google Drive</h2>
   <p>Membuat satu file berisi <b>semua proyek, halaman, foto, template KOP & gaya</b>. Setelah menekan tombol, iPad menampilkan lembar bagikan:</p>
@@ -2901,7 +2915,7 @@ async function capsInit(){try{if(!window.claude||!window.claude.use)return;
 function needBackup(){return IDX.list.some(e=>(e.u||0)>(S.lastBackup||0))&&Date.now()-(S.lastBackup||0)>3*864e5&&IDX.list.some(e=>(e.n||0)>0)&&PG().objs.length>0}
 function status(){const pg=PG();if(!pg||!pg.view)return;{const bc=$('#backchip');if(bc){const sp=pg.sheet&&P.pages.find(p=>p.id===pg.src);bc.classList.toggle('show',!!sp);if(sp)bc.textContent='‹ '+sp.name}}const[PW,PH]=pdim(pg);
   const tt=$('#top .ttl');if(tt)tt.innerHTML=`<b>${esc(P.name)}</b><small>${esc(pg.name)} · ${pg.paper==='Custom'?'Custom':pg.paper} · 1:${pg.scale}</small>`;
-  $('#status').innerHTML=`<span id="vtag">v14.8</span><span>${pg.paper==='Custom'?r1(PW)+'×'+r1(PH)+' mm':pg.paper} · Skala <b>1 : ${pg.scale}</b></span><span>Area ≈ ${fmtL(PW*pg.scale)} × ${fmtL(PH*pg.scale)} ${esc(uLbl())}</span><span>Zoom ${Math.round(pg.view.z/3.78*100)}%</span>${SEL.size?`<span>${SEL.size} dipilih</span>`:''}<span id="cloud">${LAST_SAVE?'✓ Disimpan '+hhmm(LAST_SAVE)+' · ':''}${CL.st}</span>${needBackup()?'<button class="chip" data-a="backup" style="height:22px;font-size:11px;padding:0 8px">⚠ Cadangkan</button>':''}`}
+  $('#status').innerHTML=`<span id="vtag">v14.9</span><span>${pg.paper==='Custom'?r1(PW)+'×'+r1(PH)+' mm':pg.paper} · Skala <b>1 : ${pg.scale}</b></span><span>Area ≈ ${fmtL(PW*pg.scale)} × ${fmtL(PH*pg.scale)} ${esc(uLbl())}</span><span>Zoom ${Math.round(pg.view.z/3.78*100)}%</span>${SEL.size?`<span>${SEL.size} dipilih</span>`:''}<span id="cloud">${LAST_SAVE?'✓ Disimpan '+hhmm(LAST_SAVE)+' · ':''}${CL.st}</span>${needBackup()?'<button class="chip" data-a="backup" style="height:22px;font-size:11px;padding:0 8px">⚠ Cadangkan</button>':''}`}
 function focusIn(q,sel){const i=$(q);if(!i)return;if(i.classList.contains('nk'))return nkOpen(i);try{i.focus({preventScroll:true})}catch(_){try{i.focus()}catch(__){}}if(sel)setTimeout(()=>{try{i.select()}catch(_){}},40)}
 let hT=0;function hint(s){const h=$('#hint');h.textContent=s;h.classList.add('show');clearTimeout(hT);hT=setTimeout(()=>h.classList.remove('show'),2800)}
 let tT=0;function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2600)}
