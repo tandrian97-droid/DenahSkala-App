@@ -230,6 +230,13 @@ body.focus #backchip{display:none!important}
 .tedit{overflow:auto;max-height:55vh}.tedit table{border-collapse:collapse}.tedit td{padding:2px}.tedit input{width:120px;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 8px;background:#f8f9fb;font-size:14px}.tedit input.th{font-weight:700}.tedit input.tw{width:120px;background:#eef2ff;text-align:center}
 .rb span{max-width:56px;text-align:center;line-height:1.05}
 #modal{transition:bottom .2s}.dlg{max-height:calc(100% - 24px)}body.kbopen #modal{align-items:flex-end;padding-bottom:10px}#panel{transition:bottom .2s}
+#nkp{position:fixed;left:0;right:0;bottom:0;z-index:30;display:none;flex-direction:column;gap:6px;padding:8px max(10px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));background:rgba(236,238,242,.97);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid rgba(17,20,24,.1);box-shadow:0 -8px 30px rgba(16,24,40,.12)}
+#nkp.show{display:flex}.nkh{display:flex;align-items:center;gap:10px;padding:0 4px;font-size:13px;color:var(--muted)}.nkh b{font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums;min-width:80px}.nkx{margin-left:auto;width:44px;height:30px;border-radius:9px;background:rgba(17,20,24,.06);font-size:18px}
+.nkg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-width:560px;width:100%;margin:0 auto}
+.nkg button{height:48px;border-radius:12px;background:#fff;font-size:22px;font-weight:500;box-shadow:0 1px 1px rgba(16,24,40,.12);touch-action:manipulation}
+.nkg button.fn{background:#d9dde3;font-size:16px}.nkg button.ok{background:var(--pri);color:#fff;font-size:17px;font-weight:650}.nkg button:active{transform:scale(.96);filter:brightness(.93)}
+input.nk{caret-color:transparent}input.nkon{box-shadow:0 0 0 2px var(--pri)!important;background:#eef3ff!important}
+
 </style>
 </head>
 <body>
@@ -257,6 +264,11 @@ body.focus #backchip{display:none!important}
 <div id="v3d"><div class="v3bar"><button class="btn" data-v3="close">‹ Kembali</button><b id="v3t">3D</b><span class="v3sp"></span>
 <button class="chip" data-v3="iso">Isometri</button><button class="chip" data-v3="top">Atas</button><span class="lbl">Tinggi dinding</span><input type="text" inputmode="decimal" id="v3h" class="v3in"><span class="lbl">m</span>
 <button class="chip" data-v3="ceil" id="v3cb">Plafon</button><button class="chip" data-v3="png">⤓ Gambar</button><button class="chip on" data-v3="dxf">⤓ 3D untuk SketchUp/AutoCAD</button></div><div id="v3c"></div><div class="v3hint">1 jari = putar · 2 jari = geser & zoom</div></div>
+<div id="nkp"><div class="nkh"><span id="nkl">Ukuran</span><b id="nkv"></b><button data-k="hide" class="nkx">⌄</button></div>
+<div class="nkg"><button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button><button data-k="bs" class="fn">⌫</button>
+<button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button><button data-k="clr" class="fn">C</button>
+<button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button><button data-k="next" class="fn">Berikut ⇥</button>
+<button data-k="-" class="fn">±</button><button data-k="0">0</button><button data-k=",">,</button><button data-k="ok" class="ok">OK ✓</button></div></div>
 <div id="modal"><div class="dlg" id="dlg"></div></div>
 <div id="toast"></div>
 <input type="file" id="file" accept=".json,application/json" style="display:none">
@@ -293,7 +305,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 
 function newPage(name,paper='A3',orient='L',scale=100){return{id:uid(),name,paper,orient,scale,kop:'klasik',objs:[],view:null}}
 function newProject(name){return{id:uid(),name:name||'Proyek Baru',pages:[newPage('Denah Lantai 1')],cur:0,info:{studio:'',client:'',address:'',drawnBy:'',note:'',date:''},u:Date.now()}}
-let S={pgMode:'one',pipeT:'ab',pipeD:'½"',tblH:2.5,meSt:'eks',meLast:{},eraseR:12,rectC:false,lockAll:false,tapGest:true,opLbl:'full',ceilShow:true,ceilZ:2800,opLast:{},v3ceil:false,tool:'line',ortho:'90',snap:true,grid:true,hand:true,shape:'auto',scrib:'on',tapSel:true,dimNew:true,dimBlk:false,wallH:3000,svRot:0,cats:[],
+let S={nkp:'app',pgMode:'one',pipeT:'ab',pipeD:'½"',tblH:2.5,meSt:'eks',meLast:{},eraseR:12,rectC:false,lockAll:false,tapGest:true,opLbl:'full',ceilShow:true,ceilZ:2800,opLast:{},v3ceil:false,tool:'line',ortho:'90',snap:true,grid:true,hand:true,shape:'auto',scrib:'on',tapSel:true,dimNew:true,dimBlk:false,wallH:3000,svRot:0,cats:[],
   showLen:true,unit:'m',step:50,lineC:'#16191d',lineW:0.35,penC:'#16191d',penW:0.5,hlC:'#fde047',hlW:5,
   wallT:150,wallFill:'#c5c9cf',wallPat:'none',wallPc:'#16191d',pat:'ker60',patS:1,patC:'#6b7078',area:true,
   txtH:3.5,txtC:'#16191d',txtF:'sans',hw:'off',blk:'pintu1',blkRot:0,offD:150,seenHelp:false,recentC:[],kopTpls:[],lastBackup:0,su:0,
@@ -1144,8 +1156,8 @@ function selectAll(){SEL=new Set(PG().objs.filter(o=>!o.lock).map(o=>o.id));if(S
 
 /* ---------- panels ---------- */
 const panel=$('#panel');let PA={};
-function showPanel(html,acts){panel.innerHTML=html;PA=acts||{};panel.classList.add('show');fixInputs(panel);kbAdjust()}
-function hidePanel(){panel.classList.remove('show');PA={}}
+function showPanel(html,acts){if(NK)nkClose();panel.innerHTML=html;PA=acts||{};panel.classList.add('show');nkBind(panel);fixInputs(panel);kbAdjust()}
+function hidePanel(){if(NK&&NK.el.closest('#panel'))nkClose();panel.classList.remove('show');PA={}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ce]');if(!b)return;if(b.dataset.ce==='done')finishCEdit();else cancelCEdit()});
 panel.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;if(b.dataset.p==='__pick'){const act=b.dataset.act;return colorDialog(b.dataset.cur,c=>PA[act]&&PA[act]({dataset:{v:c},value:c}))}if(PA[b.dataset.p])PA[b.dataset.p](b)});
 panel.addEventListener('change',e=>{const b=e.target.closest('[data-c]');if(b&&PA[b.dataset.c])PA[b.dataset.c](b)});
@@ -1399,8 +1411,8 @@ function goPage(i){if(allMode()){syncViews();const v=PG().view;P.cur=i;const w=P
 
 /* ---------- dialogs ---------- */
 const modal=$('#modal'),dlg=$('#dlg');let DA={};
-function openDlg(html,acts,wide){dlg.className='dlg'+(wide?' wide':'');dlg.innerHTML=html;DA=acts||{};modal.classList.add('show');fixInputs(dlg);kbAdjust()}
-function closeDlg(){modal.classList.remove('show');DA={};if(HEDIT){HEDIT=null;req()}}
+function openDlg(html,acts,wide){if(NK)nkClose();dlg.className='dlg'+(wide?' wide':'');dlg.innerHTML=html;DA=acts||{};modal.classList.add('show');nkBind(dlg);fixInputs(dlg);kbAdjust()}
+function closeDlg(){if(NK&&NK.el.closest('.dlg'))nkClose();modal.classList.remove('show');DA={};if(HEDIT){HEDIT=null;req()}}
 dlg.addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(b&&DA[b.dataset.d])DA[b.dataset.d](b)});
 dlg.addEventListener('change',e=>{const b=e.target.closest('[data-dc]');if(b&&DA[b.dataset.dc])DA[b.dataset.dc](b)});
 dlg.addEventListener('input',e=>{const b=e.target.closest('[data-dc]');if(b&&b.dataset.dc==='upd'&&b.type!=='checkbox'&&DA.upd)DA.upd(b)});
@@ -1505,6 +1517,7 @@ function calibDialog(L){openDlg(`<h2>Kalibrasi skala foto</h2><p>Jarak dua titik
 function menuDialog(){openDlg(`<h2>Menu</h2>
   <label>Nama proyek (muncul di KOP)</label><input type="text" id="pj" value="${esc(P.name)}">
   <div class="row"><div><label>Satuan ukuran</label><select id="un">${Object.keys(UNITS).map(u=>`<option ${u===S.unit?'selected':''}>${u}</option>`).join('')}</select></div>
+  <div><label>Isian angka</label><select id="nkm"><option value="app" ${S.nkp!=='os'?'selected':''}>Keypad aplikasi (di bawah)</option><option value="os" ${S.nkp==='os'?'selected':''}>Keyboard iPad / HP</option></select></div>
   <div><label>Ketuk 2/3 jari = Undo/Redo</label><select id="tg"><option value="1" ${S.tapGest!==false?'selected':''}>Nyala</option><option value="0" ${S.tapGest===false?'selected':''}>Mati</option></select></div>
   <div><label>Label panjang garis</label><select id="sl"><option value="1" ${S.showLen?'selected':''}>Tampil</option><option value="0" ${!S.showLen?'selected':''}>Sembunyi</option></select></div></div>
   <div class="list" style="margin-top:14px">
@@ -1518,7 +1531,7 @@ function menuDialog(){openDlg(`<h2>Menu</h2>
    <button data-d="imp"><b>Pulihkan dari cadangan…</b><small>Buka file .json cadangan</small></button>
    ${window.DS_NATIVE?'<button data-d="acct"><b>☁ Akun sinkron & kunci API</b><small>Masuk agar proyek muncul di semua perangkat · tulisan tangan → font</small></button>':''}<button data-d="help"><b>Cara pakai</b><small>Gerakan jari & Pencil</small></button></div>
   <div class="acts"><button class="btn pri" data-d="ok">Tutup</button></div>`,{acct:()=>window.DS_NATIVE.accountDialog({openDlg,closeDlg,toast,esc,$}),
-  ok:()=>{const n=$('#pj').value.trim();if(n)P.name=n;S.unit=$('#un').value;S.tapGest=$('#tg').value==='1';S.showLen=$('#sl').value==='1';closeDlg();renderOpts();renderPages();cloudMeta();commit()},
+  ok:()=>{const n=$('#pj').value.trim();if(n)P.name=n;S.unit=$('#un').value;S.tapGest=$('#tg').value==='1';S.nkp=$('#nkm').value;S.showLen=$('#sl').value==='1';closeDlg();renderOpts();renderPages();cloudMeta();commit()},
   proj:()=>{closeDlg();showHome()},page:()=>pageDialog(PG()),kop:kopDialog,ds:dimStyleDialog,exp:exportDialog,bk:backupDialog,imp:()=>$('#file').click(),impx:()=>{closeDlg();$('#impf').click()},help:helpDlg})}
 function backupDialog(){openDlg(`<h2>Cadangkan ke iCloud / Google Drive</h2>
   <p>Membuat satu file berisi <b>semua proyek, halaman, foto, template KOP & gaya</b>. Setelah menekan tombol, iPad menampilkan lembar bagikan:</p>
@@ -1621,6 +1634,30 @@ function meEditDialog(id){let src=null,o=null;P.pages.forEach(p=>{const x=p.objs
      if(dx){const wl=src.objs.find(q=>q.id===o.host),rec=recs.find(r=>r.sheet===sheetId)||recs[0];if(wl&&rec){const g=wallGeo(src.objs).get(wl.id);if(g){const fr={x:-rec.ns.y,y:rec.ns.x},sgn=Math.sign(-(g.d.x*fr.x+g.d.y*fr.y))||1;o.at=clamp(o.at+sgn*dx*10,o.w/2,Math.max(o.w/2,g.L-o.w/2))}}}
      closeDlg();redo2()},del:()=>{src.objs=src.objs.filter(q=>q.id!==o.id);closeDlg();redo2()}});
   function redo2(){P.u=Date.now();const keep=P.cur,v=PG().view?{...PG().view}:null;recs.forEach(r=>renderElev(r,{keepView:true,keepTool:true}));P.cur=keep;if(v)PG().view=v;commit();req()}}
+
+/* ---------- keypad angka bawaan aplikasi (iPad/HP) ---------- */
+var NK=null;const TOUCHDEV=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+function nkUse(){return TOUCHDEV&&S.nkp!=='os'}
+function nkBind(root){if(!nkUse())return;root.querySelectorAll('input').forEach(el=>{const im=el.getAttribute('data-im')||el.getAttribute('inputmode')||'';if(!/decimal|numeric/.test(im))return;el.setAttribute('data-im',im);el.readOnly=true;el.setAttribute('inputmode','none');el.classList.add('nk');
+  el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();nkOpen(el)});el.addEventListener('focus',()=>{el.blur();nkOpen(el)})})}
+function nkLabel(el){let t='';let p=el.previousElementSibling;while(p&&!t){if(p.classList&&(p.classList.contains('u')||p.tagName==='LABEL'||p.classList.contains('t')))t=p.textContent;p=p.previousElementSibling}if(!t){const l=el.closest('div')&&el.closest('div').querySelector('label');if(l)t=l.textContent}return t.replace(/[·:]/g,' ').trim().split('  ')[0]||'Angka'}
+function nkOpen(el){if(NK&&NK.el!==el)NK.el.classList.remove('nkon');NK={el,fresh:true,t0:performance.now()};el.classList.add('nkon');$('#nkl').textContent=nkLabel(el);$('#nkv').textContent=el.value;$('#nkp').classList.add('show');nkLayout()}
+function nkClose(){if(!NK)return;NK.el.classList.remove('nkon');NK=null;$('#nkp').classList.remove('show');nkLayout()}
+function nkLayout(){const h=$('#nkp').classList.contains('show')?$('#nkp').getBoundingClientRect().height:0;document.body.classList.toggle('nkopen',h>0);
+  const st=$('#stage').getBoundingClientRect();panel.style.bottom=h?Math.max(16,h-(window.innerHeight-st.bottom)+10)+'px':'';modal.style.bottom=h?h+'px':'';
+  if(NK){const box=NK.el.closest('.dlg');if(box){const r=NK.el.getBoundingClientRect(),b=box.getBoundingClientRect();if(r.bottom>b.bottom-10||r.top<b.top)box.scrollTop+=(r.top+r.height/2)-(b.top+b.height/2)}}}
+function nkSet(v){const el=NK.el;el.value=v;$('#nkv').textContent=v;el.dispatchEvent(new Event('input',{bubbles:true}))}
+$('#nkp').addEventListener('pointerdown',e=>e.preventDefault());
+$('#nkp').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b||!NK||performance.now()-NK.t0<350)return;const k=b.dataset.k,el=NK.el;let v=el.value;
+  if(k==='hide'){el.dispatchEvent(new Event('change',{bubbles:true}));nkClose();return}
+  if(k==='ok'){el.dispatchEvent(new Event('change',{bubbles:true}));const box=el.closest('#panel,.dlg,#v3d'),btn=box&&(box.querySelector('[data-enter]')||box.querySelector('.btn.pri'));nkClose();if(btn)btn.click();return}
+  if(k==='next'){el.dispatchEvent(new Event('change',{bubbles:true}));const box=el.closest('#panel,.dlg,#v3d')||document,L=[...box.querySelectorAll('input.nk')].filter(x=>x.offsetParent);const i=L.indexOf(el);if(L.length)nkOpen(L[(i+1)%L.length]);return}
+  if(k==='bs'){nkSet(NK.fresh?'':v.slice(0,-1));NK.fresh=false;return}
+  if(k==='clr'){nkSet('');NK.fresh=false;return}
+  if(k==='-'){nkSet(v.startsWith('-')?v.slice(1):'-'+(NK.fresh?'':v));NK.fresh=false;return}
+  if(k===','){if(NK.fresh)v='0';if(!/[.,]/.test(v))nkSet(v+',');else nkSet(v);NK.fresh=false;return}
+  nkSet((NK.fresh?'':v)+k);NK.fresh=false});
+cv.addEventListener('pointerdown',()=>{if(NK){NK.el.dispatchEvent(new Event('change',{bubbles:true}));nkClose()}},true);
 /* ---------- tabel ---------- */
 let RPG=null;const RDC={};
 function tblCells(o,pg){pg=pg||PG();if(o.auto==='rooms')return roomTable(pg);if(o.auto==='kusen')return kusenTable(pg);return o.cells||[['']]}
@@ -2394,7 +2431,7 @@ function needBackup(){return IDX.list.some(e=>(e.u||0)>(S.lastBackup||0))&&Date.
 function status(){const pg=PG();if(!pg||!pg.view)return;{const bc=$('#backchip');if(bc){const sp=pg.sheet&&P.pages.find(p=>p.id===pg.src);bc.classList.toggle('show',!!sp);if(sp)bc.textContent='‹ '+sp.name}}const[PW,PH]=pdim(pg);
   const tt=$('#top .ttl');if(tt)tt.innerHTML=`<b>${esc(P.name)}</b><small>${esc(pg.name)} · ${pg.paper==='Custom'?'Custom':pg.paper} · 1:${pg.scale}</small>`;
   $('#status').innerHTML=`<span>${pg.paper==='Custom'?r1(PW)+'×'+r1(PH)+' mm':pg.paper} · Skala <b>1 : ${pg.scale}</b></span><span>Area ≈ ${fmtL(PW*pg.scale)} × ${fmtL(PH*pg.scale)} ${esc(uLbl())}</span><span>Zoom ${Math.round(pg.view.z/3.78*100)}%</span>${SEL.size?`<span>${SEL.size} dipilih</span>`:''}<span id="cloud">${LAST_SAVE?'✓ Disimpan '+hhmm(LAST_SAVE)+' · ':''}${CL.st}</span>${needBackup()?'<button class="chip" data-a="backup" style="height:22px;font-size:11px;padding:0 8px">⚠ Cadangkan</button>':''}`}
-function focusIn(q,sel){const i=$(q);if(!i)return;try{i.focus({preventScroll:true})}catch(_){try{i.focus()}catch(__){}}if(sel)setTimeout(()=>{try{i.select()}catch(_){}},40)}
+function focusIn(q,sel){const i=$(q);if(!i)return;if(i.classList.contains('nk'))return nkOpen(i);try{i.focus({preventScroll:true})}catch(_){try{i.focus()}catch(__){}}if(sel)setTimeout(()=>{try{i.select()}catch(_){}},40)}
 let hT=0;function hint(s){const h=$('#hint');h.textContent=s;h.classList.add('show');clearTimeout(hT);hT=setTimeout(()=>h.classList.remove('show'),2800)}
 let tT=0;function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2600)}
 
@@ -2418,7 +2455,7 @@ var IPAD=/iPad/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&nav
 function fixInputs(root){root.querySelectorAll('input[type=text],input:not([type]),textarea').forEach(el=>{if(IPAD&&/decimal|numeric/.test(el.getAttribute('inputmode')||''))el.setAttribute('inputmode','text');el.setAttribute('enterkeyhint',el.tagName==='TEXTAREA'?'enter':'done');el.setAttribute('autocorrect','off');el.setAttribute('autocapitalize','off')});
   root.querySelectorAll('textarea').forEach(t=>{const g=()=>{const mx=Math.max(110,(visualViewport?visualViewport.height:innerHeight)*.45);t.style.height='auto';t.style.height=Math.min(t.scrollHeight+4,mx)+'px'};g();t.addEventListener('input',()=>{g();keepVisible(t)})})}
 function kbH(){const vv=window.visualViewport;return vv?Math.max(0,window.innerHeight-vv.height-vv.offsetTop):0}
-function kbAdjust(){const kb=kbH(),open=kb>80;document.body.classList.toggle('kbopen',open);
+function kbAdjust(){if(NK)return nkLayout();const kb=kbH(),open=kb>80;document.body.classList.toggle('kbopen',open);
   const st=$('#stage').getBoundingClientRect(),pb=open?Math.max(16,kb-(window.innerHeight-st.bottom)+10):'';panel.style.bottom=open?pb+'px':'';modal.style.bottom=open?kb+'px':'';
   const a=document.activeElement;if(open&&a&&/INPUT|TEXTAREA/.test(a.tagName))setTimeout(()=>keepVisible(a),40)}
 function keepVisible(el){const box=el.closest('.dlg');if(box){const r=el.getBoundingClientRect(),b=box.getBoundingClientRect();if(r.bottom>b.bottom-12||r.top<b.top+12)box.scrollTop+=(r.top+r.height/2)-(b.top+b.height/2)}
