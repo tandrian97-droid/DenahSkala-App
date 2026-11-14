@@ -315,6 +315,37 @@ input.nk{caret-color:transparent}input.nkon{box-shadow:0 0 0 2px var(--pri)!impo
 #qed.show{display:flex}#qed .ql{font-size:12px;color:var(--muted);padding:0 4px;white-space:nowrap}
 #qed input{width:110px;height:44px;border:0;border-radius:10px;background:#f3f4f6;font-size:20px;font-weight:650;padding:0 10px}
 #qed .btn{height:44px}
+
+/* ---- v14.1 lebih ringkas ---- */
+#panel.side{width:296px;border-radius:16px}
+#panel.side .qh,#panel.tab .qh{padding:10px 12px 8px;gap:6px}
+#panel .qh .t{font-size:15px}
+#panel .qh .ib{width:32px;height:32px;border-radius:16px;font-size:13px}
+#panel .qh .btn.pri{height:32px;padding:0 14px;border-radius:16px;font-size:13px}
+#panel .qbody{padding:0 12px 12px;gap:12px}
+#panel .qsec{gap:6px}
+#panel .qst{font-size:10.5px}
+#panel .qf{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 8px}
+#panel .qfl{gap:2px}#panel .qfl>label{font-size:11px}
+#panel .qiw{height:36px;border-radius:9px;padding:0 9px}
+#panel .qiw input{font-size:15px!important}
+#panel .qiw .qun{font-size:11.5px}
+#panel .qbox{padding:9px;gap:8px;border-radius:12px}
+#panel .qrow{min-height:38px;border-radius:9px;padding:0 10px;font-size:13px}
+#panel .qrow .qdot{width:22px;height:22px}
+#panel .qchk{min-height:34px;font-size:13px;gap:10px}#panel .qchk input{width:19px;height:19px}
+#panel .qsel>label{font-size:11px}#panel .qsel select{height:36px;border-radius:9px;font-size:14px}
+#panel .qfoot{padding:8px 12px 12px}#panel .qfoot .btn.pri{height:40px;border-radius:10px;font-size:14px}
+#panel .qseg .chip,#panel .qseg .btn{height:32px;font-size:12.5px}
+#panel.tab{max-height:min(40vh,300px);border-radius:18px}
+#panel.tab .qf{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+#panel.tab .qiw{height:42px}#panel.tab .qiw input{font-size:18px!important}
+#panel .qtabs button{height:30px;padding:0 11px;font-size:12.5px}
+#panel .qtwrap{padding:0 12px 10px;gap:12px}
+#panel .qkp{width:250px}
+#panel.tidy:not(.side):not(.tab){padding:8px 10px 10px;gap:8px;width:min(520px,calc(100% - 24px))}
+#panel.tidy:not(.side):not(.tab) .qiw{height:36px}
+#vtag{font-size:11px;color:var(--muted);opacity:.8;margin-left:8px}
 </style>
 </head>
 <body>
@@ -1311,7 +1342,7 @@ function qedOpen(h){const q=$('#qed'),o=h.cg.o,nm={j1:h.cg.J?h.cg.J.l1:'Jarak',j
     const g=GEO.get(ob.host);if(ob.host&&g)ob.at=clamp(ob.at,ob.w/2,Math.max(ob.w/2,g.L-ob.w/2));commit();showSelPanel();hint(nm+' → '+fmtL(nv)+' '+uLbl())};
   if(nkUse()&&inpE.classList.contains('nk'))nkOpen(inpE);else{inpE.focus();inpE.select()}}
 /* ---------- panel: model + 3 gaya ---------- */
-const QTOG={sd:'Tampilkan ukuran',nl:'Label kode & ukuran',wlnk:'Tarik dinding yang tersambung'};
+const APPV='14.1';const QTOG={sd:'Tampilkan ukuran',nl:'Label kode & ukuran',wlnk:'Tarik dinding yang tersambung'};
 let QTAB='';
 function panelMode(){const m=S.pnl||'side';if(m==='side'&&window.innerWidth<760)return'tab';return m}
 function tidyPanel2(P,mode){const N=[...P.childNodes].filter(n=>n.nodeType===1||(n.nodeType===3&&n.textContent.trim()));if(!N.length)return;
@@ -1487,8 +1518,7 @@ function showBlkPanel(o){const B=BLK[o.k];if(B&&B.me&&o.host)return showMePanel(
   if(o.host){const g=GEO.get(o.host)||wallGeo(PG().objs).get(o.host),J=hostSide(o,g);showPanel(`<span class="t">${esc(B.n)}</span><span class="u">Lebar</span>${inp('bw',fmtE(o.w))}${un()}${jarakHTML(J)}
      <span class="br"></span><span class="u">Tinggi</span>${inp('bh2',fmtE(opHead(o)-opSill(o)))}${un()}<span class="u">Ambang</span>${inp('bsl',fmtE(opSill(o)))}${un()}<span class="u">Kode</span><input type="text" id="bcd" value="${esc(o.code||'')}" placeholder="${esc(opCodes(PG().objs).get(o.id)||'')}" style="width:64px" autocomplete="off">${o.hm?'':'<span class="u" style="color:#dc2626">belum diukur</span>'}
      <button class="btn pri" data-p="ok" data-enter>Ubah</button>${sdBtn(o)}<button class="btn" data-p="nl">${o.nl?'🏷 Label sembunyi':'🏷 Label tampil'}</button>${B.door?'<button class="btn" data-p="sw">⇅ Arah buka</button>':''}${o.k==='pintu1'?'<button class="btn" data-p="hf">⇆ Engsel</button>':''}
-     <select class="opsel" data-c="kind">${Object.values(BLK).filter(b=>b.host).map(b=>`<option value="${b.k}" ${b.k===o.k?'selected':''}>${b.n}</option>`).join('')}</select><button class="btn" data-p="dup">Duplikat</button><button class="btn dan" data-p="del">Hapus</button>${X_}
-     <span class="br"></span><span class="u">Cepat (${esc(uLbl())}):</span>${(OPPRE[opKind(o)]||[]).map(v=>{const[pw,ph,ps]=v;return`<button class="chip" data-p="pre" data-v="${v}">${fmtL(pw*10)}×${fmtL(ph*10)}${ps?' +'+fmtL(ps*10):''}</button>`}).join('')}`,{
+     <select class="opsel" data-c="kind">${Object.values(BLK).filter(b=>b.host).map(b=>`<option value="${b.k}" ${b.k===o.k?'selected':''}>${b.n}</option>`).join('')}</select><button class="btn" data-p="dup">Duplikat</button><button class="btn dan" data-p="del">Hapus</button>${X_}`,{
      ok:()=>{const w=parseL(val('bw')),sl=parseU(val('bsl')),h2=parseL(val('bh2')),cd=$('#bcd').value.trim();pushUndo();if(w)o.w=w;jarakApply(o,J,w);if(g)o.at=clamp(o.at,o.w/2,g.L-o.w/2);
        if(sl!=null)o.sl=sl;else o.sl=opSill(o);if(h2)o.hd=o.sl+h2;else o.hd=opHead(o);o.hm=1;if(cd)o.code=cd;else delete o.code;S.opLast=S.opLast||{};S.opLast[o.k]={w:o.w,sl:o.sl,hd:o.hd};commit();showBlkPanel(o);hint('Diperbarui')},
      pre:b=>{const[pw,ph,ps]=b.dataset.v.split(',').map(Number);pushUndo();o.w=pw*10;o.sl=ps*10;o.hd=(ps+ph)*10;o.hm=1;if(g)o.at=clamp(o.at,o.w/2,g.L-o.w/2);S.opLast=S.opLast||{};S.opLast[o.k]={w:o.w,sl:o.sl,hd:o.hd};commit();showBlkPanel(o)},...sdAct([o],()=>showBlkPanel(o)),
@@ -2709,7 +2739,7 @@ async function capsInit(){try{if(!window.claude||!window.claude.use)return;
 function needBackup(){return IDX.list.some(e=>(e.u||0)>(S.lastBackup||0))&&Date.now()-(S.lastBackup||0)>3*864e5&&IDX.list.some(e=>(e.n||0)>0)&&PG().objs.length>0}
 function status(){const pg=PG();if(!pg||!pg.view)return;{const bc=$('#backchip');if(bc){const sp=pg.sheet&&P.pages.find(p=>p.id===pg.src);bc.classList.toggle('show',!!sp);if(sp)bc.textContent='‹ '+sp.name}}const[PW,PH]=pdim(pg);
   const tt=$('#top .ttl');if(tt)tt.innerHTML=`<b>${esc(P.name)}</b><small>${esc(pg.name)} · ${pg.paper==='Custom'?'Custom':pg.paper} · 1:${pg.scale}</small>`;
-  $('#status').innerHTML=`<span>${pg.paper==='Custom'?r1(PW)+'×'+r1(PH)+' mm':pg.paper} · Skala <b>1 : ${pg.scale}</b></span><span>Area ≈ ${fmtL(PW*pg.scale)} × ${fmtL(PH*pg.scale)} ${esc(uLbl())}</span><span>Zoom ${Math.round(pg.view.z/3.78*100)}%</span>${SEL.size?`<span>${SEL.size} dipilih</span>`:''}<span id="cloud">${LAST_SAVE?'✓ Disimpan '+hhmm(LAST_SAVE)+' · ':''}${CL.st}</span>${needBackup()?'<button class="chip" data-a="backup" style="height:22px;font-size:11px;padding:0 8px">⚠ Cadangkan</button>':''}`}
+  $('#status').innerHTML=`<span id="vtag">v14.1</span><span>${pg.paper==='Custom'?r1(PW)+'×'+r1(PH)+' mm':pg.paper} · Skala <b>1 : ${pg.scale}</b></span><span>Area ≈ ${fmtL(PW*pg.scale)} × ${fmtL(PH*pg.scale)} ${esc(uLbl())}</span><span>Zoom ${Math.round(pg.view.z/3.78*100)}%</span>${SEL.size?`<span>${SEL.size} dipilih</span>`:''}<span id="cloud">${LAST_SAVE?'✓ Disimpan '+hhmm(LAST_SAVE)+' · ':''}${CL.st}</span>${needBackup()?'<button class="chip" data-a="backup" style="height:22px;font-size:11px;padding:0 8px">⚠ Cadangkan</button>':''}`}
 function focusIn(q,sel){const i=$(q);if(!i)return;if(i.classList.contains('nk'))return nkOpen(i);try{i.focus({preventScroll:true})}catch(_){try{i.focus()}catch(__){}}if(sel)setTimeout(()=>{try{i.select()}catch(_){}},40)}
 let hT=0;function hint(s){const h=$('#hint');h.textContent=s;h.classList.add('show');clearTimeout(hT);hT=setTimeout(()=>h.classList.remove('show'),2800)}
 let tT=0;function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2600)}

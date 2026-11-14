@@ -7,7 +7,7 @@ self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Pr
 self.addEventListener('fetch', e => {
   const r = e.request; if (r.method !== 'GET') return;
   const u = new URL(r.url); if (u.origin !== location.origin) return;
-  if (r.mode === 'navigate') { e.respondWith(caches.match('./index.html').then(m => m || fetch(r))); return; }
+  if (r.mode === 'navigate') { e.respondWith(fetch(r).then(res => { const c2 = res.clone(); caches.open(V).then(c => c.put('./index.html', c2)); return res; }).catch(() => caches.match('./index.html'))); return; }
   if (u.pathname.includes('/vendor/dwg/')) { e.respondWith(caches.open('ds-dwg-088').then(c => c.match(r).then(m => m || fetch(r).then(res => { if (res.ok) c.put(r, res.clone()); return res; })))); return; }
   e.respondWith(caches.match(r, { ignoreSearch: true }).then(m => m || fetch(r)));
 });
